@@ -1,0 +1,26 @@
+# Common files.
+.DS_Store
+Thumbs.db
+
+# Common extensions.
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+
+# Python cache.
+__pycache__/
+
+# PyCharm project.
+/.idea/
+*.iml
+
+# Eclipse project.
+.project
+.pydevproject
+.settings/
