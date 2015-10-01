@@ -4,7 +4,7 @@ Fetchers for Fimfarchive.
 
 
 #
-# Fimfarchive, preserves stories from Fimfiction
+# Fimfarchive, preserves stories from Fimfiction.
 # Copyright (C) 2015  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
