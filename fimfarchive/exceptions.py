@@ -26,3 +26,21 @@ class FimfarchiveError(Exception):
     """
     Base class for Fimfarchive exceptions.
     """
+
+
+class InvalidStoryError(FimfarchiveError):
+    """
+    Story does not exist.
+    """
+
+
+class StoryPermissionError(FimfarchiveError):
+    """
+    Story is password protected.
+    """
+
+
+class StorySourceError(FimfarchiveError):
+    """
+    Story source is unusable.
+    """
