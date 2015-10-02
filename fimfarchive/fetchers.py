@@ -22,6 +22,11 @@ Fetchers for Fimfarchive.
 #
 
 
+import requests
+
+from fimfarchive.exceptions import InvalidStoryError, StorySourceError
+
+
 class Fetcher:
     """
     Abstract base class for story fetchers.
@@ -95,3 +100,77 @@ class Fetcher:
             StorySourceError: If source does not return any data.
         """
         raise NotImplementedError()
+
+
+class FimfictionFetcher(Fetcher):
+    """
+    Fetcher for Fimfiction.
+    """
+    data_path = 'https://www.fimfiction.net/download_story.php'
+    meta_path = 'https://www.fimfiction.net/api/story.php'
+
+    def close(self):
+        pass
+
+    def get(self, url, **kwargs):
+        """
+        Performs an HTTP GET request.
+
+        Args:
+            url: Target of the HTTP request.
+            **kwargs: HTTP query parameters.
+
+        Returns:
+            Response: A new `Response` object.
+
+        Raises:
+            StorySourceError: If the server does not return HTTP 200 OK.
+        """
+        try:
+            response = requests.get(url, params=kwargs)
+        except IOError as e:
+            raise StorySourceError("Could not read from server.") from e
+
+        if not response.ok:
+            raise StorySourceError(
+                "Server responded with HTTP {} {}."
+                .format(response.status_code, response.reason)
+            )
+
+        return response
+
+    def fetch_data(self, pk):
+        response = self.get(self.data_path, story=pk, html=True)
+        data = response.content
+
+        if len(data) == 0:
+            raise InvalidStoryError("Server returned empty response body.")
+
+        if b'<a name=\'1\'></a><h3>' not in data:
+            raise InvalidStoryError("Server did not return any chapters.")
+
+        if not data.endswith(b'</html>'):
+            raise StorySourceError("Server returned incomplete response.")
+
+        return data
+
+    def fetch_meta(self, pk):
+        response = self.get(self.meta_path, story=pk)
+
+        try:
+            meta = response.json()
+        except ValueError as e:
+            raise StorySourceError("Server did not return valid JSON.") from e
+
+        if 'error' in meta:
+            message = meta['error']
+
+            if message == 'Invalid story id':
+                raise InvalidStoryError("Story does not exist.")
+            else:
+                raise StorySourceError(message)
+
+        if 'story' not in meta:
+            raise StorySourceError("Server did not return a story object.")
+
+        return meta['story']
