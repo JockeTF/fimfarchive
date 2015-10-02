@@ -34,12 +34,6 @@ class InvalidStoryError(FimfarchiveError):
     """
 
 
-class StoryPermissionError(FimfarchiveError):
-    """
-    Story is password protected.
-    """
-
-
 class StorySourceError(FimfarchiveError):
     """
     Story source is unusable.

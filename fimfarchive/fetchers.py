@@ -62,7 +62,6 @@ class Fetcher:
 
         Raises:
             InvalidStoryError: If a valid story is not found.
-            StoryPermissionError: If access to the story is denied.
             StorySourceError: If source does not return any data.
         """
         raise NotImplementedError()
@@ -79,7 +78,6 @@ class Fetcher:
 
         Raises:
             InvalidStoryError: If a valid story is not found.
-            StoryPermissionError: If access to the story is denied.
             StorySourceError: If source does not return any data.
         """
         raise NotImplementedError()
@@ -96,7 +94,6 @@ class Fetcher:
 
         Raises:
             InvalidStoryError: If a valid story is not found.
-            StoryPermissionError: If access to the story is denied.
             StorySourceError: If source does not return any data.
         """
         raise NotImplementedError()
