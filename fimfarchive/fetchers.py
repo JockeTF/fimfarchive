@@ -22,7 +22,12 @@ Fetchers for Fimfarchive.
 #
 
 
+from copy import deepcopy
+import gc
+from io import BytesIO
+import json
 import requests
+from zipfile import ZipFile, BadZipFile
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 
@@ -171,3 +176,125 @@ class FimfictionFetcher(Fetcher):
             raise StorySourceError("Server did not return a story object.")
 
         return meta['story']
+
+
+class FimfarchiveFetcher(Fetcher):
+    """
+    Fetcher for Fimfarchive.
+    """
+
+    def __init__(self, file):
+        """
+        Initializes a `FimfarchiveFetcher` instance.
+
+        Args:
+            file: Path or file-like object for a Fimfarchive release.
+
+        Raises:
+            StorySourceError: If no valid Fimfarchive release can be loaded.
+        """
+        self.is_open = False
+        self.archive = None
+        self.index = None
+
+        try:
+            self._init(file)
+        except:
+            self.close()
+            raise
+        else:
+            self.is_open = True
+
+    def _init(self, file):
+        """
+        Internal initialization method.
+        """
+        try:
+            self.archive = ZipFile(file)
+        except IOError as e:
+            raise StorySourceError("Could not read from file.") from e
+        except BadZipFile as e:
+            raise StorySourceError("Archive is not a valid ZIP-file.") from e
+
+        try:
+            byte_index = self.archive.read('index.json')
+        except KeyError as e:
+            raise StorySourceError("Archive is missing the index.") from e
+        except BadZipFile as e:
+            raise StorySourceError("Archive is corrupt.") from e
+
+        try:
+            text_index = byte_index.decode()
+        except UnicodeDecodeError as e:
+            raise StorySourceError("Index is incorrectly encoded.") from e
+
+        del byte_index
+        gc.collect()
+
+        try:
+            self.index = json.loads(text_index)
+        except ValueError as e:
+            raise StorySourceError("Index is not valid JSON.") from e
+
+        del text_index
+        gc.collect()
+
+    def close(self):
+        self.is_open = False
+        self.index = None
+
+        if self.archive is not None:
+            self.archive.close()
+            self.archive = None
+
+        gc.collect()
+
+    def lookup(self, pk):
+        """
+        Finds meta for a story in the index.
+
+        Args:
+            pk: Primary key of the story.
+
+        Returns:
+            dict: A reference to the story's meta.
+
+        Raises:
+            InvalidStoryError: If story does not exist.
+            StorySourceError: If archive is closed.
+        """
+        if not self.is_open:
+            raise StorySourceError("Fetcher is closed.")
+
+        pk = str(pk)
+
+        if pk not in self.index:
+            raise InvalidStoryError("Story does not exist.")
+
+        return self.index[pk]
+
+    def fetch_data(self, pk):
+        meta = self.lookup(pk)
+
+        if 'path' not in meta:
+            raise StorySourceError("Index is missing a path value.")
+
+        try:
+            data = self.archive.read(meta['path'])
+        except ValueError as e:
+            raise StorySourceError("Archive is missing a file.") from e
+        except BadZipFile as e:
+            raise StorySourceError("Archive is corrupt.") from e
+
+        with ZipFile(BytesIO(data)) as story:
+            if story.testzip() is not None:
+                raise StorySourceError("Story is corrupt.")
+
+            if 'Chapter1.html' not in story.namelist():
+                raise InvalidStoryError("Story contains no chapters.")
+
+        return data
+
+    def fetch_meta(self, pk):
+        meta = self.lookup(pk)
+        return deepcopy(meta)
