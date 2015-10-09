@@ -25,13 +25,15 @@ Fetcher tests.
 import pytest
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
-from fimfarchive.fetchers import FimfictionFetcher
+from fimfarchive.fetchers import FimfarchiveFetcher, FimfictionFetcher
 
 
 VALID_STORY_PK = 9
 INVALID_STORY_PK = 7
 EMPTY_STORY_PK = 8
 PROTECTED_STORY_PK = 208799
+
+FIMFARCHIVE_PATH = 'fimfarchive-20150901.zip'
 
 
 class TestFimfictionFetcher:
@@ -138,3 +140,58 @@ class TestFimfictionFetcher:
         """
         with pytest.raises(InvalidStoryError):
             self.fetcher.fetch_data(PROTECTED_STORY_PK)
+
+
+class TestFimfarchiveFetcher:
+    """
+    FimfarchiveFetcher tests.
+    """
+    fetcher = None
+
+    @classmethod
+    def setup_class(cls):
+        cls.fetcher = FimfarchiveFetcher(FIMFARCHIVE_PATH)
+
+    @classmethod
+    def teardown_class(cls):
+        cls.fetcher.close()
+        cls.fetcher = None
+
+    def test_with_statment(self):
+        """
+        Tests fetcher can be used in with statements.
+        """
+        with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
+            fetcher.lookup(VALID_STORY_PK)
+
+        with pytest.raises(StorySourceError):
+            fetcher.lookup(VALID_STORY_PK)
+
+    def test_fetch_meta_for_valid_story(self):
+        """
+        Tests meta is returned if story is valid
+        """
+        meta = self.fetcher.fetch_meta(VALID_STORY_PK)
+        assert meta['id'] == VALID_STORY_PK
+        assert meta['words'] != 0
+
+    def test_fetch_meta_for_invalid_story(self):
+        """
+        Tests `InvalidStoryError` is raised if story is invalid.
+        """
+        with pytest.raises(InvalidStoryError):
+            self.fetcher.fetch_meta(INVALID_STORY_PK)
+
+    def test_fetch_data_for_valid_story(self):
+        """
+        Tests data is returned if story is valid.
+        """
+        data = self.fetcher.fetch_data(VALID_STORY_PK)
+        assert len(data) != 0
+
+    def test_fetch_data_for_invalid_story(self):
+        """
+        Tests `InvalidStoryError` is raised if story is invalid.
+        """
+        with pytest.raises(InvalidStoryError):
+            self.fetcher.fetch_data(INVALID_STORY_PK)
