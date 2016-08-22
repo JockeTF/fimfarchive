@@ -33,7 +33,7 @@ INVALID_STORY_PK = 7
 EMPTY_STORY_PK = 8
 PROTECTED_STORY_PK = 208799
 
-FIMFARCHIVE_PATH = 'fimfarchive-20150901.zip'
+FIMFARCHIVE_PATH = 'fimfarchive-20160525.zip'
 
 
 class TestFimfictionFetcher:
