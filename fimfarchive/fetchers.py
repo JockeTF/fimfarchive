@@ -22,6 +22,7 @@ Fetchers for Fimfarchive.
 #
 
 
+import codecs
 from copy import deepcopy
 import gc
 from io import BytesIO
@@ -30,6 +31,9 @@ import requests
 from zipfile import ZipFile, BadZipFile
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
+
+
+StreamReader = codecs.getreader('utf-8')
 
 
 class Fetcher:
@@ -217,26 +221,17 @@ class FimfarchiveFetcher(Fetcher):
             raise StorySourceError("Archive is not a valid ZIP-file.") from e
 
         try:
-            byte_index = self.archive.read('index.json')
+            with self.archive.open('index.json') as fobj:
+                self.index = json.load(StreamReader(fobj))
         except KeyError as e:
             raise StorySourceError("Archive is missing the index.") from e
+        except ValueError as e:
+            raise StorySourceError("Index is not valid JSON.") from e
+        except UnicodeDecodeError as e:
+            raise StorySourceError("Index is incorrectly encoded.") from e
         except BadZipFile as e:
             raise StorySourceError("Archive is corrupt.") from e
 
-        try:
-            text_index = byte_index.decode()
-        except UnicodeDecodeError as e:
-            raise StorySourceError("Index is incorrectly encoded.") from e
-
-        del byte_index
-        gc.collect()
-
-        try:
-            self.index = json.loads(text_index)
-        except ValueError as e:
-            raise StorySourceError("Index is not valid JSON.") from e
-
-        del text_index
         gc.collect()
 
     def close(self):
