@@ -1,0 +1,223 @@
+\documentclass[hidelinks,a4paper,12pt]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{float}
+\usepackage[hmargin=2cm,vmargin=2cm]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{lstautogobble}
+
+\begin{document}
+
+\title{Fimfarchive}
+\date{20161201}
+
+\maketitle
+\newpage
+\tableofcontents
+\newpage
+
+\section{Introduction} \label{sec:introduction}
+
+Fimfarchive is a project which aims to release all stories available on Fimfiction, together with their metadata, as a single archive. The archive is organized by author and could be used for backup, offline reading, or data mining.
+
+A new version will be released each season via BitTorrent, approximately once every three months. When suitable, an xdelta3 patch will also be provided for users who do not wish to redownload unchanged stories.
+
+Note that the archive contains a large number of files. Unzipping it to your file system may not be necessary if the archive is to be used together with some application. If you are a developer, reading directly from the ZIP-file may be preferable.
+
+
+\section{Index} \label{sec:index}
+
+The metadata of each story can be found in \path{index.json}. The file contains one story entry per line ordered by story ID. It was constructed using data from the Fimfiction API, which is incomplete. Additionally, each entry includes the attribute \emph{path} which shows where in the archive the story is located. Below is an example entry for the story \emph{Sunny Skies All Day Long}. Note that the structure of the metadata may change in the future as it depends on Fimfiction.
+
+\begin{lstlisting}[breaklines, basicstyle=\ttfamily\small, columns=flexible]
+{
+  "20685":{
+    "author":{
+      "id":"26190",
+      "name":"PhantomFox"
+    },
+    "categories":{
+      "Adventure":false,
+      "Alternate Universe":false,
+      "Anthro":false,
+      "Comedy":false,
+      "Crossover":false,
+      "Dark":false,
+      "Human":false,
+      "Random":false,
+      "Romance":false,
+      "Sad":false,
+      "Slice of Life":true,
+      "Tragedy":false
+    },
+    "chapter_count":1,
+    "chapters":[
+      {
+        "date_modified":1348680464,
+        "id":63408,
+        "link":"http://www.fimfiction.net/story/20685/1/sunny-skies-all-day-long/-",
+        "title":"Chapter 1",
+        "views":44911,
+        "words":8536
+      }
+    ],
+    "comments":529,
+    "content_rating":0,
+    "content_rating_text":"Everyone",
+    "date_modified":1334414541,
+    "description":"Princess Celestia tires of constantly being surrounded by 	decorum, deference, and formality, and decides to take a day off from being Princess. But visiting Ponyville incognito is harder than she expects. Will she be able to fit in and make friends without blowing her cover?",
+    "dislikes":81,
+    "full_image":"http://www.fimfiction-static.net/images/story_images/20685.png",
+    "id":20685,
+    "image":"http://www.fimfiction-static.net/images/story_images/20685_r.png",
+    "likes":5079,
+    "path":"epub/p/phantomfox-26190/sunny_skies_all_day_long-20685.epub",
+    "short_description":"Celestia's Day Off",
+    "status":"Complete",
+    "title":"Sunny Skies All Day Long",
+    "total_views":44911,
+    "url":"http://www.fimfiction.net/story/20685/sunny-skies-all-day-long",
+    "views":44911,
+    "words":8536
+  }
+}
+\end{lstlisting}
+
+
+\section{Changelog} \label{sec:changelog}
+
+\begin{center}
+\begin{tabular}{|r|r|r|r|r|r|} \hline
+\textbf{Version} & \textbf{Stories} & \textbf{Added} & \textbf{Updated} & \textbf{Removed} \\ \hline
+20161201         & $145295$         & $4582$         & $5685$           & $0$              \\ \hline
+20160901         & $140713$         & $5278$         & $6106$           & $0$              \\ \hline
+20160525         & $135435$         & $5059$         & $6238$           & $0$              \\ \hline
+20160225         & $130376$         & $6045$         & $6569$           & $0$              \\ \hline
+20151125         & $124331$         & $5399$         & $104124$         & $0$              \\ \hline
+20150901         & $118932$         & $6752$         & $6752$           & $0$              \\ \hline
+20150601         & $112180$         & $6969$         & $6946$           & $0$              \\ \hline
+20150307         & $105211$         & $6664$         & $6756$           & $0$              \\ \hline
+20141201         & $98547$          & $11028$        & $8296$           & $0$              \\ \hline
+20140719         & $87519$          & $8286$         & $7395$           & $3$              \\ \hline
+20140418         & $79236$          & $8818$         & $65208$          & $2$              \\ \hline
+20140120         & $70420$          & $9821$         & $7317$           & $14$             \\ \hline
+20131015         & $60613$          & $13446$        & $7694$           & $0$              \\ \hline
+20130616         & $47167$          & $47167$        & $0$              & $0$              \\ \hline
+\end{tabular}
+\end{center}
+
+
+\subsection{20161201}  \label{sec:changelog_20161201}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20160901}  \label{sec:changelog_20160901}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20160525}  \label{sec:changelog_20160525}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20160225}  \label{sec:changelog_20160225}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20151125}  \label{sec:changelog_20151125}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Redownloaded all available stories.
+\item Processed all stories with Calibre.
+\item Removed readme section about formatting.
+\end{itemize}
+
+\subsection{20150901}  \label{sec:changelog_20150901}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20150601}  \label{sec:changelog_20150601}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20150307}  \label{sec:changelog_20150307}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Added readme section about formatting.
+\end{itemize}
+
+\subsection{20141201} \label{sec:changelog_20141201}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Changed EPUB content source to Fimfiction's HTML exporter.
+\end{itemize}
+
+\subsection{20140719} \label{sec:changelog_20140719}
+
+\begin{itemize}
+\item Updated archive contents.
+\end{itemize}
+
+\subsection{20140418} \label{sec:changelog_20140418}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Redownloaded all available stories.
+\item Fixed mime type issues with repackaged stories.
+\end{itemize}
+
+\subsection{20140120} \label{sec:changelog_20140120}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Updated stories with new style from Fimfiction.
+\item Removed now empty stories.
+\end{itemize}
+
+\subsection{20131015} \label{sec:changelog_20131015}
+
+\begin{itemize}
+\item Updated archive contents.
+\item Added anthro category.
+\end{itemize}
+
+\subsection{20130616} \label{sec:changelog_20130616}
+
+\begin{itemize}
+\item Initial release.
+\end{itemize}
+
+
+\section{Links} \label{sec:links}
+
+\begin{itemize}
+\item Fimfarchive: \\ \url{http://www.fimfarchive.net/}
+\item Fimfarchive on Fimfiction: \\ \url{http://www.fimfiction.net/user/Fimfarchive}
+\item Fimfarchive on Reddit: \\ \url{http://www.reddit.com/user/Fimfarchive}
+\item Fimfiction: \\ \url{http://www.fimfiction.net/}
+\item xdelta: \\ \url{http://xdelta.org/}
+\end{itemize}
+
+
+\section{Contact} \label{sec:contact}
+
+To contact Fimfarchive, send an e-mail to \href{mailto:fimfarchive@gmail.com}{fimfarchive@gmail.com}.
+
+\end{document}
