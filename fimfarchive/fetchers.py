@@ -290,9 +290,6 @@ class FimfarchiveFetcher(Fetcher):
             if story.testzip() is not None:
                 raise StorySourceError("Story is corrupt.")
 
-            if 'Chapter1.html' not in story.namelist():
-                raise InvalidStoryError("Story contains no chapters.")
-
         return data
 
     def fetch_meta(self, key):
