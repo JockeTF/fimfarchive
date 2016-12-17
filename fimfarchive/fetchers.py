@@ -55,12 +55,12 @@ class Fetcher:
         """
         raise NotImplementedError()
 
-    def fetch(self, pk):
+    def fetch(self, key):
         """
         Fetches story information.
 
         Args:
-            pk: Primary key of the story.
+            key: Primary key of the story.
 
         Returns:
             Story: A new `Story` object.
@@ -71,12 +71,12 @@ class Fetcher:
         """
         raise NotImplementedError()
 
-    def fetch_data(self, pk):
+    def fetch_data(self, key):
         """
         Fetches story content data.
 
         Args:
-            pk: Primary key of the story.
+            key: Primary key of the story.
 
         Returns:
             bytes: Story content data.
@@ -87,12 +87,12 @@ class Fetcher:
         """
         raise NotImplementedError()
 
-    def fetch_meta(self, pk):
+    def fetch_meta(self, key):
         """
         Fetches story meta information.
 
         Args:
-            pk: Primary key of the story.
+            key: Primary key of the story.
 
         Returns:
             dict: Story meta information.
@@ -141,8 +141,8 @@ class FimfictionFetcher(Fetcher):
 
         return response
 
-    def fetch_data(self, pk):
-        response = self.get(self.data_path, story=pk, html=True)
+    def fetch_data(self, key):
+        response = self.get(self.data_path, story=key, html=True)
         data = response.content
 
         if len(data) == 0:
@@ -156,8 +156,8 @@ class FimfictionFetcher(Fetcher):
 
         return data
 
-    def fetch_meta(self, pk):
-        response = self.get(self.meta_path, story=pk)
+    def fetch_meta(self, key):
+        response = self.get(self.meta_path, story=key)
 
         try:
             meta = response.json()
@@ -249,12 +249,12 @@ class FimfarchiveFetcher(Fetcher):
 
         gc.collect()
 
-    def lookup(self, pk):
+    def lookup(self, key):
         """
         Finds meta for a story in the index.
 
         Args:
-            pk: Primary key of the story.
+            key: Primary key of the story.
 
         Returns:
             dict: A reference to the story's meta.
@@ -266,15 +266,15 @@ class FimfarchiveFetcher(Fetcher):
         if not self.is_open:
             raise StorySourceError("Fetcher is closed.")
 
-        pk = str(pk)
+        key = str(key)
 
-        if pk not in self.index:
+        if key not in self.index:
             raise InvalidStoryError("Story does not exist.")
 
-        return self.index[pk]
+        return self.index[key]
 
-    def fetch_data(self, pk):
-        meta = self.lookup(pk)
+    def fetch_data(self, key):
+        meta = self.lookup(key)
 
         if 'path' not in meta:
             raise StorySourceError("Index is missing a path value.")
@@ -295,6 +295,6 @@ class FimfarchiveFetcher(Fetcher):
 
         return data
 
-    def fetch_meta(self, pk):
-        meta = self.lookup(pk)
+    def fetch_meta(self, key):
+        meta = self.lookup(key)
         return deepcopy(meta)
