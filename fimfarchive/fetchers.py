@@ -32,6 +32,7 @@ from zipfile import ZipFile, BadZipFile
 import requests
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
+from fimfarchive.stories import Story
 
 
 StreamReader = codecs.getreader('utf-8')
@@ -62,12 +63,14 @@ class Fetcher:
         """
         pass
 
-    def fetch(self, key):
+    def fetch(self, key, prefetch_meta=None, prefetch_data=None):
         """
         Fetches story information.
 
         Args:
             key: Primary key of the story.
+            prefetch_meta: Force prefetching of meta.
+            prefetch_data: Force prefetching of data.
 
         Returns:
             Story: A new `Story` object.
@@ -76,7 +79,23 @@ class Fetcher:
             InvalidStoryError: If a valid story is not found.
             StorySourceError: If source does not return any data.
         """
-        raise NotImplementedError()
+        if prefetch_meta is None:
+            prefetch_meta = self.prefetch_meta
+
+        if prefetch_meta:
+            meta = self.fetch_meta(key)
+        else:
+            meta = None
+
+        if prefetch_data is None:
+            prefetch_data = self.prefetch_data
+
+        if prefetch_data:
+            data = self.fetch_data(key)
+        else:
+            data = None
+
+        return Story(key, self, meta, data)
 
     def fetch_data(self, key):
         """
