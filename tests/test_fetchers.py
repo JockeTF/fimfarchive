@@ -40,15 +40,13 @@ class TestFimfictionFetcher:
     """
     FimfictionFetcher tests.
     """
-    fetcher = None
 
-    @classmethod
-    def setup_class(cls):
-        cls.fetcher = FimfictionFetcher()
-
-    @classmethod
-    def teardown_class(cls):
-        cls.fetcher = None
+    @pytest.fixture
+    def fetcher(self):
+        """
+        Returns the fetcher instance to test.
+        """
+        return FimfictionFetcher()
 
     def test_with_statment(self):
         """
@@ -57,14 +55,14 @@ class TestFimfictionFetcher:
         with FimfictionFetcher() as fetcher:
             fetcher.get('http://example.com/')
 
-    def test_get_for_invalid_host(self):
+    def test_get_for_invalid_host(self, fetcher):
         """
         Tests `StorySourceError` is raised if server is unreachable.
         """
         with pytest.raises(StorySourceError):
-            self.fetcher.get('http://-')
+            fetcher.get('http://-')
 
-    def test_get_for_invalid_page(self):
+    def test_get_for_invalid_page(self, fetcher):
         """
         Tests `StorySourceError` is raised if page does not exist.
 
@@ -72,24 +70,24 @@ class TestFimfictionFetcher:
         other HTTP status codes indicate that something else has gone wrong.
         """
         with pytest.raises(StorySourceError):
-            self.fetcher.get('http://example.com/-')
+            fetcher.get('http://example.com/-')
 
-    def test_fetch_meta_for_valid_story(self):
+    def test_fetch_meta_for_valid_story(self, fetcher):
         """
         Tests meta is returned if story is valid
         """
-        meta = self.fetcher.fetch_meta(VALID_STORY_KEY)
+        meta = fetcher.fetch_meta(VALID_STORY_KEY)
         assert meta['id'] == VALID_STORY_KEY
         assert meta['words'] != 0
 
-    def test_fetch_meta_for_invalid_story(self):
+    def test_fetch_meta_for_invalid_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is invalid.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_meta(INVALID_STORY_KEY)
+            fetcher.fetch_meta(INVALID_STORY_KEY)
 
-    def test_fetch_meta_for_empty_story(self):
+    def test_fetch_meta_for_empty_story(self, fetcher):
         """
         Tests meta is returned if story is empty.
 
@@ -97,11 +95,11 @@ class TestFimfictionFetcher:
         since the story data is useless. But because the meta of such stories
         may still be of interest, it was decided that meta should be returned.
         """
-        meta = self.fetcher.fetch_meta(EMPTY_STORY_KEY)
+        meta = fetcher.fetch_meta(EMPTY_STORY_KEY)
         assert meta['id'] == EMPTY_STORY_KEY
         assert meta['words'] == 0
 
-    def test_fetch_meta_for_protected_story(self):
+    def test_fetch_meta_for_protected_story(self, fetcher):
         """
         Tests meta is returned if story is protected.
 
@@ -109,53 +107,51 @@ class TestFimfictionFetcher:
         since the story data is inaccessible. However, there is no way to
         determine that a story is password-protected from its meta data.
         """
-        meta = self.fetcher.fetch_meta(PROTECTED_STORY_KEY)
+        meta = fetcher.fetch_meta(PROTECTED_STORY_KEY)
         assert meta['id'] == PROTECTED_STORY_KEY
         assert meta['words'] != 0
 
-    def test_fetch_data_for_valid_story(self):
+    def test_fetch_data_for_valid_story(self, fetcher):
         """
         Tests data is returned if story is valid.
         """
-        data = self.fetcher.fetch_data(VALID_STORY_KEY)
+        data = fetcher.fetch_data(VALID_STORY_KEY)
         assert len(data) != 0
 
-    def test_fetch_data_for_invalid_story(self):
+    def test_fetch_data_for_invalid_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is invalid.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_data(INVALID_STORY_KEY)
+            fetcher.fetch_data(INVALID_STORY_KEY)
 
-    def test_fetch_data_for_empty_story(self):
+    def test_fetch_data_for_empty_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is empty.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_data(EMPTY_STORY_KEY)
+            fetcher.fetch_data(EMPTY_STORY_KEY)
 
-    def test_fetch_data_for_protected_story(self):
+    def test_fetch_data_for_protected_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is protected.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_data(PROTECTED_STORY_KEY)
+            fetcher.fetch_data(PROTECTED_STORY_KEY)
 
 
 class TestFimfarchiveFetcher:
     """
     FimfarchiveFetcher tests.
     """
-    fetcher = None
 
-    @classmethod
-    def setup_class(cls):
-        cls.fetcher = FimfarchiveFetcher(FIMFARCHIVE_PATH)
-
-    @classmethod
-    def teardown_class(cls):
-        cls.fetcher.close()
-        cls.fetcher = None
+    @pytest.yield_fixture(scope='module')
+    def fetcher(self):
+        """
+        Returns the fetcher instance to test.
+        """
+        with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
+            yield fetcher
 
     def test_with_statment(self):
         """
@@ -167,31 +163,31 @@ class TestFimfarchiveFetcher:
         with pytest.raises(StorySourceError):
             fetcher.lookup(VALID_STORY_KEY)
 
-    def test_fetch_meta_for_valid_story(self):
+    def test_fetch_meta_for_valid_story(self, fetcher):
         """
         Tests meta is returned if story is valid
         """
-        meta = self.fetcher.fetch_meta(VALID_STORY_KEY)
+        meta = fetcher.fetch_meta(VALID_STORY_KEY)
         assert meta['id'] == VALID_STORY_KEY
         assert meta['words'] != 0
 
-    def test_fetch_meta_for_invalid_story(self):
+    def test_fetch_meta_for_invalid_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is invalid.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_meta(INVALID_STORY_KEY)
+            fetcher.fetch_meta(INVALID_STORY_KEY)
 
-    def test_fetch_data_for_valid_story(self):
+    def test_fetch_data_for_valid_story(self, fetcher):
         """
         Tests data is returned if story is valid.
         """
-        data = self.fetcher.fetch_data(VALID_STORY_KEY)
+        data = fetcher.fetch_data(VALID_STORY_KEY)
         assert len(data) != 0
 
-    def test_fetch_data_for_invalid_story(self):
+    def test_fetch_data_for_invalid_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is invalid.
         """
         with pytest.raises(InvalidStoryError):
-            self.fetcher.fetch_data(INVALID_STORY_KEY)
+            fetcher.fetch_data(INVALID_STORY_KEY)
