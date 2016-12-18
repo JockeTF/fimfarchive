@@ -41,6 +41,8 @@ class Fetcher:
     """
     Abstract base class for story fetchers.
     """
+    prefetch_meta = False
+    prefetch_data = False
 
     def __enter__(self):
         """
@@ -113,6 +115,9 @@ class FimfictionFetcher(Fetcher):
     """
     Fetcher for Fimfiction.
     """
+    prefetch_meta = True
+    prefetch_data = False
+
     data_path = 'https://www.fimfiction.net/download_story.php'
     meta_path = 'https://www.fimfiction.net/api/story.php'
 
@@ -184,6 +189,8 @@ class FimfarchiveFetcher(Fetcher):
     """
     Fetcher for Fimfarchive.
     """
+    prefetch_meta = True
+    prefetch_data = True
 
     def __init__(self, file):
         """
