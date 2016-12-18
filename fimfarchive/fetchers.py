@@ -57,7 +57,7 @@ class Fetcher:
         """
         Closes file descriptors and frees memory.
         """
-        raise NotImplementedError()
+        pass
 
     def fetch(self, key):
         """
@@ -114,9 +114,6 @@ class FimfictionFetcher(Fetcher):
     """
     data_path = 'https://www.fimfiction.net/download_story.php'
     meta_path = 'https://www.fimfiction.net/api/story.php'
-
-    def close(self):
-        pass
 
     def get(self, url, **kwargs):
         """
