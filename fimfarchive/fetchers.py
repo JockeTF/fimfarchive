@@ -23,12 +23,13 @@ Fetchers for Fimfarchive.
 
 
 import codecs
-from copy import deepcopy
 import gc
-from io import BytesIO
 import json
-import requests
+from copy import deepcopy
+from io import BytesIO
 from zipfile import ZipFile, BadZipFile
+
+import requests
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 
