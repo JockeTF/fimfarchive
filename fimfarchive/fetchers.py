@@ -32,6 +32,7 @@ from zipfile import ZipFile, BadZipFile
 import requests
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
+from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
 from fimfarchive.stories import Story
 
 
@@ -44,6 +45,8 @@ class Fetcher:
     """
     prefetch_meta = False
     prefetch_data = False
+
+    flavors = frozenset()
 
     def __enter__(self):
         """
@@ -95,7 +98,7 @@ class Fetcher:
         else:
             data = None
 
-        return Story(key, self, meta, data)
+        return Story(key, self, meta, data, self.flavors)
 
     def fetch_data(self, key):
         """
@@ -139,6 +142,12 @@ class FimfictionFetcher(Fetcher):
 
     data_path = 'https://www.fimfiction.net/download_story.php'
     meta_path = 'https://www.fimfiction.net/api/story.php'
+
+    flavors = frozenset((
+        StorySource.FIMFICTION,
+        DataFormat.HTML,
+        MetaPurity.DIRTY,
+    ))
 
     def get(self, url, **kwargs):
         """
@@ -210,6 +219,12 @@ class FimfarchiveFetcher(Fetcher):
     """
     prefetch_meta = True
     prefetch_data = True
+
+    flavors = frozenset((
+        StorySource.FIMFARCHIVE,
+        DataFormat.EPUB,
+        MetaPurity.CLEAN,
+    ))
 
     def __init__(self, file):
         """

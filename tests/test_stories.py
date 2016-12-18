@@ -188,3 +188,26 @@ class TestStory:
             story.data
 
         assert not story.has_data
+
+    def test_flavors_are_copied(self, fetcher, flavor):
+        """
+        Tests story flavor change does not affect fetcher.
+        """
+        flavors = {flavor.A}
+        story = Story(KEY, fetcher, flavors=flavors)
+        story.flavors.remove(flavor.A)
+
+        assert story.flavors is not flavors
+        assert story.flavors == set()
+        assert flavors == {flavor.A}
+
+    def test_flavors_are_stored_in_set(self, fetcher, flavor):
+        """
+        Tests flavor sequence is converted to set.
+        """
+        flavors = [flavor.A]
+        story = Story(KEY, fetcher, flavors=flavors)
+
+        assert story.flavors is not flavors
+        assert story.flavors == {flavor.A}
+        assert type(story.flavors) == set

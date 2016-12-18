@@ -27,6 +27,7 @@ from unittest.mock import MagicMock
 import pytest
 
 from fimfarchive.fetchers import Fetcher
+from fimfarchive.flavors import Flavor
 
 
 @pytest.fixture
@@ -40,3 +41,15 @@ def fetcher():
     fetcher.fetch_data = MagicMock(method='fetch_data')
 
     return fetcher
+
+
+@pytest.fixture
+def flavor():
+    """
+    Returns a flavor with A and B members.
+    """
+    class MyFlavor(Flavor):
+        A = ()
+        B = ()
+
+    return MyFlavor

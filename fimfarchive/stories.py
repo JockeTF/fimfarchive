@@ -27,12 +27,13 @@ class Story:
     Represents a story.
     """
 
-    def __init__(self, key, fetcher, meta=None, data=None):
+    def __init__(self, key, fetcher=None, meta=None, data=None, flavors=()):
         if fetcher is None and (data is None or meta is None):
             raise ValueError("Story must contain fetcher if lazy.")
 
         self.key = key
         self.fetcher = fetcher
+        self.flavors = set(flavors)
         self._meta = meta
         self._data = data
 

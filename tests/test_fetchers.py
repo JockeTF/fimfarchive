@@ -106,6 +106,22 @@ class TestFetcher:
 
         fetcher.close.assert_called_once_with()
 
+    def test_empty_flavors_are_passed_to_story(self, fetcher):
+        """
+        Tests story contains empty flavors from fetcher.
+        """
+        fetcher.flavors = set()
+        story = fetcher.fetch(VALID_STORY_KEY)
+        assert story.flavors == set()
+
+    def test_custom_flavors_are_passed_to_story(self, fetcher, flavor):
+        """
+        Tests story contains custom flavors from fetcher.
+        """
+        fetcher.flavors = {flavor.A}
+        story = fetcher.fetch(VALID_STORY_KEY)
+        assert story.flavors == {flavor.A}
+
 
 class TestFimfictionFetcher:
     """
