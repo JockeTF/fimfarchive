@@ -22,6 +22,13 @@ Exceptions for Fimfarchive.
 #
 
 
+__all__ = (
+    'FimfarchiveError',
+    'InvalidStoryError',
+    'StorySourceError',
+)
+
+
 class FimfarchiveError(Exception):
     """
     Base class for Fimfarchive exceptions.

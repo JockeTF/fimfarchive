@@ -22,6 +22,11 @@ Stories for Fimfarchive.
 #
 
 
+__all__ = (
+    'Story',
+)
+
+
 class Story:
     """
     Represents a story.

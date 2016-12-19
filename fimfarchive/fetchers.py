@@ -36,6 +36,13 @@ from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
 from fimfarchive.stories import Story
 
 
+__all__ = (
+    'Fetcher',
+    'FimfictionFetcher',
+    'FimfarchiveFetcher',
+)
+
+
 StreamReader = codecs.getreader('utf-8')
 
 

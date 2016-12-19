@@ -25,6 +25,14 @@ Flavors for Fimfarchive.
 from enum import Enum
 
 
+__all__ = (
+    'Flavor',
+    'StorySource',
+    'DataFormat',
+    'MetaPurity',
+)
+
+
 class Flavor(Enum):
     """
     Base class for flavors.
