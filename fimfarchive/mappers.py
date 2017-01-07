@@ -22,6 +22,9 @@ Mappers for Fimfarchive.
 #
 
 
+import os
+
+
 class Mapper:
     """
     Callable which maps something to something else.
@@ -41,3 +44,18 @@ class StaticMapper(Mapper):
 
     def __call__(self, *args, **kwargs):
         return self.value
+
+
+class StoryPathMapper(Mapper):
+    """
+    Returns a key-based file path for a story.
+    """
+
+    def __init__(self, directory):
+        self.directory = directory
+
+    def __call__(self, story):
+        directory = str(self.directory)
+        key = str(story.key)
+
+        return os.path.join(directory, key)

@@ -22,9 +22,12 @@ Mapper tests.
 #
 
 
+import os
+from unittest.mock import MagicMock
+
 import pytest
 
-from fimfarchive.mappers import StaticMapper
+from fimfarchive.mappers import StaticMapper, StoryPathMapper
 
 
 class TestStaticMapper:
@@ -66,3 +69,36 @@ class TestStaticMapper:
         """
         mapper = StaticMapper(value)
         assert mapper(a=1, b=2) is value
+
+
+class TestStoryPathMapper:
+    """
+    StoryPathMapper tests.
+    """
+
+    def test_joins_paths(self, story):
+        """
+        Tests returns directory joined with story key.
+        """
+        directory = os.path.join('some', 'directory')
+        path = os.path.join(directory, str(story.key))
+
+        mapper = StoryPathMapper(directory)
+
+        assert mapper(story) == path
+
+    def test_casts_values(self, tmpdir, story):
+        """
+        Tests casts all values to string when joining.
+        """
+        directory = MagicMock()
+        directory.__str__.return_value = 'dir'
+
+        story.key = MagicMock()
+        story.key.__str__.return_value = 'key'
+
+        mapper = StoryPathMapper(directory)
+
+        assert mapper(story) == os.path.join('dir', 'key')
+        assert directory.__str__.called_once_with()
+        assert story.key.__str__.called_once_with()
