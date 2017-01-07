@@ -25,6 +25,13 @@ Mappers for Fimfarchive.
 import os
 
 
+__all__ = (
+    'Mapper',
+    'StaticMapper',
+    'StoryPathMapper',
+)
+
+
 class Mapper:
     """
     Callable which maps something to something else.
