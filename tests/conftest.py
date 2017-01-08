@@ -28,6 +28,7 @@ import pytest
 
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.flavors import Flavor
+from fimfarchive.stories import Story
 
 
 @pytest.fixture
@@ -53,3 +54,19 @@ def flavor():
         B = ()
 
     return MyFlavor
+
+
+@pytest.fixture
+def story(flavor):
+    """
+    Returns a non-lazy dummy story.
+    """
+    story = Story(
+        key=1,
+        fetcher=None,
+        meta={'id': 1},
+        data=b'<html />',
+        flavors={flavor.A},
+    )
+
+    return story
