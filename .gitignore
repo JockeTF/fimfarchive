@@ -25,6 +25,9 @@ __pycache__/
 .pydevproject
 .settings/
 
+# Rope project.
+.ropeproject/
+
 # Coverage output.
 .coverage
 coverage.xml
