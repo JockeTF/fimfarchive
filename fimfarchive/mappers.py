@@ -24,10 +24,13 @@ Mappers for Fimfarchive.
 
 import os
 
+from fimfarchive.exceptions import InvalidStoryError
+
 
 __all__ = (
     'Mapper',
     'StaticMapper',
+    'StoryDateMapper',
     'StoryPathMapper',
 )
 
@@ -51,6 +54,35 @@ class StaticMapper(Mapper):
 
     def __call__(self, *args, **kwargs):
         return self.value
+
+
+class StoryDateMapper(Mapper):
+    """
+    Returns the latest timestamp in a story, or None.
+    """
+
+    def __call__(self, story):
+        try:
+            meta = getattr(story, 'meta', None)
+        except InvalidStoryError:
+            return None
+
+        if not meta:
+            return None
+
+        dates = {
+            meta.get('date_modified'),
+        }
+
+        for chapter in meta.get('chapters') or tuple():
+            dates.add(chapter.get('date_modified'))
+
+        dates.discard(None)
+
+        if dates:
+            return max(dates)
+        else:
+            return None
 
 
 class StoryPathMapper(Mapper):

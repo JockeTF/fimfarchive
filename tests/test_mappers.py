@@ -23,11 +23,17 @@ Mapper tests.
 
 
 import os
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock, PropertyMock
 
 import pytest
 
-from fimfarchive.mappers import StaticMapper, StoryPathMapper
+from fimfarchive.exceptions import InvalidStoryError
+from fimfarchive.mappers import StaticMapper, StoryDateMapper, StoryPathMapper
+from fimfarchive.stories import Story
+
+
+CHAPTERS = 'chapters'
+MODIFIED = 'date_modified'
 
 
 class TestStaticMapper:
@@ -69,6 +75,193 @@ class TestStaticMapper:
         """
         mapper = StaticMapper(value)
         assert mapper(a=1, b=2) is value
+
+
+class TestStoryDateMapper:
+    """
+    StoryDateMapper tests.
+    """
+
+    @pytest.fixture
+    def mapper(self):
+        """
+        Returns a new StoryDateMapper.
+        """
+        return StoryDateMapper()
+
+    def merge(self, story, meta):
+        """
+        Returns a cloned story containing the supplied meta.
+        """
+        return Story(
+            key=story.key,
+            fetcher=None,
+            meta=meta,
+            data=story.data,
+            flavors=story.flavors,
+        )
+
+    def test_missing_story(self, mapper):
+        """
+        Tests `None` is returned when story is `None`.
+        """
+        assert mapper(None) is None
+
+    def test_invalid_story(self, mapper, story):
+        """
+        Tests `None` is returned when `InvalidStoryError` is raised.
+        """
+        with patch.object(Story, 'meta', new_callable=PropertyMock) as m:
+            m.side_effect = InvalidStoryError
+
+            assert mapper(story) is None
+            assert m.called_once_with(story)
+
+    def test_empty_meta(self, mapper, story):
+        """
+        Tests `None` is returned when meta is empty.
+        """
+        story = self.merge(story, dict())
+
+        assert mapper(story) is None
+
+    def test_meta_without_dates(self, mapper, story):
+        """
+        Tests `None` is returned when meta contains no dates.
+        """
+        meta = {
+            CHAPTERS: [
+                dict(),
+                dict(),
+                dict(),
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) is None
+
+    def test_meta_without_chapters(self, mapper, story):
+        """
+        Tests timestamp is returned when no chapters are present.
+        """
+        meta = {
+            MODIFIED: 5,
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_none_chapters(self, mapper, story):
+        """
+        Tests timestamp is returned when chapters is `None`.
+        """
+        meta = {
+            MODIFIED: 5,
+            CHAPTERS: None,
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_empty_chapters(self, mapper, story):
+        """
+        Tests timestamp is returned when chapters is empty.
+        """
+        meta = {
+            MODIFIED: 5,
+            CHAPTERS: [],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_only_chapter_dates(self, mapper, story):
+        """
+        Tests timestamp is returned when only chapter dates are present.
+        """
+        meta = {
+            CHAPTERS: [
+                {MODIFIED: 3},
+                {MODIFIED: 5},
+                {MODIFIED: 4},
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_only_story_date(self, mapper, story):
+        """
+        Tests timestamp is returned when only story date is present.
+        """
+        meta = {
+            MODIFIED: 5,
+            CHAPTERS: [
+                dict(),
+                dict(),
+                dict(),
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_latest_chapter_date(self, mapper, story):
+        """
+        Tests latests timestamp is returned when in chapter dates.
+        """
+        meta = {
+            MODIFIED: 3,
+            CHAPTERS: [
+                {MODIFIED: 1},
+                {MODIFIED: 5},
+                {MODIFIED: 3},
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_latest_story_date(self, mapper, story):
+        """
+        Tests latest timestamp is returned when in story date.
+        """
+        meta = {
+            MODIFIED: 5,
+            CHAPTERS: [
+                {MODIFIED: 1},
+                {MODIFIED: 3},
+                {MODIFIED: 2},
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
+
+    def test_meta_with_both_latest(self, mapper, story):
+        """
+        Tests latest timestamp is returned when in both.
+        """
+        meta = {
+            MODIFIED: 5,
+            CHAPTERS: [
+                {MODIFIED: 1},
+                {MODIFIED: 5},
+                {MODIFIED: 3},
+            ],
+        }
+
+        story = self.merge(story, meta)
+
+        assert mapper(story) == 5
 
 
 class TestStoryPathMapper:
