@@ -240,9 +240,9 @@ class TestFimfarchiveFetcher:
         with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
             yield fetcher
 
-    def test_with_statment(self):
+    def test_closed_fetcher_raises_exception(self):
         """
-        Tests fetcher can be used in with statements.
+        Tests `StorySourceError` is raised when fetcher is closed.
         """
         with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
             fetcher.lookup(VALID_STORY_KEY)
