@@ -30,6 +30,7 @@ __all__ = (
     'StorySource',
     'DataFormat',
     'MetaPurity',
+    'UpdateStatus',
 )
 
 
@@ -80,3 +81,13 @@ class MetaPurity(Flavor):
     """
     CLEAN = ()
     DIRTY = ()
+
+
+class UpdateStatus(Flavor):
+    """
+    Indicates if and how a story has changed.
+    """
+    CREATED = ()
+    REVIVED = ()
+    UPDATED = ()
+    DELETED = ()
