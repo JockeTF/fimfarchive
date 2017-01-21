@@ -82,7 +82,7 @@ class PersistedDict(UserDict):
             self.data = dict()
 
         for k, v in self.default.items():
-            if not k in self.data:
+            if k not in self.data:
                 self.data[k] = v
 
     def save(self):
