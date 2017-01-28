@@ -211,3 +211,40 @@ class TestStory:
         assert story.flavors is not flavors
         assert story.flavors == {flavor.A}
         assert type(story.flavors) == set
+
+    def test_merge_without_parameters(self, story):
+        """
+        Tests `merge` returns new story containing current attributes.
+        """
+        merge = story.merge()
+
+        assert merge is not story
+        assert merge.data is story.data
+        assert merge.meta is story.meta
+
+        for k, v in vars(story).items():
+            assert getattr(merge, k) == v
+
+    def test_merge_with_parameters(self, story):
+        """
+        Tests `merge` can override attributes.
+        """
+        meta = dict(story.meta)
+        merge = story.merge(meta=meta)
+
+        assert meta is not story.meta
+        assert meta is merge.meta
+
+    def test_merge_with_invalid_state(self, story):
+        """
+        Tests `merge` is affected by validation in `__init__`.
+        """
+        with pytest.raises(ValueError):
+            story.merge(fetcher=None, meta=None)
+
+    def test_merge_with_invalid_arguments(self, story):
+        """
+        Tests `merge` cannot create story using invalid arguments.
+        """
+        with pytest.raises(TypeError):
+            story.merge(alpaca=True)

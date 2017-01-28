@@ -94,3 +94,18 @@ class Story:
             self._data = self.fetcher.fetch_data(self.key)
 
         return self._data
+
+    def merge(self, **params):
+        """
+        Returns a shallow copy, optionally replacing attributes.
+
+        Args:
+            **params: Overrides parameters from the current instance.
+
+        Raises:
+            TypeError: If passed an unexpected parameter.
+        """
+        kwargs = {k.lstrip('_'): v for k, v in vars(self).items()}
+        kwargs.update(params)
+
+        return type(self)(**kwargs)

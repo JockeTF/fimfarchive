@@ -46,16 +46,6 @@ class TestUpdateSelector:
         """
         return UpdateSelector()
 
-    def merge(self, story, **params):
-        """
-        Returns a cloned story, optionally overriding parameters.
-        """
-        data = vars(story)
-        data = {k.lstrip('_'): v for k, v in data.items()}
-        data.update(params)
-
-        return Story(**data)
-
     def populate(self, story, date=0):
         """
         Returns a cloned story populated with chapter meta.
@@ -70,7 +60,7 @@ class TestUpdateSelector:
             ],
         }
 
-        return self.merge(story, meta=meta)
+        return story.merge(meta=meta)
 
     def test_filter_empty_with_chapters(self, selector, story):
         """
@@ -98,7 +88,7 @@ class TestUpdateSelector:
             'chapters': []
         }
 
-        story = self.merge(story, meta=meta)
+        story = story.merge(meta=meta)
         selected = selector.filter_empty(story)
 
         assert selected is None
@@ -268,7 +258,7 @@ class TestUpdateSelector:
 
         fetcher = Mock(spec=Fetcher)
         fetcher.fetch_data.side_effect = InvalidStoryError
-        new = self.merge(story, fetcher=fetcher, data=None)
+        new = story.merge(fetcher=fetcher, data=None)
 
         selected = selector(old, new)
 

@@ -121,7 +121,7 @@ class TestStoryDateMapper:
         """
         Tests `None` is returned when meta is empty.
         """
-        story = self.merge(story, dict())
+        story = story.merge(meta=dict())
 
         assert mapper(story) is None
 
@@ -137,7 +137,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) is None
 
@@ -149,7 +149,7 @@ class TestStoryDateMapper:
             MODIFIED: 5,
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -162,7 +162,7 @@ class TestStoryDateMapper:
             CHAPTERS: None,
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -175,7 +175,7 @@ class TestStoryDateMapper:
             CHAPTERS: [],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -191,7 +191,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -208,7 +208,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -225,7 +225,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -242,7 +242,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
@@ -259,7 +259,7 @@ class TestStoryDateMapper:
             ],
         }
 
-        story = self.merge(story, meta)
+        story = story.merge(meta=meta)
 
         assert mapper(story) == 5
 
