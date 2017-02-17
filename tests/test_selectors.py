@@ -249,21 +249,37 @@ class TestUpdateSelector:
         assert selected is old
         assert UpdateStatus.DELETED in old.flavors
 
-    def test_protected_selection(self, selector, story):
+    def test_old_protected_selection(self, selector, story):
         """
-        Tests behavior for stories that have become password protected.
+        Tests behavior for stories that have become password-protected.
         """
         old = self.populate(story, 0)
         new = self.populate(story, 1)
 
         fetcher = Mock(spec=Fetcher)
         fetcher.fetch_data.side_effect = InvalidStoryError
-        new = story.merge(fetcher=fetcher, data=None)
+        new = new.merge(fetcher=fetcher, data=None)
 
         selected = selector(old, new)
 
+        fetcher.fetch_data.assert_called_once_with(new.key)
         assert selected is old
         assert UpdateStatus.DELETED in old.flavors
+
+    def test_new_protected_selection(self, selector, story):
+        """
+        Tests behavior for new password-protected stories.
+        """
+        new = self.populate(story, 1)
+
+        fetcher = Mock(spec=Fetcher)
+        fetcher.fetch_data.side_effect = InvalidStoryError
+        new = new.merge(fetcher=fetcher, data=None)
+
+        selected = selector(None, new)
+
+        fetcher.fetch_data.assert_called_once_with(new.key)
+        assert selected is None
 
     def test_invalid_selection(self, selector):
         """
