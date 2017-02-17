@@ -128,13 +128,13 @@ class UpdateSelector(Selector):
         new = self.filter_empty(new)
         deleted = old and not new
 
-        if old and new:
+        if old:
             old = self.filter_invalid(old)
 
         if old and new:
             new = self.filter_unchanged(old, new)
 
-        if old and new:
+        if new:
             new = self.filter_invalid(new)
             deleted = old and not new
 
