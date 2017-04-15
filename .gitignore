@@ -16,6 +16,9 @@ Thumbs.db
 # Python cache.
 __pycache__/
 
+# Virtual environment.
+venv/
+
 # PyCharm project.
 /.idea/
 *.iml
