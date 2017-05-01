@@ -171,8 +171,8 @@ class FimfictionFetcher(Fetcher):
             StorySourceError: If the server does not return HTTP 200 OK.
         """
         try:
-            response = requests.get(url, params=kwargs)
-        except IOError as e:
+            response = requests.get(url, params=kwargs, timeout=60)
+        except OSError as e:
             raise StorySourceError("Could not read from server.") from e
 
         if not response.ok:
