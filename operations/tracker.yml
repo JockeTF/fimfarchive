@@ -1,0 +1,9 @@
+---
+#
+# Configures trackers.
+#
+
+- name: Tracker
+  hosts: trackers
+  roles:
+    - common
