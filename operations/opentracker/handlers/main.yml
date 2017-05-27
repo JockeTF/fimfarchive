@@ -1,0 +1,10 @@
+---
+#
+# OpenTracker handlers.
+#
+
+- name: Restart OpenTracker
+  service:
+    name: opentracker
+    enabled: yes
+    state: restarted

@@ -1,0 +1,13 @@
+---
+#
+# OpenTracker tasks.
+#
+
+- name: Prepare system
+  include: prep.yml
+
+- name: Install OpenTracker
+  include: make.yml
+
+- name: Configure OpenTracker
+  include: conf.yml

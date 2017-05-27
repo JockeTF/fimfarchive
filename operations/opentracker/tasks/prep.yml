@@ -1,0 +1,46 @@
+---
+#
+# Prepares system for OpenTracker.
+#
+
+- name: Install build dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - git
+    - libowfat-dev
+    - zlib1g-dev
+
+- name: Create UNIX group
+  group:
+    name: "{{ opentracker.user }}"
+    system: yes
+    state: present
+
+- name: Create UNIX user
+  user:
+    name: "{{ opentracker.user }}"
+    group: "{{ opentracker.user }}"
+    home: "{{ opentracker.home }}"
+    createhome: yes
+    skeleton: yes
+    system: yes
+    state: present
+
+- name: Create SSH directory
+  file:
+    path: "{{ opentracker.home }}/.ssh"
+    owner: "{{ opentracker.user }}"
+    group: "{{ opentracker.user }}"
+    mode: 0500
+    state: directory
+
+- name: Configure SSH hosts
+  copy:
+    src: known_hosts
+    dest: "{{ opentracker.home }}/.ssh/known_hosts"
+    owner: "{{ opentracker.user }}"
+    group: "{{ opentracker.user }}"
+    mode: 0400

@@ -1,0 +1,13 @@
+[Unit]
+Description=OpenTracker
+After=network.target
+
+[Service]
+Type=simple
+User={{ opentracker.user }}
+WorkingDirectory={{ opentracker.conf }}
+ExecStart=/usr/local/bin/opentracker -f "{{ opentracker.conf }}/config"
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target

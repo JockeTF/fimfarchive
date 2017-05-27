@@ -1,0 +1,10 @@
+---
+#
+# OpenTracker defaults.
+#
+
+opentracker:
+  user: tracker
+  home: /var/lib/tracker
+  repo: /var/lib/tracker/repo
+  conf: /etc/opentracker

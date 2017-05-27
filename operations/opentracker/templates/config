@@ -1,0 +1,2 @@
+access.whitelist {{ opentracker.conf }}/whitelist
+tracker.redirect_url http://www.fimfarchive.net/
