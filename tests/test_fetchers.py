@@ -35,7 +35,7 @@ INVALID_STORY_KEY = 7
 EMPTY_STORY_KEY = 8
 PROTECTED_STORY_KEY = 208799
 
-FIMFARCHIVE_PATH = 'fimfarchive-20161201.zip'
+FIMFARCHIVE_PATH = 'fimfarchive-20170601.zip'
 
 
 class TestFetcher:
@@ -205,6 +205,7 @@ class TestFimfictionFetcher:
         data = fetcher.fetch_data(VALID_STORY_KEY)
         assert len(data) != 0
 
+    @pytest.mark.xfail(reason='knighty/fimfiction-issues#139')
     def test_fetch_data_for_invalid_story(self, fetcher):
         """
         Tests `InvalidStoryError` is raised if story is invalid.

@@ -147,8 +147,8 @@ class FimfictionFetcher(Fetcher):
     prefetch_meta = True
     prefetch_data = False
 
-    data_path = 'https://www.fimfiction.net/download_story.php'
-    meta_path = 'https://www.fimfiction.net/api/story.php'
+    data_path = 'https://www.fimfiction.net/story/download/{}/html'
+    meta_path = 'https://www.fimfiction.net/api/story.php?story={}'
 
     flavors = frozenset((
         StorySource.FIMFICTION,
@@ -156,24 +156,27 @@ class FimfictionFetcher(Fetcher):
         MetaPurity.DIRTY,
     ))
 
-    def get(self, url, **kwargs):
+    def get(self, url):
         """
         Performs an HTTP GET request.
 
         Args:
             url: Target of the HTTP request.
-            **kwargs: HTTP query parameters.
 
         Returns:
             Response: A new `Response` object.
 
         Raises:
-            StorySourceError: If the server does not return HTTP 200 OK.
+            InvalidStoryError: If access to the resource was denied.
+            StorySourceError: If the request fails for any other reason.
         """
         try:
-            response = requests.get(url, params=kwargs, timeout=60)
+            response = requests.get(url, timeout=60)
         except OSError as e:
             raise StorySourceError("Could not read from server.") from e
+
+        if response.status_code == 403:
+            raise InvalidStoryError("Access to resource was denied.")
 
         if not response.ok:
             raise StorySourceError(
@@ -184,13 +187,14 @@ class FimfictionFetcher(Fetcher):
         return response
 
     def fetch_data(self, key):
-        response = self.get(self.data_path, story=key, html=True)
+        url = self.data_path.format(key)
+        response = self.get(url)
         data = response.content
 
         if len(data) == 0:
             raise InvalidStoryError("Server returned empty response body.")
 
-        if b'<a name=\'1\'></a><h3>' not in data:
+        if b'<h1><a name=\'1\'></a>' not in data:
             raise InvalidStoryError("Server did not return any chapters.")
 
         if not data.endswith(b'</html>'):
@@ -199,7 +203,8 @@ class FimfictionFetcher(Fetcher):
         return data
 
     def fetch_meta(self, key):
-        response = self.get(self.meta_path, story=key)
+        url = self.meta_path.format(key)
+        response = self.get(url)
 
         try:
             meta = response.json()
