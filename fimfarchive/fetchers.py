@@ -27,12 +27,13 @@ import gc
 import json
 from copy import deepcopy
 from io import BytesIO
+from typing import FrozenSet
 from zipfile import ZipFile, BadZipFile
 
 import requests
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
-from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
+from fimfarchive.flavors import Flavor, StorySource, DataFormat, MetaPurity
 from fimfarchive.stories import Story
 
 
@@ -43,6 +44,7 @@ __all__ = (
 )
 
 
+FlavorSet = FrozenSet[Flavor]
 StreamReader = codecs.getreader('utf-8')
 
 
@@ -53,7 +55,7 @@ class Fetcher:
     prefetch_meta = False
     prefetch_data = False
 
-    flavors = frozenset()
+    flavors = frozenset()  # type: FlavorSet
 
     def __enter__(self):
         """

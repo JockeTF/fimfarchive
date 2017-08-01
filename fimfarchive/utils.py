@@ -25,7 +25,7 @@ Various utilities.
 import json
 import os
 import shutil
-from collections import UserDict
+from typing import Dict, Any
 
 
 __all__ = (
@@ -52,7 +52,7 @@ class Empty(metaclass=EmptyMeta):
         return False
 
 
-class PersistedDict(UserDict):
+class PersistedDict(Dict[str, Any]):
     """
     Dictionary for simple persistance.
     """
@@ -75,22 +75,19 @@ class PersistedDict(UserDict):
         """
         Loads data from file as JSON.
         """
+        self.clear()
+        self.update(self.default)
+
         if os.path.exists(self.path):
             with open(self.path, 'rt') as fobj:
-                self.data = json.load(fobj)
-        else:
-            self.data = dict()
-
-        for k, v in self.default.items():
-            if k not in self.data:
-                self.data[k] = v
+                self.update(json.load(fobj))
 
     def save(self):
         """
         Saves data to file as JSON.
         """
         content = json.dumps(
-            self.data,
+            self,
             indent=4,
             ensure_ascii=False,
             sort_keys=True,
