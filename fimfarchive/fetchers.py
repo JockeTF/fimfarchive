@@ -44,7 +44,6 @@ __all__ = (
 )
 
 
-FlavorSet = FrozenSet[Flavor]
 StreamReader = codecs.getreader('utf-8')
 
 
@@ -55,7 +54,7 @@ class Fetcher:
     prefetch_meta = False
     prefetch_data = False
 
-    flavors = frozenset()  # type: FlavorSet
+    flavors: FrozenSet[Flavor] = frozenset()
 
     def __enter__(self):
         """
