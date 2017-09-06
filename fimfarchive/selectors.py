@@ -38,7 +38,7 @@ class Selector:
     Picks one of the two supplied stories.
     """
 
-    def __call__(old, new):
+    def __call__(self, old, new):
         """
         Returns either the old or the new story.
 
