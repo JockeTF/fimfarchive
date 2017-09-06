@@ -23,4 +23,5 @@
 - name: Start NTP daemon
   service:
     name: ntp
+    enabled: yes
     state: started
