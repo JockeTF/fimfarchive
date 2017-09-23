@@ -1,5 +1,5 @@
 """
-Import tests.
+Tasks module.
 """
 
 
@@ -22,34 +22,9 @@ Import tests.
 #
 
 
-import pytest
+from .update import UpdateTask
 
 
-MODULES = (
-    'exceptions',
-    'fetchers',
-    'flavors',
-    'mappers',
-    'selectors',
-    'signals',
-    'stories',
-    'tasks',
-    'utils',
-    'writers',
+__all__ = (
+    'UpdateTask',
 )
-
-
-class TestImport:
-    """
-    Tests import.
-    """
-
-    @pytest.mark.parametrize('module', MODULES)
-    def test_wildcard_import(self, module):
-        """
-        Tests wildcard import.
-        """
-        template = 'from fimfarchive.{} import *'
-        statement = template.format(module)
-
-        exec(statement)
