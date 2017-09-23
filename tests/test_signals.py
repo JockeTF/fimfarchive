@@ -69,12 +69,13 @@ def sender(signal):
 @pytest.fixture
 def receiver(sender):
     """
-    Returns a signal receiver instance.
+    Returns a connected signal receiver intance.
     """
     class Receiver(SignalReceiver):
         on_signal = Mock('on_signal')
 
-    return Receiver(sender)
+    with Receiver(sender) as receiver:
+        yield receiver
 
 
 @pytest.fixture
@@ -182,7 +183,7 @@ class TestSignalReceiver:
 
     def test_send(self, params, sender, receiver):
         """
-        Tests receiver recives emitted singal.
+        Tests receiver receives emitted signal.
         """
         sender.on_signal(*params.values())
         receiver.on_signal.assert_called_once_with(sender, **params)
