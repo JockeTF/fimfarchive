@@ -1,5 +1,5 @@
 """
-Import tests.
+Command base class.
 """
 
 
@@ -22,35 +22,30 @@ Import tests.
 #
 
 
-import pytest
+from abc import ABC, abstractmethod
 
 
-MODULES = (
-    'commands',
-    'exceptions',
-    'fetchers',
-    'flavors',
-    'mappers',
-    'selectors',
-    'signals',
-    'stories',
-    'tasks',
-    'utils',
-    'writers',
+__all__ = (
+    'Command',
 )
 
 
-class TestImport:
+class Command(ABC):
     """
-    Tests import.
+    Command line interface for tasks.
     """
 
-    @pytest.mark.parametrize('module', MODULES)
-    def test_wildcard_import(self, module):
+    @abstractmethod
+    def __call__(self, *args: str) -> int:
         """
-        Tests wildcard import.
-        """
-        template = 'from fimfarchive.{} import *'
-        statement = template.format(module)
+        Runs the command.
 
-        exec(statement)
+        Args:
+            *args: Command line arguments.
+
+        Returns:
+            Application exit status.
+
+        Raises:
+            SystemExit: If the arguments are invalid.
+        """

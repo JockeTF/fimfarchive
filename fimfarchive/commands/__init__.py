@@ -1,5 +1,5 @@
 """
-Import tests.
+Command module.
 """
 
 
@@ -22,35 +22,9 @@ Import tests.
 #
 
 
-import pytest
+from .base import Command
 
 
-MODULES = (
-    'commands',
-    'exceptions',
-    'fetchers',
-    'flavors',
-    'mappers',
-    'selectors',
-    'signals',
-    'stories',
-    'tasks',
-    'utils',
-    'writers',
+__all__ = (
+    'Command',
 )
-
-
-class TestImport:
-    """
-    Tests import.
-    """
-
-    @pytest.mark.parametrize('module', MODULES)
-    def test_wildcard_import(self, module):
-        """
-        Tests wildcard import.
-        """
-        template = 'from fimfarchive.{} import *'
-        statement = template.format(module)
-
-        exec(statement)
