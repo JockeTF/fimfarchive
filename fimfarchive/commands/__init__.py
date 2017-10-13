@@ -23,8 +23,10 @@ Command module.
 
 
 from .base import Command
+from .root import RootCommand
 
 
 __all__ = (
     'Command',
+    'RootCommand',
 )
