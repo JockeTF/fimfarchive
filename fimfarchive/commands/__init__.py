@@ -24,9 +24,11 @@ Command module.
 
 from .base import Command
 from .root import RootCommand
+from .update import UpdateCommand
 
 
 __all__ = (
     'Command',
     'RootCommand',
+    'UpdateCommand',
 )

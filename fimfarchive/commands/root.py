@@ -25,6 +25,7 @@ Root command.
 from typing import Dict, Type
 
 from .base import Command
+from .update import UpdateCommand
 
 
 __all__ = (
@@ -36,7 +37,9 @@ class RootCommand(Command):
     """
     The main application command.
     """
-    commands: Dict[str, Type[Command]] = dict()
+    commands: Dict[str, Type[Command]] = {
+        'update': UpdateCommand,
+    }
 
     def load(self, command: str) -> Command:
         """
