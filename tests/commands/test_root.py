@@ -108,6 +108,13 @@ class TestRootCommanad():
         assert "failure  Command that returns 1." in doc
         assert "truncated documentation line" not in doc
 
+    def test_root_usage_without_commands(self, root):
+        """
+        Tests usage contains text when no commands are available.
+        """
+        type(root).commands = dict()
+        assert root.usage.strip()
+
     def test_root_call_without_args(self, root, success, failure):
         """
         Tests `SystemExit` is raised if called without arguments.

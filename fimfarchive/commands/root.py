@@ -93,6 +93,9 @@ class RootCommand(Command):
             'Fimfarchive, ensuring that history is preseved.\n\n',
         ]
 
+        if not self.commands:
+            return ''.join(text).strip()
+
         commands = sorted(cmd for cmd in self.commands.keys())
         adjust = max(len(cmd) for cmd in commands) + 2
 
