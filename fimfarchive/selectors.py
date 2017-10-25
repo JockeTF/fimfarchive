@@ -29,6 +29,7 @@ from fimfarchive.mappers import StoryDateMapper
 
 __all__ = (
     'Selector',
+    'RefetchSelector',
     'UpdateSelector',
 )
 
@@ -148,3 +149,15 @@ class UpdateSelector(Selector):
             return self.flavored(old, UpdateStatus.DELETED)
         else:
             return None
+
+
+class RefetchSelector(UpdateSelector):
+    """
+    Selects the new story if it is available.
+    """
+
+    def filter_unchanged(self, old, new):
+        """
+        Returns the new story.
+        """
+        return new

@@ -30,7 +30,7 @@ from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.flavors import UpdateStatus
 from fimfarchive.mappers import StoryDateMapper
-from fimfarchive.selectors import UpdateSelector
+from fimfarchive.selectors import RefetchSelector, UpdateSelector
 from fimfarchive.stories import Story
 
 
@@ -134,7 +134,7 @@ class TestUpdateSelector:
 
     def test_filter_unchanged_for_unchanged(self, selector, story):
         """
-        Tests `filter_unchanged` drops changed stories.
+        Tests `filter_unchanged` drops unchanged stories.
         """
         old = self.populate(story, 0)
         new = self.populate(story, 0)
@@ -288,3 +288,61 @@ class TestUpdateSelector:
         selected = selector(None, None)
 
         assert selected is None
+
+
+class TestRefetchSelector(TestUpdateSelector):
+    """
+    RefetchSelector tests.
+    """
+
+    @pytest.fixture
+    def selector(self):
+        """
+        Returns a new refetch selector.
+        """
+        return RefetchSelector()
+
+    def test_filter_unchanged_for_unchanged(self, selector, story):
+        """
+        Tests `filter_unchanged` keeps unchanged stories.
+        """
+        old = self.populate(story, 0)
+        new = self.populate(story, 0)
+
+        selected = selector.filter_unchanged(old, new)
+
+        assert selected is new
+
+    def test_filter_unchanged_missing_old_date(self, selector, story):
+        """
+        Tests `filter_unchanged` keeps stories when missing old date.
+        """
+        old = self.populate(story, None)
+        new = self.populate(story, 1)
+
+        selected = selector.filter_unchanged(old, new)
+
+        assert selected is new
+
+    def test_filter_unchanged_missing_new_date(self, selector, story):
+        """
+        Tests `filter_unchanged` keeps stories when missing new date.
+        """
+        old = self.populate(story, 1)
+        new = self.populate(story, None)
+
+        selected = selector.filter_unchanged(old, new)
+
+        assert selected is new
+
+    def test_revived_selection(self, selector, story):
+        """
+        Tests behavior for stories that have not updated.
+        """
+        old = self.populate(story, 1)
+        new = self.populate(story, 1)
+
+        selected = selector(old, new)
+
+        assert selected is new
+        assert UpdateStatus.UPDATED in new.flavors
