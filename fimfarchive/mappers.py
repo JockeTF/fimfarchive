@@ -24,6 +24,8 @@ Mappers for Fimfarchive.
 
 import os
 
+import arrow
+
 from fimfarchive.exceptions import InvalidStoryError
 
 
@@ -80,7 +82,7 @@ class StoryDateMapper(Mapper):
         dates.discard(None)
 
         if dates:
-            return max(dates)
+            return max(arrow.get(date) for date in dates)
         else:
             return None
 

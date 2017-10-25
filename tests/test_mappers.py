@@ -151,7 +151,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_none_chapters(self, mapper, story):
         """
@@ -164,7 +164,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_empty_chapters(self, mapper, story):
         """
@@ -177,7 +177,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_only_chapter_dates(self, mapper, story):
         """
@@ -193,7 +193,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_only_story_date(self, mapper, story):
         """
@@ -210,7 +210,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_latest_chapter_date(self, mapper, story):
         """
@@ -227,7 +227,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_latest_story_date(self, mapper, story):
         """
@@ -244,7 +244,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
     def test_meta_with_both_latest(self, mapper, story):
         """
@@ -261,7 +261,7 @@ class TestStoryDateMapper:
 
         story = story.merge(meta=meta)
 
-        assert mapper(story) == 5
+        assert mapper(story).timestamp == 5
 
 
 class TestStoryPathMapper:
