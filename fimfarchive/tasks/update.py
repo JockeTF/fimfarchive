@@ -30,7 +30,7 @@ from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.flavors import DataFormat, UpdateStatus
 from fimfarchive.mappers import StoryPathMapper
-from fimfarchive.selectors import UpdateSelector
+from fimfarchive.selectors import Selector, UpdateSelector
 from fimfarchive.signals import Signal, SignalSender
 from fimfarchive.stories import Story
 from fimfarchive.utils import PersistedDict
@@ -74,6 +74,7 @@ class UpdateTask(SignalSender):
             self,
             fimfarchive: Fetcher,
             fimfiction: Fetcher,
+            selector: Selector = None,
             workdir: str = DEFAULT_WORKDIR,
             retries: int = DEFAULT_RETRIES,
             skips: int = DEFAULT_SKIPS,
@@ -84,14 +85,19 @@ class UpdateTask(SignalSender):
         Args:
             fimfarchive: Fetcher for the old release.
             fimfiction: Fetcher for the new release.
+            selector: Selector for which story to save.
             workdir: Path for storage of state and stories.
             retries: Number of retries before giving up.
             skips: Number of skips before giving up.
         """
         super().__init__()
 
+        if selector is None:
+            selector = UpdateSelector()
+
         self.fimfarchive = fimfarchive
         self.fimfiction = fimfiction
+        self.select = selector
         self.workdir = workdir
         self.retries = retries
         self.skips = skips
@@ -99,8 +105,6 @@ class UpdateTask(SignalSender):
         os.makedirs(self.workdir, exist_ok=True)
         state_path = os.path.join(self.workdir, self.state_file)
         self.state = PersistedDict(state_path, self.state_vars)
-
-        self.select = UpdateSelector()
 
         meta_mapper = self.get_mapper('meta')
         skip_mapper = self.get_mapper('skip')

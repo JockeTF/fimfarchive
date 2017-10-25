@@ -29,6 +29,7 @@ import pytest
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.flavors import DataFormat, UpdateStatus
+from fimfarchive.selectors import RefetchSelector, UpdateSelector
 from fimfarchive.stories import Story
 from fimfarchive.tasks.update import (
     UpdateTask, SUCCESS_DELAY, SKIPPED_DELAY, FAILURE_DELAY,
@@ -97,13 +98,21 @@ class TestUpdateTask:
         return DummyFetcher()
 
     @pytest.fixture
-    def task(self, fimfarchive, fimfiction, tmpdir):
+    def selector(self):
+        """
+        Returns an `UpdateSelector` instance.
+        """
+        return UpdateSelector()
+
+    @pytest.fixture
+    def task(self, fimfarchive, fimfiction, selector, tmpdir):
         """
         Returns an `UpdateTask` instance.
         """
         return UpdateTask(
             fimfiction=fimfiction,
             fimfarchive=fimfarchive,
+            selector=selector,
             workdir=str(tmpdir),
             retries=2,
             skips=2,
@@ -267,3 +276,25 @@ class TestUpdateTask:
 
         with pytest.raises(ValueError):
             task.write(story)
+
+
+class TestRefetchingUpdateTask(TestUpdateTask):
+    """
+    Tests update task with a refetch selector.
+    """
+
+    @pytest.fixture
+    def selector(self):
+        """
+        Returns a `RefetchSelector` instance.
+        """
+        return RefetchSelector()
+
+    def test_revived_story(self, task, fimfarchive, fimfiction):
+        """
+        Tests updating for a revived story.
+        """
+        fimfarchive.add(key=1, date=1)
+        target = fimfiction.add(key=1, date=1)
+
+        self.verify_fetch(task, target, UpdateStatus.UPDATED)
