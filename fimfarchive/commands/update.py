@@ -23,13 +23,14 @@ Update command.
 
 
 import traceback
-from argparse import ArgumentParser, FileType
+from argparse import ArgumentParser, Namespace, FileType
 from typing import Any, Iterable, Iterator, Optional
 
 from jmespath import search
 
-from fimfarchive.fetchers import FimfarchiveFetcher, FimfictionFetcher
+from fimfarchive.fetchers import Fetcher, FimfarchiveFetcher, FimfictionFetcher
 from fimfarchive.flavors import UpdateStatus
+from fimfarchive.selectors import Selector, RefetchSelector
 from fimfarchive.signals import SignalReceiver
 from fimfarchive.stories import Story
 from fimfarchive.tasks import UpdateTask
@@ -169,7 +170,7 @@ class UpdatePrinter(SignalReceiver):
         if story:
             print(StoryFormatter(story))
         else:
-            print("Status: Missing")
+            print("Action: Missing")
 
     def on_failure(self, sender, key, error):
         """
@@ -202,15 +203,37 @@ class UpdateCommand(Command):
             metavar='PATH',
         )
 
+        parser.add_argument(
+            '--refetch',
+            help="refetch all available stories",
+            action='store_true',
+        )
+
         return parser
+
+    def configure(self, opts: Namespace) -> UpdateTask:
+        """
+        Returns a configured task instance.
+
+        Args:
+            opts: Parsed command line arguments.
+        """
+        fimfarchive: Fetcher = FimfarchiveFetcher(opts.archive)
+        fimfiction: Fetcher = FimfictionFetcher()
+        selector: Optional[Selector] = None
+
+        if opts.refetch:
+            selector = RefetchSelector()
+
+        return UpdateTask(
+            fimfarchive=fimfarchive,
+            fimfiction=fimfiction,
+            selector=selector,
+        )
 
     def __call__(self, *args):
         opts = self.parser.parse_args(args)
-
-        task = UpdateTask(
-            fimfarchive=FimfarchiveFetcher(opts.archive),
-            fimfiction=FimfictionFetcher(),
-        )
+        task = self.configure(opts)
 
         with UpdatePrinter(task):
             task.run()
