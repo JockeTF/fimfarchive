@@ -72,7 +72,7 @@ class FimfarchiveFetcher(Fetcher):
 
         try:
             self._init(file)
-        except:
+        except Exception:
             self.close()
             raise
         else:
