@@ -26,7 +26,7 @@ import traceback
 from argparse import ArgumentParser, Namespace, FileType
 from typing import Any, Iterable, Iterator, Optional
 
-from jmespath import search
+from jmespath import compile as jmes
 
 from fimfarchive.fetchers import Fetcher, FimfarchiveFetcher, FimfictionFetcher
 from fimfarchive.flavors import UpdateStatus
@@ -59,6 +59,14 @@ class StoryFormatter(Iterable[str]):
         'action',
     )
 
+    paths = {
+        'author': jmes('author.name'),
+        'status': jmes('completion_status || status'),
+        'words': jmes('num_words || words'),
+        'likes': jmes('num_likes || likes'),
+        'dislikes': jmes('num_dislikes || dislikes'),
+    }
+
     def __init__(self, story: Story) -> None:
         """
         Constructor.
@@ -73,7 +81,12 @@ class StoryFormatter(Iterable[str]):
         Returns a value from story meta, or None.
         """
         meta = self.story.meta
-        return meta.get(key)
+        path = self.paths.get(key)
+
+        if path:
+            return path.search(meta)
+        else:
+            return meta.get(key)
 
     def __iter__(self) -> Iterator[str]:
         """
@@ -91,21 +104,12 @@ class StoryFormatter(Iterable[str]):
         return '\n'.join(self)
 
     @property
-    def author(self) -> Optional[str]:
-        """
-        Returns the name of the author, or None.
-        """
-        meta = self.story.meta
-        return search('author.name', meta)
-
-    @property
     def approval(self) -> Optional[str]:
         """
         Returns the likes to dislikes ratio, or None.
         """
-        meta = self.story.meta
-        likes = meta.get('likes')
-        dislikes = meta.get('dislikes')
+        likes = self.likes
+        dislikes = self.dislikes
 
         try:
             ratio = likes / (likes + dislikes)

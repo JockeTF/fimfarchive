@@ -65,9 +65,9 @@ class TestStoryFormatter():
         story = story.merge(meta=meta, flavors=flavors)
         self.assert_formatted_equals(expected, story)
 
-    def test_complete_meta(self, story):
+    def test_old_meta(self, story):
         """
-        Tests story formatting with complete meta.
+        Tests story formatting with old-style meta.
         """
         flavors: Set[Flavor] = {
             UpdateStatus.CREATED,
@@ -82,6 +82,44 @@ class TestStoryFormatter():
             'words': 4,
             'likes': 3,
             'dislikes': 2,
+            'chapters': [
+                1
+            ],
+        }
+
+        expected = """
+            Title: A
+            Author: B
+            Status: C
+            Words: 4
+            Likes: 3
+            Dislikes: 2
+            Approval: 60%
+            Chapters: 1
+            Action: Created
+        """
+
+        story = story.merge(meta=meta, flavors=flavors)
+        self.assert_formatted_equals(expected, story)
+
+    def test_new_meta(self, story):
+        """
+        Tests story formatting with new-style meta.
+        """
+        flavors: Set[Flavor] = {
+            UpdateStatus.CREATED,
+        }
+
+        meta: Dict[str, Any] = {
+            'title': 'A',
+            'author': {
+                'name': 'B'
+            },
+            'status': 'visible',
+            'completion_status': 'C',
+            'num_words': 4,
+            'num_likes': 3,
+            'num_dislikes': 2,
             'chapters': [
                 1
             ],
