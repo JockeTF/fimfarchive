@@ -22,14 +22,21 @@ Stampers for Fimfarchive.
 #
 
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional, Set, Type, TypeVar
 
+import arrow
+
+from fimfarchive.flavors import Flavor, UpdateStatus
 from fimfarchive.stories import Story
 
 
 __all__ = (
     'Stamper',
+    'UpdateStamper',
 )
+
+
+F = TypeVar('F', bound=Flavor)
 
 
 class Stamper:
@@ -62,3 +69,59 @@ class Stamper:
             story: The story to stamp.
         """
         raise NotImplementedError()
+
+
+class UpdateStamper(Stamper):
+    """
+    Adds modification dates to stories.
+    """
+    spec: Dict[str, Set[UpdateStatus]] = {
+        'date_created': {
+            UpdateStatus.CREATED,
+        },
+        'date_fetched': {
+            UpdateStatus.CREATED,
+            UpdateStatus.REVIVED,
+            UpdateStatus.UPDATED,
+        },
+        'date_updated': {
+            UpdateStatus.CREATED,
+            UpdateStatus.UPDATED,
+        },
+    }
+
+    def find_flavor(self, story: Story, flavor: Type[F]) -> Optional[F]:
+        """
+        Searches for a flavor of a specific type.
+
+        Args:
+            story: The story to search in.
+            flavor: The flavor type to find.
+
+        Returns:
+            A flavor of the desired type, or None.
+        """
+        for current in story.flavors:
+            if isinstance(current, flavor):
+                return current
+
+        return None
+
+    def __call__(self, story: Story) -> None:
+        """
+        Applies modification dates to a story.
+
+        Args:
+            story: The story to stamp.
+        """
+        timestamp = arrow.utcnow().isoformat()
+        flavor = self.find_flavor(story, UpdateStatus)
+        archive = self.get_archive(story)
+
+        archive['date_checked'] = timestamp
+
+        for key, value in self.spec.items():
+            if flavor in value:
+                archive[key] = timestamp
+            elif key not in archive:
+                archive[key] = None

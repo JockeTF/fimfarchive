@@ -22,11 +22,14 @@ Stamper tests.
 #
 
 
+from unittest.mock import patch
 from typing import Dict
 
+import arrow
 import pytest
 
-from fimfarchive.stampers import Stamper
+from fimfarchive.flavors import UpdateStatus
+from fimfarchive.stampers import Stamper, UpdateStamper
 
 
 class TestStamper:
@@ -62,3 +65,125 @@ class TestStamper:
 
         assert archive is original
         assert meta['archive'] is original
+
+
+class TestUpdateStamper:
+    """
+    UpdateStamper tests.
+    """
+
+    @pytest.fixture
+    def time(self):
+        """
+        Returns a timestamp for the mocked utcnow.
+        """
+        stamp = arrow.get(1)
+
+        with patch('arrow.utcnow') as m:
+            m.return_value = stamp
+            yield stamp.isoformat()
+
+    @pytest.fixture
+    def stamper(self, time):
+        """
+        Returns an update stamper instance.
+        """
+        return UpdateStamper()
+
+    def test_created_story(self, stamper, story, time):
+        """
+        Tests timestamps are added for created stories.
+        """
+        story.flavors.add(UpdateStatus.CREATED)
+        stamper(story)
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] == time
+        assert archive['date_fetched'] == time
+        assert archive['date_updated'] == time
+
+    def test_updated_story(self, stamper, story, time):
+        """
+        Tests timestamps are added for updated stories.
+        """
+        story.flavors.add(UpdateStatus.UPDATED)
+        stamper(story)
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] is None
+        assert archive['date_fetched'] == time
+        assert archive['date_updated'] == time
+
+    def test_revived_story(self, stamper, story, time):
+        """
+        Tests timestamps are added for revived stories.
+        """
+        story.flavors.add(UpdateStatus.REVIVED)
+        stamper(story)
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] is None
+        assert archive['date_fetched'] == time
+        assert archive['date_updated'] is None
+
+    def test_deleted_story(self, stamper, story, time):
+        """
+        Tests timestamps are added for deleted stories.
+        """
+        story.flavors.add(UpdateStatus.DELETED)
+        stamper(story)
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] is None
+        assert archive['date_fetched'] is None
+        assert archive['date_updated'] is None
+
+    def test_created_modification(self, stamper, story, time):
+        """
+        Tests existing timestamps are replaced for created stories.
+        """
+        story.flavors.add(UpdateStatus.CREATED)
+        prev = arrow.get(-1).isoformat()
+
+        story.meta['archive'] = {
+            'date_checked': prev,
+            'date_created': prev,
+            'date_fetched': prev,
+            'date_updated': prev,
+        }
+
+        stamper(story)
+        assert prev != time
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] == time
+        assert archive['date_fetched'] == time
+        assert archive['date_updated'] == time
+
+    def test_deleted_modification(self, stamper, story, time):
+        """
+        Tests existing timestamps are kept for deleted stories.
+        """
+        story.flavors.add(UpdateStatus.DELETED)
+        prev = arrow.get(-1).isoformat()
+
+        story.meta['archive'] = {
+            'date_checked': prev,
+            'date_created': prev,
+            'date_fetched': prev,
+            'date_updated': prev,
+        }
+
+        stamper(story)
+        assert prev != time
+
+        archive = story.meta['archive']
+        assert archive['date_checked'] == time
+        assert archive['date_created'] == prev
+        assert archive['date_fetched'] == prev
+        assert archive['date_updated'] == prev
