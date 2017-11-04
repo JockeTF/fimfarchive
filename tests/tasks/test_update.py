@@ -105,7 +105,14 @@ class TestUpdateTask:
         return UpdateSelector()
 
     @pytest.fixture
-    def task(self, fimfarchive, fimfiction, selector, tmpdir):
+    def stamper(self):
+        """
+        Returns a stamper mock.
+        """
+        return MagicMock()
+
+    @pytest.fixture
+    def task(self, fimfarchive, fimfiction, selector, stamper, tmpdir):
         """
         Returns an `UpdateTask` instance.
         """
@@ -113,6 +120,7 @@ class TestUpdateTask:
             fimfiction=fimfiction,
             fimfarchive=fimfarchive,
             selector=selector,
+            stamper=stamper,
             workdir=str(tmpdir),
             retries=2,
             skips=2,
@@ -142,6 +150,7 @@ class TestUpdateTask:
         )
 
         self.verify_run(task, delays)
+        task.stamp.assert_called_once_with(target)
         task.write.assert_called_once_with(target)
         assert status in target.flavors
         assert task.state['key'] == 4
@@ -150,6 +159,7 @@ class TestUpdateTask:
         """
         Runs the task and verifies an empty fetch.
         """
+        task.write = MagicMock()
         task.skip_writer.write = MagicMock()
 
         target = fetcher.add(key=1, date=1)
@@ -161,6 +171,8 @@ class TestUpdateTask:
         )
 
         self.verify_run(task, delays)
+        task.stamp.assert_not_called()
+        task.write.assert_not_called()
         task.skip_writer.write.assert_called_once_with(target)
 
     def verify_failure(self, task, fetcher):
@@ -176,6 +188,7 @@ class TestUpdateTask:
         )
 
         self.verify_run(task, delays)
+        task.stamp.assert_not_called()
         task.write.assert_not_called()
 
     def test_created_story(self, task, fimfiction):

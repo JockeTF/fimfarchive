@@ -32,6 +32,7 @@ from fimfarchive.flavors import DataFormat, UpdateStatus
 from fimfarchive.mappers import StoryPathMapper
 from fimfarchive.selectors import Selector, UpdateSelector
 from fimfarchive.signals import Signal, SignalSender
+from fimfarchive.stampers import Stamper, UpdateStamper
 from fimfarchive.stories import Story
 from fimfarchive.utils import PersistedDict
 from fimfarchive.writers import DirectoryWriter
@@ -75,6 +76,7 @@ class UpdateTask(SignalSender):
             fimfarchive: Fetcher,
             fimfiction: Fetcher,
             selector: Selector = None,
+            stamper: Stamper = None,
             workdir: str = DEFAULT_WORKDIR,
             retries: int = DEFAULT_RETRIES,
             skips: int = DEFAULT_SKIPS,
@@ -86,6 +88,7 @@ class UpdateTask(SignalSender):
             fimfarchive: Fetcher for the old release.
             fimfiction: Fetcher for the new release.
             selector: Selector for which story to save.
+            stamper: Stamper for adding story information.
             workdir: Path for storage of state and stories.
             retries: Number of retries before giving up.
             skips: Number of skips before giving up.
@@ -95,9 +98,13 @@ class UpdateTask(SignalSender):
         if selector is None:
             selector = UpdateSelector()
 
+        if stamper is None:
+            stamper = UpdateStamper()
+
         self.fimfarchive = fimfarchive
         self.fimfiction = fimfiction
         self.select = selector
+        self.stamp = stamper
         self.workdir = workdir
         self.retries = retries
         self.skips = skips
@@ -176,6 +183,7 @@ class UpdateTask(SignalSender):
             selected = selected.merge(meta=new.meta)
 
         if selected:
+            self.stamp(selected)
             self.write(selected)
         elif new:
             self.skip_writer.write(new)
