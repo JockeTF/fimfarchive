@@ -33,6 +33,7 @@ MODULES = (
     'mappers',
     'selectors',
     'signals',
+    'stampers',
     'stories',
     'tasks',
     'utils',

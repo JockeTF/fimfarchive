@@ -27,6 +27,11 @@ from typing import Any, Dict
 from fimfarchive.stories import Story
 
 
+__all__ = (
+    'Stamper',
+)
+
+
 class Stamper:
     """
     Adds archive-related information to stories.
