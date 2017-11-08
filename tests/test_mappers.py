@@ -48,33 +48,12 @@ class TestStaticMapper:
         """
         return object()
 
-    def test_value(self, value):
+    def test_value(self, story, value):
         """
         Tests returns the supplied value.
         """
         mapper = StaticMapper(value)
-        assert mapper() is value
-
-    def test_default_value(self):
-        """
-        Tests `None` is returned by default.
-        """
-        mapper = StaticMapper()
-        assert mapper() is None
-
-    def test_args(self, value):
-        """
-        Tests callable ignores args.
-        """
-        mapper = StaticMapper(value)
-        assert mapper(1, 2, 3) is value
-
-    def test_kwargs(self, value):
-        """
-        Tests callable ignores kwargs.
-        """
-        mapper = StaticMapper(value)
-        assert mapper(a=1, b=2) is value
+        assert mapper(story) is value
 
 
 class TestStoryDateMapper:

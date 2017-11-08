@@ -23,10 +23,13 @@ Mappers for Fimfarchive.
 
 
 import os
+from abc import abstractmethod
+from typing import Generic, Optional, TypeVar
 
-import arrow
+from arrow import api as arrow, Arrow
 
 from fimfarchive.exceptions import InvalidStoryError
+from fimfarchive.stories import Story
 
 
 __all__ = (
@@ -37,33 +40,45 @@ __all__ = (
 )
 
 
-class Mapper:
+T = TypeVar('T')
+
+
+class Mapper(Generic[T]):
     """
-    Callable which maps something to something else.
+    Callable which maps stories to something else.
     """
 
-    def __call__(self, *args, **kwargs):
-        raise NotImplementedError()
+    @abstractmethod
+    def __call__(self, story: Story) -> T:
+        """
+        Applies the mapper.
+
+        Args:
+            story: The story to map.
+
+        Returns:
+            A mapped object.
+        """
 
 
-class StaticMapper(Mapper):
+class StaticMapper(Mapper[T]):
     """
     Returns the supplied value for any call.
     """
 
-    def __init__(self, value=None):
+    def __init__(self, value: T) -> None:
         self.value = value
 
-    def __call__(self, *args, **kwargs):
+    def __call__(self, story: Story) -> T:
         return self.value
 
 
-class StoryDateMapper(Mapper):
+class StoryDateMapper(Mapper[Optional[Arrow]]):
     """
     Returns the latest timestamp in a story, or None.
     """
 
-    def __call__(self, story):
+    def __call__(self, story: Story) -> Optional[Arrow]:
         try:
             meta = getattr(story, 'meta', None)
         except InvalidStoryError:
@@ -87,15 +102,15 @@ class StoryDateMapper(Mapper):
             return None
 
 
-class StoryPathMapper(Mapper):
+class StoryPathMapper(Mapper[str]):
     """
     Returns a key-based file path for a story.
     """
 
-    def __init__(self, directory):
+    def __init__(self, directory: str) -> None:
         self.directory = directory
 
-    def __call__(self, story):
+    def __call__(self, story: Story) -> str:
         directory = str(self.directory)
         key = str(story.key)
 
