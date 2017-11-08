@@ -1,5 +1,5 @@
 """
-Import tests.
+Converter base class.
 """
 
 
@@ -22,37 +22,29 @@ Import tests.
 #
 
 
-import pytest
+from abc import ABC, abstractmethod
+
+from fimfarchive.stories import Story
 
 
-MODULES = (
-    'commands',
-    'converters',
-    'exceptions',
-    'fetchers',
-    'flavors',
-    'mappers',
-    'selectors',
-    'signals',
-    'stampers',
-    'stories',
-    'tasks',
-    'utils',
-    'writers',
+__all__ = (
+    'Converter',
 )
 
 
-class TestImport:
+class Converter(ABC):
     """
-    Tests import.
+    Converter for stories.
     """
 
-    @pytest.mark.parametrize('module', MODULES)
-    def test_wildcard_import(self, module):
+    @abstractmethod
+    def __call__(self, story: Story) -> Story:
         """
-        Tests wildcard import.
-        """
-        template = 'from fimfarchive.{} import *'
-        statement = template.format(module)
+        Applies the conversion.
 
-        exec(statement)
+        Args:
+            *story: The story to convert.
+
+        Returns:
+            A converted story.
+        """

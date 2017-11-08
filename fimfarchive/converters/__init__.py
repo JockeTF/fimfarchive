@@ -1,5 +1,5 @@
 """
-Import tests.
+Converter module.
 """
 
 
@@ -22,37 +22,9 @@ Import tests.
 #
 
 
-import pytest
+from .base import Converter
 
 
-MODULES = (
-    'commands',
-    'converters',
-    'exceptions',
-    'fetchers',
-    'flavors',
-    'mappers',
-    'selectors',
-    'signals',
-    'stampers',
-    'stories',
-    'tasks',
-    'utils',
-    'writers',
+__all__ = (
+    'Converter',
 )
-
-
-class TestImport:
-    """
-    Tests import.
-    """
-
-    @pytest.mark.parametrize('module', MODULES)
-    def test_wildcard_import(self, module):
-        """
-        Tests wildcard import.
-        """
-        template = 'from fimfarchive.{} import *'
-        statement = template.format(module)
-
-        exec(statement)
