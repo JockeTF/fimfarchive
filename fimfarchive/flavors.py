@@ -74,6 +74,7 @@ class DataFormat(Flavor):
     EPUB = ()
     FPUB = ()
     HTML = ()
+    JSON = ()
 
 
 class MetaFormat(Flavor):
