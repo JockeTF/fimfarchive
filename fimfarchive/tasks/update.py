@@ -28,7 +28,7 @@ from typing import Optional
 
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import Fetcher
-from fimfarchive.flavors import DataFormat, UpdateStatus
+from fimfarchive.flavors import DataFormat, StorySource, UpdateStatus
 from fimfarchive.mappers import StoryPathMapper
 from fimfarchive.selectors import Selector, UpdateSelector
 from fimfarchive.signals import Signal, SignalSender
@@ -119,6 +119,7 @@ class UpdateTask(SignalSender):
         html_mapper = self.get_mapper('html')
         json_mapper = self.get_mapper('json')
 
+        self.meta_writer = DirectoryWriter(meta_mapper)
         self.skip_writer = DirectoryWriter(skip_mapper)
         self.epub_writer = DirectoryWriter(meta_mapper, epub_mapper)
         self.html_writer = DirectoryWriter(meta_mapper, html_mapper)
@@ -160,7 +161,9 @@ class UpdateTask(SignalSender):
         Raises:
             ValueError: If story flavor is unsupported.
         """
-        if DataFormat.HTML in story.flavors:
+        if StorySource.FIMFARCHIVE in story.flavors:
+            self.meta_writer.write(story)
+        elif DataFormat.HTML in story.flavors:
             self.html_writer.write(story)
         elif DataFormat.JSON in story.flavors:
             self.json_writer.write(story)

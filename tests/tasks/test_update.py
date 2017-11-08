@@ -28,7 +28,7 @@ import pytest
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.fetchers import Fetcher
-from fimfarchive.flavors import DataFormat, UpdateStatus
+from fimfarchive.flavors import DataFormat, StorySource, UpdateStatus
 from fimfarchive.selectors import RefetchSelector, UpdateSelector
 from fimfarchive.stories import Story
 from fimfarchive.tasks.update import (
@@ -260,6 +260,23 @@ class TestUpdateTask:
         Tests handling of a failure in Fimfiction.
         """
         self.verify_failure(task, fimfiction)
+
+    def test_write_meta(self, task, story):
+        """
+        Tests writing of meta for stories from Fimfarchive.
+        """
+        story = story.merge(flavors=[
+            DataFormat.JSON,
+            StorySource.FIMFARCHIVE,
+        ])
+
+        task.meta_writer.write = MagicMock()
+        task.json_writer.write = MagicMock()
+
+        task.write(story)
+
+        task.meta_writer.write.assert_called_once_with(story)
+        task.json_writer.write.assert_not_called()
 
     def test_write_epub(self, task, story):
         """
