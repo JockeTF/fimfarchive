@@ -281,6 +281,16 @@ class TestUpdateTask:
         task.write(story)
         task.html_writer.write.assert_called_once_with(story)
 
+    def test_write_json(self, task, story):
+        """
+        Tests writing of a story in JSON format.
+        """
+        story = story.merge(flavors=[DataFormat.JSON])
+        task.json_writer.write = MagicMock()
+
+        task.write(story)
+        task.json_writer.write.assert_called_once_with(story)
+
     def test_write_unsupported(self, task, story):
         """
         Tests `ValueError` is raised for unknown data formats.

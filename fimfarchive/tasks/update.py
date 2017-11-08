@@ -117,10 +117,12 @@ class UpdateTask(SignalSender):
         skip_mapper = self.get_mapper('skip')
         epub_mapper = self.get_mapper('epub')
         html_mapper = self.get_mapper('html')
+        json_mapper = self.get_mapper('json')
 
         self.skip_writer = DirectoryWriter(skip_mapper)
         self.epub_writer = DirectoryWriter(meta_mapper, epub_mapper)
         self.html_writer = DirectoryWriter(meta_mapper, html_mapper)
+        self.json_writer = DirectoryWriter(meta_mapper, json_mapper)
 
     def get_mapper(self, subdir: str) -> StoryPathMapper:
         """
@@ -160,6 +162,8 @@ class UpdateTask(SignalSender):
         """
         if DataFormat.HTML in story.flavors:
             self.html_writer.write(story)
+        elif DataFormat.JSON in story.flavors:
+            self.json_writer.write(story)
         elif DataFormat.EPUB in story.flavors:
             self.epub_writer.write(story)
         else:
