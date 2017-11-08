@@ -29,6 +29,7 @@ __all__ = (
     'Flavor',
     'StorySource',
     'DataFormat',
+    'MetaFormat',
     'MetaPurity',
     'UpdateStatus',
 )
@@ -73,6 +74,14 @@ class DataFormat(Flavor):
     EPUB = ()
     FPUB = ()
     HTML = ()
+
+
+class MetaFormat(Flavor):
+    """
+    Indicates the general structure of story meta.
+    """
+    ALPHA = ()
+    BETA = ()
 
 
 class MetaPurity(Flavor):

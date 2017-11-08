@@ -25,7 +25,7 @@ Fimfiction fetcher.
 import requests
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
-from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
+from fimfarchive.flavors import StorySource, DataFormat, MetaFormat, MetaPurity
 
 from .base import Fetcher
 
@@ -48,6 +48,7 @@ class FimfictionFetcher(Fetcher):
     flavors = frozenset((
         StorySource.FIMFICTION,
         DataFormat.HTML,
+        MetaFormat.ALPHA,
         MetaPurity.DIRTY,
     ))
 
