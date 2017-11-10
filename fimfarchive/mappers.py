@@ -24,11 +24,12 @@ Mappers for Fimfarchive.
 
 import os
 from abc import abstractmethod
-from typing import Generic, Optional, TypeVar
+from typing import Dict, Generic, Optional, Set, TypeVar
 
 from arrow import api as arrow, Arrow
 
 from fimfarchive.exceptions import InvalidStoryError
+from fimfarchive.flavors import MetaFormat
 from fimfarchive.stories import Story
 
 
@@ -115,3 +116,24 @@ class StoryPathMapper(Mapper[str]):
         key = str(story.key)
 
         return os.path.join(directory, key)
+
+
+class MetaFormatMapper(Mapper[Optional[MetaFormat]]):
+    """
+    Guesses the meta format of stories.
+    """
+    spec: Dict[MetaFormat, Set[str]] = {
+        MetaFormat.ALPHA: {'likes', 'dislikes', 'words'},
+        MetaFormat.BETA: {'num_likes', 'num_dislikes', 'num_words'},
+    }
+
+    def __call__(self, story: Story) -> Optional[MetaFormat]:
+        items = self.spec.items()
+        meta = set(story.meta.keys())
+
+        matches = {fmt for fmt, spec in items if spec & meta}
+
+        if len(matches) == 1:
+            return next(iter(matches))
+        else:
+            return None

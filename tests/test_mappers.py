@@ -23,12 +23,16 @@ Mapper tests.
 
 
 import os
+from typing import no_type_check, Dict, Any
 from unittest.mock import patch, MagicMock, PropertyMock
 
 import pytest
 
 from fimfarchive.exceptions import InvalidStoryError
-from fimfarchive.mappers import StaticMapper, StoryDateMapper, StoryPathMapper
+from fimfarchive.flavors import MetaFormat
+from fimfarchive.mappers import (
+    MetaFormatMapper, StaticMapper, StoryDateMapper, StoryPathMapper
+)
 from fimfarchive.stories import Story
 
 
@@ -108,7 +112,7 @@ class TestStoryDateMapper:
         """
         Tests `None` is returned when meta contains no dates.
         """
-        meta = {
+        meta: Dict[str, Any] = {
             CHAPTERS: [
                 dict(),
                 dict(),
@@ -259,6 +263,7 @@ class TestStoryPathMapper:
 
         assert mapper(story) == path
 
+    @no_type_check
     def test_casts_values(self, tmpdir, story):
         """
         Tests casts all values to string when joining.
@@ -274,3 +279,58 @@ class TestStoryPathMapper:
         assert mapper(story) == os.path.join('dir', 'key')
         assert directory.__str__.called_once_with()
         assert story.key.__str__.called_once_with()
+
+
+class TestMetaFormatMapper:
+    """
+    MetaFormatMapper tests.
+    """
+
+    @pytest.fixture
+    def mapper(self):
+        """
+        Returns a meta format mapper instance.
+        """
+        return MetaFormatMapper()
+
+    @pytest.fixture(params=['likes', 'dislikes', 'words'])
+    def alpha(self, request):
+        """
+        Returns an alpha meta key.
+        """
+        return request.param
+
+    @pytest.fixture(params=['num_likes', 'num_dislikes', 'num_words'])
+    def beta(self, request):
+        """
+        Returns a beta meta key.
+        """
+        return request.param
+
+    def merge(self, story, *keys):
+        """
+        Returns a story containing the requested meta keys.
+        """
+        meta = {key: i for i, key in enumerate(keys, 1)}
+        return story.merge(meta=meta)
+
+    def test_alpha_format(self, mapper, story, alpha):
+        """
+        Tests alpha meta format is detected.
+        """
+        story = self.merge(story, alpha, 'misc')
+        assert mapper(story) == MetaFormat.ALPHA
+
+    def test_beta_format(self, mapper, story, beta):
+        """
+        Tests beta meta format is detected.
+        """
+        story = self.merge(story, beta, 'misc')
+        assert mapper(story) == MetaFormat.BETA
+
+    def test_conflict(self, mapper, story, alpha, beta):
+        """
+        Tests None is returned for conflicting meta keys.
+        """
+        story = self.merge(story, alpha, beta)
+        assert mapper(story) is None
