@@ -27,7 +27,8 @@ import os
 
 import pytest
 
-from fimfarchive.utils import Empty, PersistedDict
+from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
+from fimfarchive.utils import find_flavor, Empty, PersistedDict
 
 
 class TestEmpty:
@@ -189,3 +190,33 @@ class TestPersistedDict:
         data = PersistedDict(tmpfile, default=extra)
 
         assert dict(data) == sample
+
+
+class TestFindFlavor:
+    """
+    find_flavor tests.
+    """
+
+    @pytest.fixture
+    def story(self, story):
+        """
+        Returns a meta-flavored story.
+        """
+        return story.merge(flavors=[
+            MetaFormat.BETA,
+            MetaPurity.CLEAN,
+        ])
+
+    def test_present_flavor(self, story):
+        """
+        Tests flavor is returned when present.
+        """
+        found = find_flavor(story, MetaFormat)
+        assert found == MetaFormat.BETA
+
+    def test_missing_flavor(self, story):
+        """
+        Tests None is returned when flavor is missing.
+        """
+        found = find_flavor(story, DataFormat)
+        assert found is None

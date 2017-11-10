@@ -25,13 +25,20 @@ Various utilities.
 import json
 import os
 import shutil
-from typing import Dict, Any
+from typing import Any, Dict, Optional, Type, TypeVar
+
+from fimfarchive.flavors import Flavor
+from fimfarchive.stories import Story
 
 
 __all__ = (
     'Empty',
     'PersistedDict',
+    'find_flavor',
 )
+
+
+F = TypeVar('F', bound=Flavor)
 
 
 class EmptyMeta(type):
@@ -101,3 +108,21 @@ class PersistedDict(Dict[str, Any]):
 
         if os.path.exists(self.temp):
             os.remove(self.temp)
+
+
+def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
+    """
+    Searches for a flavor of a specific type.
+
+    Args:
+        story: The story to search in.
+        flavor: The flavor type to find.
+
+    Returns:
+        A flavor of the desired type, or None.
+    """
+    for current in story.flavors:
+        if isinstance(current, flavor):
+            return current
+
+    return None

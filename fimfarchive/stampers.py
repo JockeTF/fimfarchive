@@ -22,21 +22,19 @@ Stampers for Fimfarchive.
 #
 
 
-from typing import Any, Dict, Optional, Set, Type, TypeVar
+from typing import Any, Dict, Set
 
 import arrow
 
-from fimfarchive.flavors import Flavor, UpdateStatus
+from fimfarchive.flavors import UpdateStatus
 from fimfarchive.stories import Story
+from fimfarchive.utils import find_flavor
 
 
 __all__ = (
     'Stamper',
     'UpdateStamper',
 )
-
-
-F = TypeVar('F', bound=Flavor)
 
 
 class Stamper:
@@ -90,23 +88,6 @@ class UpdateStamper(Stamper):
         },
     }
 
-    def find_flavor(self, story: Story, flavor: Type[F]) -> Optional[F]:
-        """
-        Searches for a flavor of a specific type.
-
-        Args:
-            story: The story to search in.
-            flavor: The flavor type to find.
-
-        Returns:
-            A flavor of the desired type, or None.
-        """
-        for current in story.flavors:
-            if isinstance(current, flavor):
-                return current
-
-        return None
-
     def __call__(self, story: Story) -> None:
         """
         Applies modification dates to a story.
@@ -115,7 +96,7 @@ class UpdateStamper(Stamper):
             story: The story to stamp.
         """
         timestamp = arrow.utcnow().isoformat()
-        flavor = self.find_flavor(story, UpdateStatus)
+        flavor = find_flavor(story, UpdateStatus)
         archive = self.get_archive(story)
 
         archive['date_checked'] = timestamp

@@ -63,8 +63,8 @@ class TestStamper:
         meta['archive'] = original
         archive = stamper.get_archive(story)
 
-        assert archive is original
         assert meta['archive'] is original
+        assert archive is original
 
 
 class TestUpdateStamper:
