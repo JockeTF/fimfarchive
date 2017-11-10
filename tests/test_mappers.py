@@ -334,3 +334,12 @@ class TestMetaFormatMapper:
         """
         story = self.merge(story, alpha, beta)
         assert mapper(story) is None
+
+    def test_existing_flavor(self, mapper, story, beta):
+        """
+        Tests existing flavor takes precedence over meta.
+        """
+        story = story.merge(flavors=[MetaFormat.ALPHA])
+        story = self.merge(story, beta, 'misc')
+
+        assert mapper(story) is MetaFormat.ALPHA

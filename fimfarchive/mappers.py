@@ -31,6 +31,7 @@ from arrow import api as arrow, Arrow
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.flavors import MetaFormat
 from fimfarchive.stories import Story
+from fimfarchive.utils import find_flavor
 
 
 __all__ = (
@@ -128,9 +129,13 @@ class MetaFormatMapper(Mapper[Optional[MetaFormat]]):
     }
 
     def __call__(self, story: Story) -> Optional[MetaFormat]:
+        flavor = find_flavor(story, MetaFormat)
+
+        if flavor:
+            return flavor
+
         items = self.spec.items()
         meta = set(story.meta.keys())
-
         matches = {fmt for fmt, spec in items if spec & meta}
 
         if len(matches) == 1:
