@@ -31,5 +31,5 @@ from fimfarchive import __version__
 setup(
     name="fimfarchive",
     version=__version__,
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests', 'tests.*']),
 )
