@@ -1,4 +1,5 @@
 arrow
+bbcode
 blinker
 jmespath
 requests

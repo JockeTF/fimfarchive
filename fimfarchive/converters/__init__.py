@@ -23,8 +23,10 @@ Converter module.
 
 
 from .base import Converter
+from .alpha_beta import AlphaBetaConverter
 
 
 __all__ = (
     'Converter',
+    'AlphaBetaConverter',
 )
