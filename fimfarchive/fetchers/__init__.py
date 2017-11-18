@@ -23,12 +23,14 @@ Story fetchers.
 
 
 from .base import Fetcher
+from .directory import DirectoryFetcher
 from .fimfarchive import FimfarchiveFetcher
 from .fimfiction import FimfictionFetcher
 
 
 __all__ = (
     'Fetcher',
+    'DirectoryFetcher',
     'FimfarchiveFetcher',
     'FimfictionFetcher',
 )
