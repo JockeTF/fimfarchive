@@ -23,13 +23,59 @@ Setuptools for Fimfarchive.
 #
 
 
-from setuptools import setup, find_packages
+import os
+from typing import Iterable, List, Tuple
+
+from setuptools import setup
 
 from fimfarchive import __version__
+
+
+PACKAGE = 'fimfarchive'
+
+
+def to_name(path: str) -> str:
+    """
+    Converts path to a package name.
+    """
+    return path.replace(os.path.sep, '.')
+
+
+def iter_package_paths() -> Iterable[str]:
+    """
+    Yields all package paths to install.
+    """
+    for dirpath, dirnames, filenames in os.walk(PACKAGE):
+        if '__init__.py' in filenames:
+            yield dirpath
+
+
+def iter_package_names() -> Iterable[str]:
+    """
+    Yields all package names to install.
+    """
+    for dirpath in iter_package_paths():
+        yield to_name(dirpath)
+
+
+def iter_package_data() -> Iterable[Tuple[str, List[str]]]:
+    """
+    Yields all package data to install.
+    """
+    for dirpath in iter_package_paths():
+        filenames = [
+            filename for filename in os.listdir(dirpath)
+            if os.path.isfile(os.path.join(dirpath, filename))
+            and not filename.endswith('.py')
+        ]
+
+        if filenames:
+            yield to_name(dirpath), filenames
 
 
 setup(
     name="fimfarchive",
     version=__version__,
-    packages=find_packages(exclude=['tests', 'tests.*']),
+    packages=list(iter_package_names()),
+    package_data=dict(iter_package_data()),
 )
