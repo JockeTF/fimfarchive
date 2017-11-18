@@ -28,10 +28,11 @@ from typing import Iterable, List, Tuple
 
 from setuptools import setup
 
-from fimfarchive import __version__
+from fimfarchive import __author__, __license__, __version__
 
 
 PACKAGE = 'fimfarchive'
+GITHUB = 'https://github.com/JockeTF/fimfarchive'
 
 
 def to_name(path: str) -> str:
@@ -76,6 +77,11 @@ def iter_package_data() -> Iterable[Tuple[str, List[str]]]:
 setup(
     name="fimfarchive",
     version=__version__,
+    license=__license__,
+    author=__author__,
+    author_email='fimfarchive@gmail.com',
+    url='http://www.fimfarchive.net/',
+    download_url=f'{GITHUB}/archive/{__version__}.tar.gz',
     packages=list(iter_package_names()),
     package_data=dict(iter_package_data()),
 )
