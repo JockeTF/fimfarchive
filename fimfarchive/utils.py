@@ -25,7 +25,8 @@ Various utilities.
 import json
 import os
 import shutil
-from typing import Any, Dict, Optional, Type, TypeVar
+from typing import Any, Dict, Optional, Type, TypeVar, Union
+from pkg_resources import resource_string
 
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
@@ -126,3 +127,41 @@ def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
             return current
 
     return None
+
+
+class ResourceLoader:
+    """
+    Loads resources from a package.
+    """
+
+    def __init__(self, package: str, binary: bool = False) -> None:
+        """
+        Constructor.
+
+        Args:
+            package: The package to load from.
+            binary: Set to return binary data.
+        """
+        self.package = package
+        self.binary = binary
+
+    def __call__(self, name: str, binary: bool = None) -> Union[str, bytes]:
+        """
+        Loads a package resource.
+
+        Args:
+            name: The name of the resource to load.
+            binary: Set to return binary data.
+
+        Returns:
+            A resource as string or bytes.
+        """
+        if binary is None:
+            binary = self.binary
+
+        data = resource_string(self.package, name)
+
+        if binary:
+            return data
+        else:
+            return data.decode()

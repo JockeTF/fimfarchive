@@ -1,0 +1,135 @@
+{
+    "2nd Person": {
+        "id": 225,
+        "name": "Second Person",
+        "old_id": "g:second_person",
+        "type": "content",
+        "url": "https://www.fimfiction.net/tag/second-person"
+    },
+    "Adventure": {
+        "id": 226,
+        "name": "Adventure",
+        "old_id": "g:adventure",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/adventure"
+    },
+    "Alternate Universe": {
+        "id": 240,
+        "name": "Alternate Universe",
+        "old_id": "g:alternate_universe",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/alternate-universe"
+    },
+    "Anthro": {
+        "id": 227,
+        "name": "Anthro",
+        "old_id": "g:anthro",
+        "type": "content",
+        "url": "https://www.fimfiction.net/tag/anthro"
+    },
+    "Comedy": {
+        "id": 228,
+        "name": "Comedy",
+        "old_id": "g:comedy",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/comedy"
+    },
+    "Crossover": {
+        "id": 229,
+        "name": "Crossover",
+        "old_id": "g:crossover",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/crossover"
+    },
+    "Dark": {
+        "id": 122,
+        "name": "Dark",
+        "old_id": "g:dark",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/dark"
+    },
+    "Drama": {
+        "id": 230,
+        "name": "Drama",
+        "old_id": "g:drama",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/drama"
+    },
+    "Equestria Girls": {
+        "id": 123,
+        "name": "Equestria Girls",
+        "old_id": "g:equestria_girls",
+        "type": "series",
+        "url": "https://www.fimfiction.net/tag/equestria-girls"
+    },
+    "Horror": {
+        "id": 231,
+        "name": "Horror",
+        "old_id": "g:horror",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/horror"
+    },
+    "Human": {
+        "id": 232,
+        "name": "Human",
+        "old_id": "g:human",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/human"
+    },
+    "Mystery": {
+        "id": 233,
+        "name": "Mystery",
+        "old_id": "g:mystery",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/mystery"
+    },
+    "Random": {
+        "id": 234,
+        "name": "Random",
+        "old_id": "g:random",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/random"
+    },
+    "Romance": {
+        "id": 120,
+        "name": "Romance",
+        "old_id": "g:romance",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/romance"
+    },
+    "Sad": {
+        "id": 235,
+        "name": "Sad",
+        "old_id": "g:sad",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/sad"
+    },
+    "Sci-Fi": {
+        "id": 236,
+        "name": "Science Fiction",
+        "old_id": "g:scifi",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/scifi"
+    },
+    "Slice of Life": {
+        "id": 237,
+        "name": "Slice of Life",
+        "old_id": "g:slice_of_life",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/slice-of-life"
+    },
+    "Thriller": {
+        "id": 238,
+        "name": "Thriller",
+        "old_id": "g:thriller",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/thriller"
+    },
+    "Tragedy": {
+        "id": 239,
+        "name": "Tragedy",
+        "old_id": "g:tragedy",
+        "type": "genre",
+        "url": "https://www.fimfiction.net/tag/tragedy"
+    }
+}
