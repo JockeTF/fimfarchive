@@ -1,5 +1,8 @@
 arrow
 bbcode
 blinker
+flake8
 jmespath
+mypy
+pytest
 requests

@@ -84,4 +84,11 @@ setup(
     download_url=f'{GITHUB}/archive/{__version__}.tar.gz',
     packages=list(iter_package_names()),
     package_data=dict(iter_package_data()),
+    install_requires=(
+        'arrow',
+        'bbcode',
+        'blinker',
+        'jmespath',
+        'requests',
+    ),
 )
