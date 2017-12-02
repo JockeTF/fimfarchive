@@ -30,59 +30,111 @@ Note that the archive contains a large number of files. Unzipping it to your fil
 
 \section{Index} \label{sec:index}
 
-The metadata of each story can be found in \path{index.json}. The file contains one story entry per line ordered by story ID. It was constructed using data from the Fimfiction API, which is incomplete. Additionally, each entry includes the attribute \emph{path} which shows where in the archive the story is located. Below is an example entry for the story \emph{Sunny Skies All Day Long}. Note that the structure of the metadata may change in the future as it depends on Fimfiction.
+The metadata of each story can be found in \path{index.json}. The file contains one story entry per line ordered by story ID. It was constructed using data from the Fimfiction API, which is incomplete. Additionally, each entry includes the attribute \path{archive.path} which shows where in the archive the story is located. Below is an example entry for the story \emph{Sunny Skies All Day Long}. Note that the structure of the metadata may change in the future.
 
 \begin{lstlisting}[breaklines, basicstyle=\ttfamily\small, columns=flexible]
 {
-  "20685":{
-    "author":{
-      "id":"26190",
-      "name":"PhantomFox"
+  "archive": {
+    "date_checked": "2017-11-03T12:03:47.175215+00:00",
+    "date_created": null,
+    "date_fetched": "2017-11-03T12:03:47.175215+00:00",
+    "date_updated": "2017-11-03T12:03:47.175215+00:00",
+    "path":"epub/p/phantomfox-26190/sunny_skies_all_day_long-20685.epub"
+  },
+  "author": {
+    "avatar": {
+      "128": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-128",
+      "16": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-16",
+      "192": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-192",
+      "256": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-256",
+      "32": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-32",
+      "384": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-384",
+      "48": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-48",
+      "512": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-512",
+      "64": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-64",
+      "96": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-96"
     },
-    "categories":{
-      "Adventure":false,
-      "Alternate Universe":false,
-      "Anthro":false,
-      "Comedy":false,
-      "Crossover":false,
-      "Dark":false,
-      "Human":false,
-      "Random":false,
-      "Romance":false,
-      "Sad":false,
-      "Slice of Life":true,
-      "Tragedy":false
+    "bio_html": "",
+    "date_joined": "2012-04-13T19:09:19+00:00",
+    "id": 26190,
+    "name": "PhantomFox",
+    "num_blog_posts": 1,
+    "num_followers": 699,
+    "num_stories": 3,
+    "url": "https://www.fimfiction.net/user/26190/PhantomFox"
+  },
+  "chapters": [
+    {
+      "chapter_number": 1,
+      "date_modified": "2012-09-26T17:27:44+00:00",
+      "date_published": "2012-09-26T17:27:44+00:00",
+      "id": 63408,
+      "num_views": 86994,
+      "num_words": 8536,
+      "published": true,
+      "title": "Chapter 1",
+      "url": "https://www.fimfiction.net/story/20685/1/sunny-skies-all-day-long/chapter-1"
+    }
+  ],
+  "color": {
+    "hex": "dfbeae",
+    "rgb": [
+      223,
+      190,
+      174
+    ]
+  },
+  "completion_status": "complete",
+  "content_rating": "everyone",
+  "cover_image": {
+    "full": "https://cdn-img.fimfiction.net/story/5c7h-1432428695-20685-full",
+    "large": "https://cdn-img.fimfiction.net/story/5c7h-1432428695-20685-large",
+    "medium": "https://cdn-img.fimfiction.net/story/5c7h-1432428695-20685-medium",
+    "thumbnail": "https://cdn-img.fimfiction.net/story/5c7h-1432428695-20685-tiny"
+  },
+  "date_modified": null,
+  "date_published": "2012-04-14T14:42:21+00:00",
+  "date_updated": "2012-04-14T14:42:21+00:00",
+  "description_html": "<p>Princess Celestia tires of constantly being surrounded by decorum, deference, and formality, and decides to take a day off from being Princess.  But visiting Ponyville incognito is harder than she expects.  Will she be able to fit in and make friends without blowing her cover?</p>",
+  "id": 20685,
+  "num_chapters": 1,
+  "num_comments": 773,
+  "num_dislikes": 140,
+  "num_likes": 8796,
+  "num_views": 86994,
+  "num_words": 8536,
+  "prequel": null,
+  "published": true,
+  "rating": 98,
+  "short_description": "Celestia's Day Off",
+  "status": "visible",
+  "submitted": true,
+  "tags": [
+    {
+      "id": 73,
+      "name": "Main 6",
+      "old_id": "c:74",
+      "type": "character",
+      "url": "https://www.fimfiction.net/tag/main-6"
     },
-    "chapter_count":1,
-    "chapters":[
-      {
-        "date_modified":1348680464,
-        "id":63408,
-        "link":"http://www.fimfiction.net/story/20685/1/sunny-skies-all-day-long/-",
-        "title":"Chapter 1",
-        "views":44911,
-        "words":8536
-      }
-    ],
-    "comments":529,
-    "content_rating":0,
-    "content_rating_text":"Everyone",
-    "date_modified":1334414541,
-    "description":"Princess Celestia tires of constantly being surrounded by 	decorum, deference, and formality, and decides to take a day off from being Princess. But visiting Ponyville incognito is harder than she expects. Will she be able to fit in and make friends without blowing her cover?",
-    "dislikes":81,
-    "full_image":"http://www.fimfiction-static.net/images/story_images/20685.png",
-    "id":20685,
-    "image":"http://www.fimfiction-static.net/images/story_images/20685_r.png",
-    "likes":5079,
-    "path":"epub/p/phantomfox-26190/sunny_skies_all_day_long-20685.epub",
-    "short_description":"Celestia's Day Off",
-    "status":"Complete",
-    "title":"Sunny Skies All Day Long",
-    "total_views":44911,
-    "url":"http://www.fimfiction.net/story/20685/sunny-skies-all-day-long",
-    "views":44911,
-    "words":8536
-  }
+    {
+      "id": 16,
+      "name": "Princess Celestia",
+      "old_id": "c:17",
+      "type": "character",
+      "url": "https://www.fimfiction.net/tag/princess-celestia"
+    },
+    {
+      "id": 237,
+      "name": "Slice of Life",
+      "old_id": "g:slice_of_life",
+      "type": "genre",
+      "url": "https://www.fimfiction.net/tag/slice-of-life"
+    }
+  ],
+  "title": "Sunny Skies All Day Long",
+  "total_num_views": 86994,
+  "url": "https://www.fimfiction.net/story/20685/sunny-skies-all-day-long"
 }
 \end{lstlisting}
 
