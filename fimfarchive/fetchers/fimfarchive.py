@@ -22,15 +22,16 @@ Fimfarchive fetcher.
 #
 
 
-import codecs
-import gc
 import json
-from copy import deepcopy
-from io import BytesIO
+from typing import cast, Any, Dict, IO, Iterable, Optional, Tuple, Union
 from zipfile import ZipFile, BadZipFile
+
+from boltons.cacheutils import LRU
+from jmespath import compile as jmes
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
+from fimfarchive.utils import Empty
 
 from .base import Fetcher
 
@@ -40,7 +41,7 @@ __all__ = (
 )
 
 
-StreamReader = codecs.getreader('utf-8')
+PATH = jmes('archive.path || path')
 
 
 class FimfarchiveFetcher(Fetcher):
@@ -48,7 +49,7 @@ class FimfarchiveFetcher(Fetcher):
     Fetcher for Fimfarchive.
     """
     prefetch_meta = True
-    prefetch_data = True
+    prefetch_data = False
 
     flavors = frozenset((
         StorySource.FIMFARCHIVE,
@@ -56,106 +57,175 @@ class FimfarchiveFetcher(Fetcher):
         MetaPurity.CLEAN,
     ))
 
-    def __init__(self, file):
+    def __init__(self, source: Union[str, IO[bytes]]) -> None:
         """
-        Initializes a `FimfarchiveFetcher` instance.
+        Constructor.
 
         Args:
-            file: Path or file-like object for a Fimfarchive release.
+            source: Path or file-like object for a Fimfarchive release.
 
         Raises:
             StorySourceError: If no valid Fimfarchive release can be loaded.
         """
-        self.is_open = False
-        self.archive = None
-        self.index = None
+        self.archive: ZipFile
+        self.index: Dict[int, str]
+        self.paths: Dict[int, str]
+        self.is_open: bool = False
 
         try:
-            self._init(file)
+            self.initialize(source)
         except Exception:
             self.close()
             raise
-        else:
-            self.is_open = True
 
-    def _init(self, file):
+    def initialize(self, source: Union[str, IO[bytes]]) -> None:
         """
         Internal initialization method.
+
+        Args:
+            source: Path or file-like object for a Fimfarchive release.
+
+        Raises:
+            StorySourceError: If no valid Fimfarchive release can be loaded.
         """
         try:
-            self.archive = ZipFile(file)
+            self.archive = ZipFile(source)
         except IOError as e:
-            raise StorySourceError("Could not read from file.") from e
+            raise StorySourceError("Could not read from source.") from e
         except BadZipFile as e:
-            raise StorySourceError("Archive is not a valid ZIP-file.") from e
+            raise StorySourceError("Source is not a valid ZIP-file.") from e
 
         try:
             with self.archive.open('index.json') as fobj:
-                self.index = json.load(StreamReader(fobj))
+                self.index = dict(self.load_index(fobj))
         except KeyError as e:
             raise StorySourceError("Archive is missing the index.") from e
-        except ValueError as e:
-            raise StorySourceError("Index is not valid JSON.") from e
-        except UnicodeDecodeError as e:
-            raise StorySourceError("Index is incorrectly encoded.") from e
         except BadZipFile as e:
             raise StorySourceError("Archive is corrupt.") from e
 
-        gc.collect()
+        self.paths = LRU()
+        self.is_open = True
 
-    def close(self):
-        self.is_open = False
-        self.index = None
-
-        if self.archive is not None:
-            self.archive.close()
-            self.archive = None
-
-        gc.collect()
-
-    def lookup(self, key):
+    def load_index(self, source: IO[bytes]) -> Iterable[Tuple[int, str]]:
         """
-        Finds meta for a story in the index.
+        Yields unparsed index items from a byte stream.
+
+        Args:
+            source: The stream to read from.
+
+        Returns:
+            An iterable over index items.
+
+        Raises:
+            StorySourceError: If an item is malformed.
+        """
+        for part in source:
+            if len(part) < 3:
+                continue
+
+            try:
+                line = part.decode().strip()
+            except UnicodeDecodeError as e:
+                raise StorySourceError("Incorrectly encoded index.") from e
+
+            key, meta = line.split(':', 1)
+            key = key.strip(' "')
+            meta = meta.strip(' ,')
+
+            if meta[0] != '{' or meta[-1] != '}':
+                raise StorySourceError(f"Malformed index meta: {meta}")
+
+            try:
+                yield int(key), meta
+            except ValueError as e:
+                raise StorySourceError(f"Malformed index key: {key}") from e
+
+    def validate(self, key: int) -> int:
+        """
+        Ensures that the key matches a valid story
 
         Args:
             key: Primary key of the story.
 
         Returns:
-            dict: A reference to the story's meta.
+            The key as cast to an int.
 
         Raises:
-            InvalidStoryError: If story does not exist.
-            StorySourceError: If archive is closed.
+            InvalidStoryError: If a valid story is not found.
+            StorySourceError: If the fetcher is closed.
         """
+        key = int(key)
+
         if not self.is_open:
             raise StorySourceError("Fetcher is closed.")
 
-        key = str(key)
-
         if key not in self.index:
-            raise InvalidStoryError("Story does not exist.")
+            raise InvalidStoryError(f"No such story: {key}")
 
-        return self.index[key]
+        return key
 
-    def fetch_data(self, key):
-        meta = self.lookup(key)
+    def fetch_path(self, key: int) -> Optional[str]:
+        """
+        Fetches the archive path of a story.
 
-        if 'path' not in meta:
-            raise StorySourceError("Index is missing a path value.")
+        Args:
+            key: Primary key of the story.
+
+        Returns:
+            A path to the story, or None.
+
+        Raises:
+            InvalidStoryError: If a valid story is not found.
+            StorySourceError: If the fetcher is closed.
+        """
+        key = self.validate(key)
+        path = self.paths.get(key, Empty)
+
+        if path is not Empty:
+            return cast(Optional[str], path)
+
+        meta = self.fetch_meta(key)
+        return PATH.search(meta)
+
+    def close(self) -> None:
+        self.is_open = False
+        self.index = None
+        self.paths = None
+
+        if self.archive is not None:
+            self.archive.close()
+            self.archive = None
+
+    def fetch_meta(self, key: int) -> Dict[str, Any]:
+        key = self.validate(key)
+        raw = self.index[key]
 
         try:
-            data = self.archive.read(meta['path'])
+            meta = json.loads(raw)
         except ValueError as e:
-            raise StorySourceError("Archive is missing a file.") from e
-        except BadZipFile as e:
-            raise StorySourceError("Archive is corrupt.") from e
+            raise StorySourceError("Malformed meta for {key}: {raw}") from e
 
-        with ZipFile(BytesIO(data)) as story:
-            if story.testzip() is not None:
-                raise StorySourceError("Story is corrupt.")
+        actual = meta.get('id')
+
+        if key != actual:
+            raise StorySourceError("Invalid ID for {key}: {actual}")
+
+        self.paths[key] = PATH.search(meta)
+
+        return meta
+
+    def fetch_data(self, key: int) -> bytes:
+        key = self.validate(key)
+        path = self.fetch_path(key)
+
+        if not path:
+            raise StorySourceError("Missing path attribute for {key}.")
+
+        try:
+            data = self.archive.read(path)
+        except ValueError as e:
+            raise StorySourceError("Missing file for {key}: {path}") from e
+        except BadZipFile as e:
+            raise StorySourceError("Corrupt file for {key}: {path}") from e
 
         return data
-
-    def fetch_meta(self, key):
-        meta = self.lookup(key)
-        return deepcopy(meta)

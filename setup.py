@@ -88,6 +88,7 @@ setup(
         'arrow',
         'bbcode',
         'blinker',
+        'boltons',
         'jmespath',
         'requests',
     ),

@@ -1,6 +1,7 @@
 arrow
 bbcode
 blinker
+boltons
 flake8
 jmespath
 mypy

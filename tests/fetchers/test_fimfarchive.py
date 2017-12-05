@@ -31,7 +31,7 @@ from fimfarchive.fetchers import FimfarchiveFetcher
 VALID_STORY_KEY = 9
 INVALID_STORY_KEY = 7
 
-FIMFARCHIVE_PATH = 'fimfarchive-20170601.zip'
+FIMFARCHIVE_PATH = 'fimfarchive-20171203.zip'
 
 
 class TestFimfarchiveFetcher:
@@ -52,10 +52,10 @@ class TestFimfarchiveFetcher:
         Tests `StorySourceError` is raised when fetcher is closed.
         """
         with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
-            fetcher.lookup(VALID_STORY_KEY)
+            fetcher.fetch_meta(VALID_STORY_KEY)
 
         with pytest.raises(StorySourceError):
-            fetcher.lookup(VALID_STORY_KEY)
+            fetcher.fetch_meta(VALID_STORY_KEY)
 
     def test_fetch_meta_for_valid_story(self, fetcher):
         """
@@ -63,7 +63,6 @@ class TestFimfarchiveFetcher:
         """
         meta = fetcher.fetch_meta(VALID_STORY_KEY)
         assert meta['id'] == VALID_STORY_KEY
-        assert meta['words'] != 0
 
     def test_fetch_meta_for_invalid_story(self, fetcher):
         """
