@@ -24,6 +24,7 @@ Update task.
 
 import os
 import time
+from copy import deepcopy
 from typing import Optional
 
 from fimfarchive.exceptions import InvalidStoryError
@@ -172,6 +173,29 @@ class UpdateTask(SignalSender):
         else:
             raise ValueError("Unsupported story flavor.")
 
+    def copy_archive_meta(
+            self,
+            old: Optional[Story],
+            new: Optional[Story],
+            ) -> None:
+        """
+        Copies archive meta from old story to new.
+
+        Args:
+            old: The story to copy from.
+            new: The story to copy to.
+
+        Raises:
+            ValueError: If new story already contains archive meta.
+        """
+        try:
+            if 'archive' in new.meta:
+                raise ValueError("New story contains archive meta.")
+
+            new.meta['archive'] = deepcopy(old.meta['archive'])
+        except (AttributeError, InvalidStoryError, KeyError):
+            return
+
     def update(self, key: int) -> Optional[Story]:
         """
         Updates the specified story.
@@ -184,6 +208,8 @@ class UpdateTask(SignalSender):
         """
         old = self.fetch(self.fimfarchive, key)
         new = self.fetch(self.fimfiction, key)
+
+        self.copy_archive_meta(old, new)
         selected = self.select(old, new)
 
         if selected and UpdateStatus.REVIVED in selected.flavors:

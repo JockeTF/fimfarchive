@@ -22,6 +22,7 @@ Update task tests.
 #
 
 
+from typing import Dict
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -45,7 +46,7 @@ class DummyFetcher(Fetcher):
         """
         Constructor.
         """
-        self.stories = dict()
+        self.stories: Dict[int, Story] = dict()
 
     def add(self, key, date, flavors=()):
         """
@@ -110,6 +111,13 @@ class TestUpdateTask:
         Returns a stamper mock.
         """
         return MagicMock()
+
+    @pytest.fixture
+    def archive(self):
+        """
+        Returns an archive meta dictionary.
+        """
+        return {'key': 'value'}
 
     @pytest.fixture
     def task(self, fimfarchive, fimfiction, selector, stamper, tmpdir):
@@ -199,25 +207,31 @@ class TestUpdateTask:
 
         self.verify_fetch(task, target, UpdateStatus.CREATED)
 
-    def test_revived_story(self, task, fimfarchive, fimfiction):
+    def test_revived_story(self, task, fimfarchive, fimfiction, archive):
         """
         Tests updating for a revived story.
         """
         target = fimfarchive.add(key=1, date=1)
         other = fimfiction.add(key=1, date=1)
+        target.meta['archive'] = archive
 
         target.merge = MagicMock(return_value=target)
         self.verify_fetch(task, target, UpdateStatus.REVIVED)
         target.merge.assert_called_once_with(meta=other.meta)
+        assert other.meta['archive'] is not archive
+        assert other.meta['archive'] == archive
 
-    def test_updated_story(self, task, fimfarchive, fimfiction):
+    def test_updated_story(self, task, fimfarchive, fimfiction, archive):
         """
         Tests updating for an updated story.
         """
-        fimfarchive.add(key=1, date=0)
+        other = fimfarchive.add(key=1, date=0)
         target = fimfiction.add(key=1, date=1)
+        other.meta['archive'] = archive
 
         self.verify_fetch(task, target, UpdateStatus.UPDATED)
+        assert target.meta['archive'] is not archive
+        assert target.meta['archive'] == archive
 
     def test_deleted_story(self, task, fimfarchive):
         """
@@ -316,6 +330,17 @@ class TestUpdateTask:
 
         with pytest.raises(ValueError):
             task.write(story)
+
+    def test_remote_archive(self, task, fimfarchive, fimfiction, archive):
+        """
+        Tests `ValueError` is raised if Fimfiction returns archive meta.
+        """
+        old = fimfarchive.add(key=1, date=0)
+        new = fimfiction.add(key=1, date=1)
+        new.meta['archive'] = archive
+
+        with pytest.raises(ValueError):
+            task.copy_archive_meta(old, new)
 
 
 class TestRefetchingUpdateTask(TestUpdateTask):
