@@ -203,12 +203,12 @@ class FimfarchiveFetcher(Fetcher):
         try:
             meta = json.loads(raw)
         except ValueError as e:
-            raise StorySourceError("Malformed meta for {key}: {raw}") from e
+            raise StorySourceError(f"Malformed meta for {key}: {raw}") from e
 
         actual = meta.get('id')
 
         if key != actual:
-            raise StorySourceError("Invalid ID for {key}: {actual}")
+            raise StorySourceError(f"Invalid ID for {key}: {actual}")
 
         self.paths[key] = PATH.search(meta)
 
@@ -219,13 +219,13 @@ class FimfarchiveFetcher(Fetcher):
         path = self.fetch_path(key)
 
         if not path:
-            raise StorySourceError("Missing path attribute for {key}.")
+            raise StorySourceError(f"Missing path attribute for {key}.")
 
         try:
             data = self.archive.read(path)
         except ValueError as e:
-            raise StorySourceError("Missing file for {key}: {path}") from e
+            raise StorySourceError(f"Missing file for {key}: {path}") from e
         except BadZipFile as e:
-            raise StorySourceError("Corrupt file for {key}: {path}") from e
+            raise StorySourceError(f"Corrupt file for {key}: {path}") from e
 
         return data
