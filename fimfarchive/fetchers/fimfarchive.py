@@ -31,6 +31,7 @@ from jmespath import compile as jmes
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
+from fimfarchive.stories import Story
 from fimfarchive.utils import Empty
 
 from .base import Fetcher
@@ -139,6 +140,19 @@ class FimfarchiveFetcher(Fetcher):
                 yield int(key), meta
             except ValueError as e:
                 raise StorySourceError(f"Malformed index key: {key}") from e
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of stories in the archive.
+        """
+        return len(self.index)
+
+    def __iter__(self) -> Iterable[Story]:
+        """
+        Yields all stories in the archive, ordered by ID.
+        """
+        for key in sorted(self.index.keys()):
+            yield self.fetch(key)
 
     def validate(self, key: int) -> int:
         """
