@@ -24,6 +24,7 @@ Directory fetcher tests.
 
 import json
 import pytest
+from pathlib import Path
 from typing import Any, Dict
 
 from fimfarchive.exceptions import InvalidStoryError
@@ -48,7 +49,7 @@ class TestDirectoryFetcher:
         return {'id': key}
 
     @pytest.fixture
-    def metadir(self, tmpdir) -> str:
+    def metadir(self, tmpdir) -> Path:
         """
         Returns a temporary meta directory path.
         """
@@ -59,7 +60,7 @@ class TestDirectoryFetcher:
             path = subdir.join(str(key))
             path.write(json.dumps(meta))
 
-        return str(subdir)
+        return Path(str(subdir))
 
     def make_data(self, key: int) -> bytes:
         """
@@ -68,7 +69,7 @@ class TestDirectoryFetcher:
         return f'STORY {key}'.encode()
 
     @pytest.fixture
-    def datadir(self, tmpdir) -> str:
+    def datadir(self, tmpdir) -> Path:
         """
         Returns a temporary data directory path.
         """
@@ -79,7 +80,7 @@ class TestDirectoryFetcher:
             path = subdir.join(str(key))
             path.write(data)
 
-        return str(subdir)
+        return Path(str(subdir))
 
     @pytest.fixture
     def fetcher(self, metadir, datadir, flavor) -> DirectoryFetcher:
@@ -147,3 +148,18 @@ class TestDirectoryFetcher:
         """
         story = fetcher.fetch(key)
         assert {flavor} == set(story.flavors)
+
+    def test_len(self, fetcher):
+        """
+        Tests len returns the total number of available stories.
+        """
+        assert 3 == len(fetcher)
+
+    def test_iter(self, fetcher):
+        """
+        Tests iter yields all available stories, ordered by key.
+        """
+        expected = sorted((META_KEY, DATA_KEY, BOTH_KEY))
+        actual = list(story.key for story in fetcher)
+
+        assert expected == actual

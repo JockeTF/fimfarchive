@@ -23,11 +23,13 @@ Directory fetcher.
 
 
 import json
-import os
-from typing import Any, Dict, Iterable
+from itertools import chain
+from pathlib import Path
+from typing import Any, Dict, Iterable, Optional, Set
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import Flavor
+from fimfarchive.stories import Story
 
 from .base import Fetcher
 
@@ -41,14 +43,14 @@ class DirectoryFetcher(Fetcher):
     """
     Fetches stories from file system.
     """
-    prefetch_meta = True
+    prefetch_meta = False
     prefetch_data = False
 
     def __init__(
             self,
-            meta_path: str,
-            data_path: str,
-            flavors: Iterable[Flavor],
+            meta_path: Path = None,
+            data_path: Path = None,
+            flavors: Iterable[Flavor] = tuple(),
             ) -> None:
         """
         Constructor.
@@ -62,7 +64,63 @@ class DirectoryFetcher(Fetcher):
         self.data_path = data_path
         self.flavors = frozenset(flavors)
 
-    def read_file(self, path: str) -> bytes:
+    def iter_path_keys(self, path: Optional[Path]) -> Iterable[int]:
+        """
+        Yields all story keys found in the specified directory.
+
+        Args:
+            path: Path to the directory.
+
+        Returns:
+            An iterator over story key.
+
+        Raises:
+            StorySourceError: If the path is invalid.
+        """
+        if path is None:
+            return
+
+        if not path.is_dir():
+            raise StorySourceError("Path is not a directory: {path}")
+
+        for item in Path(path).iterdir():
+            if not item.is_file():
+                raise StorySourceError(f"Path is not a file: {item}")
+
+            if not item.name.isdigit():
+                raise StorySourceError(f"Name is not a digit: {item}")
+
+            yield int(item.name)
+
+    def list_keys(self) -> Set[int]:
+        """
+        Lists all available story keys.
+
+        Returns:
+            An unordered set of story keys.
+
+        Raises:
+            StorySourceError: If any path is invalid.
+        """
+        meta_keys = self.iter_path_keys(self.meta_path)
+        data_keys = self.iter_path_keys(self.data_path)
+
+        return set(chain(meta_keys, data_keys))
+
+    def __len__(self) -> int:
+        """
+        Returns the total number of stories in the directories.
+        """
+        return len(self.list_keys())
+
+    def __iter__(self) -> Iterable[Story]:
+        """
+        Yields all stories in the directories, ordered by ID.
+        """
+        for key in sorted(self.list_keys()):
+            yield self.fetch(key)
+
+    def read_file(self, path: Path) -> bytes:
         """
         Reads file data for the path.
 
@@ -77,21 +135,26 @@ class DirectoryFetcher(Fetcher):
             StorySourceError: If the file could not be read.
         """
         try:
-            with open(path, 'rb') as fobj:
-                return fobj.read()
+            return path.read_bytes()
         except FileNotFoundError as e:
             raise InvalidStoryError("File does not exist.") from e
         except Exception as e:
             raise StorySourceError("Unable to read file.") from e
 
     def fetch_data(self, key: int) -> bytes:
-        path = os.path.join(self.data_path, str(key))
+        if self.data_path is None:
+            raise StorySourceError("Data path is undefined.")
+
+        path = self.data_path / str(key)
         raw = self.read_file(path)
 
         return raw
 
     def fetch_meta(self, key: int) -> Dict[str, Any]:
-        path = os.path.join(self.meta_path, str(key))
+        if self.meta_path is None:
+            raise StorySourceError("Meta path is undefined.")
+
+        path = self.meta_path / str(key)
         raw = self.read_file(path)
 
         return json.loads(raw.decode())
