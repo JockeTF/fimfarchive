@@ -25,7 +25,7 @@ Directory fetcher.
 import json
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional, Set
+from typing import Any, Dict, Iterable, Iterator, Optional, Set
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import Flavor
@@ -64,7 +64,7 @@ class DirectoryFetcher(Fetcher):
         self.data_path = data_path
         self.flavors = frozenset(flavors)
 
-    def iter_path_keys(self, path: Optional[Path]) -> Iterable[int]:
+    def iter_path_keys(self, path: Optional[Path]) -> Iterator[int]:
         """
         Yields all story keys found in the specified directory.
 
@@ -113,7 +113,7 @@ class DirectoryFetcher(Fetcher):
         """
         return len(self.list_keys())
 
-    def __iter__(self) -> Iterable[Story]:
+    def __iter__(self) -> Iterator[Story]:
         """
         Yields all stories in the directories, ordered by ID.
         """

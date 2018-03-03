@@ -23,7 +23,7 @@ Fimfarchive fetcher.
 
 
 import json
-from typing import cast, Any, Dict, IO, Iterable, Optional, Tuple, Union
+from typing import cast, Any, Dict, IO, Iterator, Optional, Tuple, Union
 from zipfile import ZipFile, BadZipFile
 
 from boltons.cacheutils import LRU
@@ -107,7 +107,7 @@ class FimfarchiveFetcher(Fetcher):
         self.paths = LRU()
         self.is_open = True
 
-    def load_index(self, source: IO[bytes]) -> Iterable[Tuple[int, str]]:
+    def load_index(self, source: IO[bytes]) -> Iterator[Tuple[int, str]]:
         """
         Yields unparsed index items from a byte stream.
 
@@ -147,7 +147,7 @@ class FimfarchiveFetcher(Fetcher):
         """
         return len(self.index)
 
-    def __iter__(self) -> Iterable[Story]:
+    def __iter__(self) -> Iterator[Story]:
         """
         Yields all stories in the archive, ordered by ID.
         """
