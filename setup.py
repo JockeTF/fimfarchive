@@ -91,5 +91,6 @@ setup(
         'boltons',
         'jmespath',
         'requests',
+        'tqdm',
     ),
 )

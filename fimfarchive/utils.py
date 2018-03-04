@@ -25,8 +25,11 @@ Various utilities.
 import json
 import os
 import shutil
+from functools import partial
 from typing import Any, Dict, Optional, Type, TypeVar, Union
 from pkg_resources import resource_string
+
+from tqdm import tqdm
 
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
@@ -36,10 +39,20 @@ __all__ = (
     'Empty',
     'PersistedDict',
     'find_flavor',
+    'tqdm',
 )
 
 
 F = TypeVar('F', bound=Flavor)
+
+
+tqdm = partial(
+    tqdm,
+    ascii=True,
+    leave=False,
+    smoothing=0,
+    ncols=72,
+)
 
 
 class EmptyMeta(type):
