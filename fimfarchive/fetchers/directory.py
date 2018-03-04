@@ -81,7 +81,7 @@ class DirectoryFetcher(Fetcher):
             return
 
         if not path.is_dir():
-            raise StorySourceError("Path is not a directory: {path}")
+            raise StorySourceError(f"Path is not a directory: {path}")
 
         for item in Path(path).iterdir():
             if not item.is_file():
