@@ -13,7 +13,7 @@
   command: update-grub
   environment:
     UCF_FORCE_CONFFNEW: YES
-  when: result | changed
+  when: result is changed
 
 - name: Install Debian utilities
   apt:
@@ -33,4 +33,4 @@
 
 - name: Reconfigure unattended upgrades
   command: dpkg-reconfigure -f noninteractive unattended-upgrades
-  when: result | changed
+  when: result is changed

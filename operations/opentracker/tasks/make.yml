@@ -20,7 +20,7 @@
     FEATURES: "-DWANT_ACCESSLIST_WHITE"
   become: yes
   become_user: "{{ opentracker.user }}"
-  when: result | changed
+  when: result is changed
 
 - name: Install OpenTracker
   copy:
@@ -31,7 +31,7 @@
     owner: root
     group: root
   notify: Restart OpenTracker
-  when: result | changed
+  when: result is changed
 
 - name: Clean OpenTracker
   make:
@@ -39,4 +39,4 @@
     target: clean
   become: yes
   become_user: "{{ opentracker.user }}"
-  when: result | changed
+  when: result is changed

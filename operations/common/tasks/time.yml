@@ -13,7 +13,7 @@
 
 - name: Reconfigure tzdata
   command: dpkg-reconfigure -f noninterractive tzdata
-  when: result | changed
+  when: result is changed
 
 - name: Install NTP daemon
   apt:
