@@ -188,12 +188,15 @@ class UpdateTask(SignalSender):
         Raises:
             ValueError: If new story already contains archive meta.
         """
+        if old is None or new is None:
+            return
+
         try:
             if 'archive' in new.meta:
                 raise ValueError("New story contains archive meta.")
 
             new.meta['archive'] = deepcopy(old.meta['archive'])
-        except (AttributeError, InvalidStoryError, KeyError):
+        except (InvalidStoryError, KeyError):
             return
 
     def update(self, key: int) -> Optional[Story]:
@@ -213,6 +216,7 @@ class UpdateTask(SignalSender):
         selected = self.select(old, new)
 
         if selected and UpdateStatus.REVIVED in selected.flavors:
+            assert new is not None
             selected = selected.merge(meta=new.meta)
 
         if selected:

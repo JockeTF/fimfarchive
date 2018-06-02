@@ -31,7 +31,7 @@ from fimfarchive.fetchers import FimfarchiveFetcher
 VALID_STORY_KEY = 9
 INVALID_STORY_KEY = 7
 
-FIMFARCHIVE_PATH = 'fimfarchive-20171203.zip'
+FIMFARCHIVE_PATH = 'fimfarchive.zip'
 
 
 class TestFimfarchiveFetcher:
@@ -39,7 +39,7 @@ class TestFimfarchiveFetcher:
     FimfarchiveFetcher tests.
     """
 
-    @pytest.yield_fixture(scope='module')
+    @pytest.fixture(scope='module')
     def fetcher(self):
         """
         Returns the fetcher instance to test.
@@ -84,3 +84,11 @@ class TestFimfarchiveFetcher:
         """
         with pytest.raises(InvalidStoryError):
             fetcher.fetch_data(INVALID_STORY_KEY)
+
+    @pytest.mark.parametrize('attr', ('archive', 'index', 'paths'))
+    def test_close_when_missing_attribute(self, attr):
+        """
+        Tests close works even after partial initialization.
+        """
+        with FimfarchiveFetcher(FIMFARCHIVE_PATH) as fetcher:
+            delattr(fetcher, attr)

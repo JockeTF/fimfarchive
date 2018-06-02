@@ -203,12 +203,15 @@ class FimfarchiveFetcher(Fetcher):
 
     def close(self) -> None:
         self.is_open = False
-        self.index = None
-        self.paths = None
 
-        if self.archive is not None:
+        if hasattr(self, 'archive'):
             self.archive.close()
-            self.archive = None
+
+        if hasattr(self, 'index'):
+            self.index.clear()
+
+        if hasattr(self, 'paths'):
+            self.paths.clear()
 
     def fetch_meta(self, key: int) -> Dict[str, Any]:
         key = self.validate(key)

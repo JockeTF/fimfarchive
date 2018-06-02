@@ -263,7 +263,7 @@ class RootHandler(Handler):
         return rating and rating.strip().lower()
 
     @property
-    def cover_image(self) -> Dict[str, Any]:
+    def cover_image(self) -> Optional[Dict[str, Any]]:
         image = self.meta.get('image')
 
         if image is None:
@@ -299,7 +299,7 @@ class RootHandler(Handler):
         return f'<p>{html.strip()}</p>'
 
     @property
-    def rating(self) -> int:
+    def rating(self) -> Optional[int]:
         likes = self.num_likes
         dislikes = self.num_dislikes
 
