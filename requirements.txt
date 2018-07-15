@@ -3,6 +3,7 @@ bbcode
 blinker
 boltons
 flake8
+git+https://github.com/qvantel/jsonapi-client.git
 jmespath
 mypy
 pytest

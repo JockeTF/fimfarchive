@@ -90,6 +90,7 @@ setup(
         'blinker',
         'boltons',
         'jmespath',
+        'jsonapi-client',
         'requests',
         'tqdm',
     ),

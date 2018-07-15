@@ -26,6 +26,7 @@ from .base import Fetcher
 from .directory import DirectoryFetcher
 from .fimfarchive import FimfarchiveFetcher
 from .fimfiction import FimfictionFetcher
+from .fimfiction2 import Fimfiction2Fetcher
 
 
 __all__ = (
@@ -33,4 +34,5 @@ __all__ = (
     'DirectoryFetcher',
     'FimfarchiveFetcher',
     'FimfictionFetcher',
+    'Fimfiction2Fetcher',
 )
