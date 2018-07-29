@@ -36,3 +36,8 @@
     src: service
     dest: /etc/systemd/system/deluged.service
   notify: Restart Deluge
+  register: result
+
+- name: Enabled service
+  command: systemctl enable deluged
+  when: result is changed
