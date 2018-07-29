@@ -1,0 +1,10 @@
+---
+#
+# Configures seeders.
+#
+
+- name: Seeder
+  hosts: seeders
+  roles:
+    - common
+    - deluge

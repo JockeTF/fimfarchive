@@ -1,0 +1,9 @@
+---
+#
+# Builds and installs Deluge.
+#
+
+- name: Install Deluge
+  apt:
+    name: deluged
+    state: present

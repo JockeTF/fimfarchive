@@ -1,0 +1,16 @@
+[Unit]
+Description=Deluge Daemon
+Documentation=man:deluged
+After=network-online.target
+
+[Service]
+Type=simple
+User={{ deluge.user }}
+Group={{ deluge.user }}
+UMask=002
+ExecStart=/usr/bin/deluged -c {{ deluge.conf }} -d
+Restart=on-failure
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target

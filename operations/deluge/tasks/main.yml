@@ -1,0 +1,13 @@
+---
+#
+# Deluge tasks.
+#
+
+- name: Prepare system
+  include: prep.yml
+
+- name: Install Deluge
+  include: make.yml
+
+- name: Configure Deluge
+  include: conf.yml
