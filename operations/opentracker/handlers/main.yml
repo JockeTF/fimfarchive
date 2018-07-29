@@ -4,7 +4,8 @@
 #
 
 - name: Restart OpenTracker
-  service:
+  systemd:
     name: opentracker
     enabled: yes
+    daemon_reload: yes
     state: restarted
