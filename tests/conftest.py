@@ -38,8 +38,8 @@ def fetcher():
     """
     fetcher = Fetcher()
 
-    fetcher.fetch_meta = MagicMock(method='fetch_meta')
-    fetcher.fetch_data = MagicMock(method='fetch_data')
+    fetcher.fetch_meta = MagicMock(method='fetch_meta')  # type: ignore
+    fetcher.fetch_data = MagicMock(method='fetch_data')  # type: ignore
 
     return fetcher
 
