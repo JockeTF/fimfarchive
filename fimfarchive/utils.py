@@ -26,8 +26,8 @@ import json
 import os
 import shutil
 from functools import partial
+from importlib_resources import read_binary, read_text
 from typing import Any, Dict, Optional, Type, TypeVar, Union
-from pkg_resources import resource_string
 
 from tqdm import tqdm
 
@@ -172,9 +172,7 @@ class ResourceLoader:
         if binary is None:
             binary = self.binary
 
-        data = resource_string(self.package, name)
-
         if binary:
-            return data
+            return read_binary(self.package, name)
         else:
-            return data.decode()
+            return read_text(self.package, name)

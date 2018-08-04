@@ -89,6 +89,7 @@ setup(
         'bbcode',
         'blinker',
         'boltons',
+        'importlib_resources',
         'jmespath',
         'jsonapi-client',
         'requests',

@@ -4,6 +4,7 @@ blinker
 boltons
 flake8
 git+https://github.com/qvantel/jsonapi-client.git
+importlib_resources
 jmespath
 mypy
 pytest
