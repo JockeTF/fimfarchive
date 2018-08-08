@@ -1,5 +1,5 @@
 """
-Global pytest configuration.
+Global pytest fixtures.
 """
 
 
@@ -22,4 +22,11 @@ Global pytest configuration.
 #
 
 
-from .fixtures import *  # noqa
+from .common import fetcher, flavor, story
+
+
+__all__ = (
+    'fetcher',
+    'flavor',
+    'story',
+)
