@@ -9,4 +9,5 @@ jmespath
 mypy
 pytest
 requests
+requests-mock
 tqdm

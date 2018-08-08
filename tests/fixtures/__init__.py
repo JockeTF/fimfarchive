@@ -23,10 +23,12 @@ Global pytest fixtures.
 
 
 from .common import fetcher, flavor, story
+from .responses import responses
 
 
 __all__ = (
     'fetcher',
     'flavor',
+    'responses',
     'story',
 )
