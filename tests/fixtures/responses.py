@@ -114,7 +114,10 @@ class Recorder(ContextManager['Recorder']):
         """
         Overrides the session send method.
         """
-        Session.send = self  # type: ignore
+        def send(session, request, **kwargs):
+            return self(session, request, **kwargs)
+
+        Session.send = send  # type: ignore
 
         return self
 
