@@ -149,7 +149,7 @@ class ApiClient:
         Args:
             token: Fimfiction authorization bearer.
         """
-        self.session = self.create_session(token)
+        self.token = token
 
     def create_session(self, token: str) -> Session:
         """
@@ -201,8 +201,9 @@ class ApiClient:
             A jsonapi response document.
         """
         query = self.create_filter(params)
+        session = self.create_session(self.token)
 
-        return self.session.get(path, query)
+        return session.get(path, query)
 
 
 class Requester(ABC):
