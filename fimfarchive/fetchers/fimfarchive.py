@@ -37,6 +37,13 @@ from fimfarchive.utils import Empty
 from .base import Fetcher
 
 
+try:
+    from lz4.block import compress, decompress
+except ModuleNotFoundError:
+    compress = lambda data: data  # noqa
+    decompress = lambda data: data  # noqa
+
+
 __all__ = (
     'FimfarchiveFetcher',
 )
@@ -124,20 +131,16 @@ class FimfarchiveFetcher(Fetcher):
             if len(part) < 3:
                 continue
 
-            try:
-                line = part.decode().strip()
-            except UnicodeDecodeError as e:
-                raise StorySourceError("Incorrectly encoded index.") from e
+            line = part.strip()
+            key, meta = line.split(b':', 1)
+            key = key.strip(b' "')
+            meta = meta.strip(b' ,')
 
-            key, meta = line.split(':', 1)
-            key = key.strip(' "')
-            meta = meta.strip(' ,')
-
-            if meta[0] != '{' or meta[-1] != '}':
-                raise StorySourceError(f"Malformed index meta: {meta}")
+            if meta[0] != 123 or meta[-1] != 125:
+                raise StorySourceError(f"Malformed index meta: {key}")
 
             try:
-                yield int(key), meta
+                yield int(key), compress(meta)
             except ValueError as e:
                 raise StorySourceError(f"Malformed index key: {key}") from e
 
@@ -218,7 +221,9 @@ class FimfarchiveFetcher(Fetcher):
         raw = self.index[key]
 
         try:
-            meta = json.loads(raw)
+            meta = json.loads(decompress(raw).decode())
+        except UnicodeDecodeError as e:
+            raise StorySourceError("Incorrectly encoded index.") from e
         except ValueError as e:
             raise StorySourceError(f"Malformed meta for {key}: {raw}") from e
 
