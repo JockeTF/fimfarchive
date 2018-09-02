@@ -22,15 +22,20 @@ Update command.
 #
 
 
+import os
 import traceback
 from argparse import ArgumentParser, Namespace, FileType
+from os.path import basename
 from typing import Any, Iterable, Iterator, Optional
 
+import arrow
 from jmespath import compile as jmes
 
-from fimfarchive.fetchers import Fetcher, FimfarchiveFetcher, FimfictionFetcher
+from fimfarchive.fetchers import (
+    Fetcher, FimfarchiveFetcher, Fimfiction2Fetcher, FimfictionFetcher,
+)
 from fimfarchive.flavors import UpdateStatus
-from fimfarchive.selectors import Selector, RefetchSelector
+from fimfarchive.selectors import Selector, RefetchSelector, UpdateSelector
 from fimfarchive.signals import SignalReceiver
 from fimfarchive.stories import Story
 from fimfarchive.tasks import UpdateTask
@@ -41,6 +46,9 @@ from .base import Command
 __all__ = (
     'UpdateCommand',
 )
+
+
+ACCESS_TOKEN_KEY = 'FIMFICTION_ACCESS_TOKEN'
 
 
 class StoryFormatter(Iterable[str]):
@@ -200,6 +208,12 @@ class UpdateCommand(Command):
         )
 
         parser.add_argument(
+            '--alpha',
+            help="fetch from Fimfiction APIv1",
+            action='store_true',
+        )
+
+        parser.add_argument(
             '--archive',
             help="previous version of the archive",
             type=FileType('rb'),
@@ -222,12 +236,30 @@ class UpdateCommand(Command):
         Args:
             opts: Parsed command line arguments.
         """
-        fimfarchive: Fetcher = FimfarchiveFetcher(opts.archive)
-        fimfiction: Fetcher = FimfictionFetcher()
-        selector: Optional[Selector] = None
+        fimfarchive: Fetcher
+        fimfiction: Fetcher
+        selector: Selector
+
+        token = os.environ.get(ACCESS_TOKEN_KEY)
+
+        if opts.alpha:
+            fimfiction = FimfictionFetcher()
+        elif token:
+            fimfiction = Fimfiction2Fetcher(token, True, opts.refetch)
+        else:
+            exit(f"Environment variable required: {ACCESS_TOKEN_KEY}")
 
         if opts.refetch:
             selector = RefetchSelector()
+        else:
+            selector = UpdateSelector()
+
+        print(f"\nStarted: {arrow.now()}")
+        print(f"Archive: {basename(opts.archive.name)}")
+        print(f"Fetcher: {type(fimfiction).__name__}")
+        print(f"Selector: {type(selector).__name__}")
+
+        fimfarchive = FimfarchiveFetcher(opts.archive)
 
         return UpdateTask(
             fimfarchive=fimfarchive,
@@ -241,5 +273,7 @@ class UpdateCommand(Command):
 
         with UpdatePrinter(task):
             task.run()
+
+        print(f"\nDone: {arrow.now()}")
 
         return 0
