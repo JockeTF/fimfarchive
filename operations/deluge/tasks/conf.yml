@@ -38,6 +38,7 @@
   notify: Restart Deluge
   register: result
 
-- name: Enabled service
+- name: Enable service
+  # Needed to override SysV init.
   command: systemctl enable deluged
   when: result is changed
