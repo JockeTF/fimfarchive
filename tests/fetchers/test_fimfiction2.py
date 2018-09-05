@@ -60,14 +60,15 @@ class TestFimfiction2Fetcher:
     """
 
     @pytest.fixture(params=BULK_COMBINATIONS)
-    def fetcher(self, request):
+    def fetcher(self, responses, request):
         """
         Returns a Fimfarchive2Fetcher instance.
         """
         bulk_meta, bulk_data = request.param
-        token = os.environ['FIMFICTION_ACCESS_TOKEN']
+        token = os.environ.get('FIMFICTION_ACCESS_TOKEN', 'None')
         fetcher = Fimfiction2Fetcher(token, bulk_meta, bulk_data)
 
+        fetcher.requester.bulk.bulk_size = 2
         fetcher.prefetch_meta = False
         fetcher.prefetch_data = False
 
