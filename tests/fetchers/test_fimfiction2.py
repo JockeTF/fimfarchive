@@ -29,6 +29,9 @@ import pytest
 
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import Fimfiction2Fetcher
+from fimfarchive.utils import JayWalker
+
+from tests.fixtures.responses import Recorder
 
 
 VALID_STORY_KEY = 9
@@ -54,6 +57,20 @@ BULK_COMBINATIONS = [
 ]
 
 
+class Redactor(JayWalker):
+    """
+    Redacts recorded responses.
+    """
+
+    def handle(self, data, key, value) -> None:
+        key = str(key)
+
+        if key.endswith('_html') or key == 'short_description':
+            data[key] = "REDACTED"
+        else:
+            self.walk(value)
+
+
 class TestFimfiction2Fetcher:
     """
     Fimfarchive2Fetcher tests.
@@ -71,6 +88,9 @@ class TestFimfiction2Fetcher:
         fetcher.requester.bulk.bulk_size = 2
         fetcher.prefetch_meta = False
         fetcher.prefetch_data = False
+
+        if isinstance(responses, Recorder):
+            responses.walker = Redactor()
 
         yield fetcher
 
