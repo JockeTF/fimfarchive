@@ -26,7 +26,7 @@ import json
 from json import JSONDecodeError
 from os import environ
 from pathlib import Path
-from typing import Any, ContextManager, Dict, Iterator, Union, Type
+from typing import Any, ContextManager, Dict, Iterator, Optional, Union, Type
 
 import importlib_resources as resources
 import pytest
@@ -34,6 +34,8 @@ from _pytest.fixtures import FixtureRequest
 from requests import Session, Response
 from requests.sessions import Request
 from requests_mock import Mocker
+
+from fimfarchive.utils import JayWalker
 
 
 __all__ = (
@@ -58,6 +60,7 @@ class Recorder(ContextManager['Recorder']):
         """
         self.original = Session.send
         self.responses: Dict = dict()
+        self.walker: Optional[JayWalker]
         self.path = path
 
     def __iter__(self) -> Iterator[Dict[str, Any]]:
@@ -128,6 +131,10 @@ class Recorder(ContextManager['Recorder']):
         Session.send = self.original  # type: ignore
 
         data = {NAMESPACE: list(self)}
+        walker = self.walker
+
+        if walker is not None:
+            walker.walk(data)
 
         with open(self.path, 'wt') as fobj:
             json.dump(data, fobj, sort_keys=True, indent=4)
