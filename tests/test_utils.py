@@ -24,11 +24,12 @@ Utility tests.
 
 import json
 import os
+from unittest.mock import call, patch
 
 import pytest
 
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
-from fimfarchive.utils import find_flavor, Empty, PersistedDict
+from fimfarchive.utils import find_flavor, Empty, JayWalker, PersistedDict
 
 
 class TestEmpty:
@@ -134,7 +135,7 @@ class TestPersistedDict:
         """
         Tests data is replaced on load.
         """
-        extra = {object(): object()}
+        extra = {'key': object()}
         data = PersistedDict(tmpfile)
         data.update(extra)
         data.load()
@@ -190,6 +191,76 @@ class TestPersistedDict:
         data = PersistedDict(tmpfile, default=extra)
 
         assert dict(data) == sample
+
+
+class TestJayWalker:
+    """
+    JayWalker tests.
+    """
+
+    @pytest.fixture
+    def walker(self):
+        """
+        Returns a walker instance.
+        """
+        walker = JayWalker()
+
+        with patch.object(walker, 'handle', wraps=walker.handle):
+            yield walker
+
+    @pytest.mark.parametrize('obj', [None, 'alpaca', 42])
+    def test_ignored_walk(self, walker, obj):
+        """
+        Tests walker ignores plain values.
+        """
+        walker.walk(obj)
+        walker.handle.assert_not_called()
+
+    def test_list_walk(self, walker):
+        """
+        Tests walker can walk lists.
+        """
+        data = ['a', 'b', 'c']
+        walker.walk(data)
+
+        assert walker.handle.mock_calls == [
+            call(data, 0, 'a'),
+            call(data, 1, 'b'),
+            call(data, 2, 'c'),
+        ]
+
+    def test_dict_walk(self, walker):
+        """
+        Tests walker can walk dicts.
+        """
+        data = {0: 'a', 1: 'b', 2: 'c'}
+        walker.walk(data)
+
+        assert walker.handle.mock_calls == [
+            call(data, 0, 'a'),
+            call(data, 1, 'b'),
+            call(data, 2, 'c'),
+        ]
+
+    def test_nested_walk(self, walker):
+        """
+        Tests walker can walk nested objects.
+        """
+        data = {
+            'a': ['b', 'c'],
+            'd': {'e': 'f'},
+        }
+
+        walker.walk([data])
+
+        assert walker.handle.mock_calls == [
+            call([data], 0, data),
+            call(data, 'a', data['a']),
+            call(data['a'], 0, 'b'),
+            call(data['a'], 1, 'c'),
+            call(data, 'd', data['d']),
+            call(data['d'], 'e', 'f'),
+        ]
 
 
 class TestFindFlavor:

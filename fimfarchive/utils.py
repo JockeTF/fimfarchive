@@ -27,7 +27,7 @@ import os
 import shutil
 from functools import partial
 from importlib_resources import read_binary, read_text
-from typing import Any, Dict, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Iterator, Optional, Type, TypeVar, Union
 
 from tqdm import tqdm
 
@@ -122,6 +122,42 @@ class PersistedDict(Dict[str, Any]):
 
         if os.path.exists(self.temp):
             os.remove(self.temp)
+
+
+class JayWalker:
+    """
+    Walker for JSON objects.
+    """
+
+    def walk(self, data) -> None:
+        """
+        Walks the attributes of a JSON object.
+
+        Args:
+            data: The object to walk.
+        """
+        iterator: Iterator
+
+        if isinstance(data, dict):
+            iterator = iter(data.items())
+        elif isinstance(data, list):
+            iterator = enumerate(data)
+        else:
+            return
+
+        for key, value in iterator:
+            self.handle(data, key, value)
+
+    def handle(self, data, key, value) -> None:
+        """
+        Handles a single JSON entry.
+
+        Args:
+            data: The current object.
+            key: The key of the entry.
+            value: The value of the entry.
+        """
+        self.walk(value)
 
 
 def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
