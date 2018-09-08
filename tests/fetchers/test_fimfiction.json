@@ -1,0 +1,145 @@
+{
+    "responses": [
+        {
+            "method": "GET",
+            "status_code": 404,
+            "text": "<html><body>REDACTED</body></html>",
+            "url": "http://example.com/-"
+        },
+        {
+            "json": {
+                "story": {
+                    "author": {
+                        "id": 197482,
+                        "name": "That Naga Pone"
+                    },
+                    "chapter_count": 1,
+                    "chapters": [
+                        {
+                            "date_modified": 1417226139,
+                            "id": 666935,
+                            "link": "https://www.fimfiction.net/story/208799/1/forgotten-ponies-of-equestria/chapter-1-celestias-and-lunas-3rd-sister-turnout",
+                            "title": "Chapter 1: Celestia's and Luna's 3rd Sister Turnout",
+                            "views": 37,
+                            "words": 1893
+                        }
+                    ],
+                    "comments": 6,
+                    "content_rating": 0,
+                    "content_rating_text": "Everyone",
+                    "date_modified": 1415461804,
+                    "description": "REDACTED",
+                    "dislikes": -1,
+                    "id": 208799,
+                    "likes": -1,
+                    "short_description": "REDACTED",
+                    "status": "Incomplete",
+                    "title": "Forgotten Ponies of Equestria",
+                    "total_views": 37,
+                    "url": "https://www.fimfiction.net/story/208799/forgotten-ponies-of-equestria",
+                    "views": 37,
+                    "words": 1893
+                }
+            },
+            "method": "GET",
+            "status_code": 200,
+            "url": "https://www.fimfiction.net/api/story.php?story=208799"
+        },
+        {
+            "json": {
+                "error": "Invalid story id"
+            },
+            "method": "GET",
+            "status_code": 200,
+            "url": "https://www.fimfiction.net/api/story.php?story=7"
+        },
+        {
+            "json": {
+                "story": {
+                    "author": {
+                        "id": 17,
+                        "name": "Cheddah"
+                    },
+                    "chapter_count": 0,
+                    "comments": 1,
+                    "content_rating": 0,
+                    "content_rating_text": "Everyone",
+                    "date_modified": 0,
+                    "description": "REDACTED",
+                    "dislikes": 8,
+                    "id": 8,
+                    "likes": 111,
+                    "short_description": "REDACTED",
+                    "status": "Incomplete",
+                    "title": "The Reports of Agent X",
+                    "total_views": 0,
+                    "url": "https://www.fimfiction.net/story/8/the-reports-of-agent-x",
+                    "views": 0,
+                    "words": 0
+                }
+            },
+            "method": "GET",
+            "status_code": 200,
+            "url": "https://www.fimfiction.net/api/story.php?story=8"
+        },
+        {
+            "json": {
+                "story": {
+                    "author": {
+                        "id": 18,
+                        "name": "Sethisto"
+                    },
+                    "chapter_count": 1,
+                    "chapters": [
+                        {
+                            "date_modified": 1390908352,
+                            "id": 10,
+                            "link": "https://www.fimfiction.net/story/9/1/the-greatest-equine-who-has-ever-lived/chapter-1",
+                            "title": "Chapter 1",
+                            "views": 10362,
+                            "words": 321
+                        }
+                    ],
+                    "comments": 231,
+                    "content_rating": 0,
+                    "content_rating_text": "Everyone",
+                    "date_modified": 1309035953,
+                    "description": "REDACTED",
+                    "dislikes": 52,
+                    "full_image": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-full",
+                    "id": 9,
+                    "image": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-medium",
+                    "likes": 393,
+                    "short_description": "REDACTED",
+                    "status": "Incomplete",
+                    "title": "The Greatest Equine Who has Ever Lived!",
+                    "total_views": 10362,
+                    "url": "https://www.fimfiction.net/story/9/the-greatest-equine-who-has-ever-lived",
+                    "views": 10362,
+                    "words": 321
+                }
+            },
+            "method": "GET",
+            "status_code": 200,
+            "url": "https://www.fimfiction.net/api/story.php?story=9"
+        },
+        {
+            "method": "GET",
+            "status_code": 403,
+            "text": "<html><body>REDACTED</body></html>",
+            "url": "https://www.fimfiction.net/story/download/208799/html"
+        },
+        {
+            "method": "GET",
+            "status_code": 403,
+            "text": "<html><body>REDACTED</body></html>",
+            "url": "https://www.fimfiction.net/story/download/8/html"
+        },
+        {
+            "method": "GET",
+            "status_code": 200,
+            "text": "<html><body><h1><a name='1'></a>REDACTED</h1></body></html>",
+            "url": "https://www.fimfiction.net/story/download/9/html"
+        }
+    ]
+}
