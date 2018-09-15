@@ -5,7 +5,7 @@ Stories for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2018  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,6 +22,19 @@ Stories for Fimfarchive.
 #
 
 
+from typing import TYPE_CHECKING, Any, Dict, Iterable, TypeVar
+
+from fimfarchive.exceptions import StorySourceError
+
+
+if TYPE_CHECKING:
+    from fimfarchive.fetchers import Fetcher
+    from fimfarchive.flavors import Flavor
+else:
+    Fetcher = TypeVar('Fetcher')
+    Flavor = TypeVar('Flavor')
+
+
 __all__ = (
     'Story',
 )
@@ -32,7 +45,24 @@ class Story:
     Represents a story.
     """
 
-    def __init__(self, key, fetcher=None, meta=None, data=None, flavors=()):
+    def __init__(
+            self,
+            key: int,
+            fetcher: Fetcher = None,
+            meta: Dict[str, Any] = None,
+            data: bytes = None,
+            flavors: Iterable[Flavor] = (),
+            ) -> None:
+        """
+        Constructor.
+
+        Args:
+            key: Primary key of the story.
+            fetcher: Fetcher to use for lazy fetching.
+            meta: Meta to populate the story with.
+            data: Data to populate the story with.
+            flavors: Content type hints.
+        """
         if fetcher is None and (data is None or meta is None):
             raise ValueError("Story must contain fetcher if lazy.")
 
@@ -43,21 +73,21 @@ class Story:
         self._data = data
 
     @property
-    def is_fetched(self):
+    def is_fetched(self) -> bool:
         """
         True if no more fetches are necessary.
         """
         return self.has_meta and self.has_data
 
     @property
-    def has_meta(self):
+    def has_meta(self) -> bool:
         """
         True if story meta has been fetched.
         """
         return self._meta is not None
 
     @property
-    def meta(self):
+    def meta(self) -> Dict[str, Any]:
         """
         Returns the story meta.
 
@@ -67,20 +97,23 @@ class Story:
             InvalidStoryError: If a valid story is not found.
             StorySourceError: If source does not return any data.
         """
-        if not self.has_meta:
+        if self._meta is None and self.fetcher:
             self._meta = self.fetcher.fetch_meta(self.key)
+
+        if self._meta is None:
+            raise StorySourceError("Meta is missing.")
 
         return self._meta
 
     @property
-    def has_data(self):
+    def has_data(self) -> bool:
         """
         True if story data has been fetched.
         """
         return self._data is not None
 
     @property
-    def data(self):
+    def data(self) -> bytes:
         """
         Returns the story data.
 
@@ -90,12 +123,15 @@ class Story:
             InvalidStoryError: If a valid story is not found.
             StorySourceError: If source does not return any data.
         """
-        if not self.has_data:
+        if self._data is None and self.fetcher:
             self._data = self.fetcher.fetch_data(self.key)
+
+        if self._data is None:
+            raise StorySourceError("Data is missing.")
 
         return self._data
 
-    def merge(self, **params):
+    def merge(self, **params) -> 'Story':
         """
         Returns a shallow copy, optionally replacing attributes.
 

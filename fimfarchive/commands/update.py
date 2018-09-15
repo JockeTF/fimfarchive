@@ -5,7 +5,7 @@ Update command.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2018  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -136,10 +136,10 @@ class StoryFormatter(Iterable[str]):
         meta = self.story.meta
         chapters = meta.get('chapters')
 
-        try:
-            return len(chapters)
-        except TypeError:
+        if chapters is None:
             return None
+
+        return len(chapters)
 
     @property
     def action(self) -> Optional[str]:
