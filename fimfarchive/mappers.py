@@ -5,7 +5,7 @@ Mappers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2018  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,13 +23,15 @@ Mappers for Fimfarchive.
 
 
 import os
+import string
 from abc import abstractmethod
-from typing import Dict, Generic, Optional, Set, TypeVar
+from html import unescape
+from typing import Dict, Generic, Optional, Set, TypeVar, Union
 
 from arrow import api as arrow, Arrow
 
 from fimfarchive.exceptions import InvalidStoryError
-from fimfarchive.flavors import MetaFormat
+from fimfarchive.flavors import DataFormat, MetaFormat
 from fimfarchive.stories import Story
 from fimfarchive.utils import find_flavor
 
@@ -39,6 +41,7 @@ __all__ = (
     'StaticMapper',
     'StoryDateMapper',
     'StoryPathMapper',
+    'StorySlugMapper',
 )
 
 
@@ -117,6 +120,151 @@ class StoryPathMapper(Mapper[str]):
         key = str(story.key)
 
         return os.path.join(directory, key)
+
+
+class StorySlugMapper(Mapper[str]):
+    """
+    Returns a slug-based file path for a story.
+    """
+
+    def __init__(self, template: str = None) -> None:
+        """
+        Constructor.
+
+        Args:
+            template: Format string for the path.
+        """
+        self.template = '{extension}/{group}/{author}/{story}.{extension}'
+        self.whitelist = set(string.ascii_letters + string.digits)
+        self.groupings = set(string.ascii_lowercase)
+        self.ignore = {'\''}
+        self.spacing = '_'
+        self.part_limit = 112
+        self.slug_limit = 255
+
+        if template is not None:
+            self.template = template
+
+    def slugify(self, text: str) -> str:
+        """
+        Creates a slug from any text.
+
+        Args:
+            text: The text to slufigy.
+
+        Returns:
+            A slugified version of the text.
+        """
+        chars = [self.spacing]
+
+        for char in unescape(str(text)):
+            if char in self.whitelist:
+                chars.append(char)
+            elif char not in self.ignore and chars[-1] != self.spacing:
+                chars.append(self.spacing)
+
+        slug = ''.join(chars).strip(self.spacing)
+
+        if self.part_limit < len(slug):
+            limit = self.part_limit + 1
+            chars = slug[:limit].split(self.spacing)
+            slug = self.spacing.join(chars[:-1])
+
+        return slug.lower()
+
+    def join(self, key: int, slug: Optional[str]) -> str:
+        """
+        Appends a key to a slug.
+
+        Args:
+            key: The key to append.
+            slug: The target slug.
+
+        Returns:
+            A string with both slug and key.
+        """
+        key = int(key)
+
+        if key < 0:
+            raise ValueError("Key must not be negative.")
+
+        if slug:
+            return f'{slug}-{key}'
+        else:
+            return f'{key}'
+
+    def group(self, slug: str) -> str:
+        """
+        Returns the group for part of a path.
+
+        Args:
+            slug: The slug to group.
+
+        Return:
+            A group for the slug.
+        """
+        path = slug[:1]
+
+        if path not in self.groupings:
+            path = self.spacing
+
+        return path
+
+    def classify(self, story: Story) -> str:
+        """
+        Returns a file extension for the story.
+
+        Args:
+            story: The story to classify.
+
+        Returns:
+            A file extension.
+        """
+        for flavor in story.flavors:
+            if isinstance(flavor, DataFormat):
+                return flavor.name.lower()
+
+        return 'data'
+
+    def generate(self, story: Story) -> Dict[str, Union[int, str]]:
+        """
+        Returns the parts of a path.
+
+        Args:
+            story: The story to generate parts from.
+
+        Returns:
+            The parts of the path.
+        """
+        story_meta = story.meta
+        author_meta = story.meta['author']
+
+        story_slug = self.slugify(story_meta['title'])
+        author_slug = self.slugify(author_meta['name'])
+        story_path = self.join(story_meta['id'], story_slug)
+        author_path = self.join(author_meta['id'], author_slug)
+        group_path = self.group(author_path)
+        extension = self.classify(story)
+
+        return {
+            'group': group_path,
+            'author': author_path,
+            'author_key': author_meta['id'],
+            'author_slug': author_path,
+            'story': story_path,
+            'story_key': story_meta['id'],
+            'story_slug': story_slug,
+            'extension': extension,
+        }
+
+    def __call__(self, story: Story) -> str:
+        parts = self.generate(story)
+        path = self.template.format(**parts)
+
+        if self.slug_limit < len(path):
+            raise ValueError("Path too long: {}".format(path))
+
+        return path
 
 
 class MetaFormatMapper(Mapper[Optional[MetaFormat]]):

@@ -5,7 +5,7 @@ Mapper tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2018  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,9 +29,10 @@ from unittest.mock import patch, MagicMock, PropertyMock
 import pytest
 
 from fimfarchive.exceptions import InvalidStoryError
-from fimfarchive.flavors import MetaFormat
+from fimfarchive.flavors import DataFormat, MetaFormat
 from fimfarchive.mappers import (
-    MetaFormatMapper, StaticMapper, StoryDateMapper, StoryPathMapper
+    MetaFormatMapper, StaticMapper, StoryDateMapper,
+    StoryPathMapper, StorySlugMapper
 )
 from fimfarchive.stories import Story
 
@@ -279,6 +280,126 @@ class TestStoryPathMapper:
         assert mapper(story) == os.path.join('dir', 'key')
         assert directory.__str__.called_once_with()
         assert story.key.__str__.called_once_with()
+
+
+class TestStorySlugMapper:
+    """
+    StorySlugMapper tests.
+    """
+
+    @pytest.fixture
+    def mapper(self) -> StorySlugMapper:
+        """
+        Returns a mapper instance.
+        """
+        return StorySlugMapper()
+
+    @pytest.fixture
+    def story(self, story: Story) -> Story:
+        """
+        Returns a story instance.
+        """
+        meta = {
+            'id': 1337,
+            'title': 'title',
+            'author': {
+                'id': 42,
+                'name': 'name',
+            },
+        }
+
+        return story.merge(
+            meta=meta,
+            flavors=[DataFormat.EPUB]
+        )
+
+    def test_mapping(self, mapper, story):
+        """
+        Tests a simple slug mapping.
+        """
+        assert mapper(story) == 'epub/n/name-42/title-1337.epub'
+
+    def test_custom_mapping(self, story):
+        """
+        Tests a slug mapping with a custom template.
+        """
+        mapper = StorySlugMapper('{story}.{extension}')
+
+        assert mapper(story) == 'title-1337.epub'
+
+    @pytest.mark.parametrize('text,result', (
+        ('Project Sunflower: Harmony', 'project_sunflower_harmony'),
+        ('The Enchanted Library', 'the_enchanted_library'),
+        ('Hurricane\'s Way', 'hurricanes_way'),
+        ('Sharers\' Day', 'sharers_day'),
+        ('Paca ' * 32, ('paca_' * 22)[:-1]),
+        ('Paca' * 32, ''),
+        (None, 'none'),
+        ('  ', ''),
+        (' ', ''),
+        ('', ''),
+    ))
+    def test_slugify(self, mapper, text, result):
+        """
+        Tests creating a slug for a title.
+        """
+        assert mapper.slugify(text) == result
+
+    @pytest.mark.parametrize('key,slug,result', (
+        (16, 'slug', 'slug-16'),
+        (32, None, '32'),
+        (64, '', '64'),
+    ))
+    def test_join(self, mapper, key, slug, result):
+        """
+        Tests joining a slug with a key.
+        """
+        assert mapper.join(key, slug) == result
+
+    def test_join_with_negative_key(self, mapper):
+        """
+        Tests `ValueError` is raised when joining a negative key.
+        """
+        with pytest.raises(ValueError):
+            mapper.join('-1', 'slug')
+
+    @pytest.mark.parametrize('slug,result', (
+        ('alpaca', 'a'),
+        ('pony', 'p'),
+        ('42', '_'),
+        ('  ', '_'),
+        (' ', '_'),
+        ('', '_'),
+    ))
+    def test_group(self, mapper, slug, result):
+        """
+        Tests grouping of a slug.
+        """
+        assert mapper.group(slug) == result
+
+    @pytest.mark.parametrize('flavors,result', (
+        ({MetaFormat.BETA, DataFormat.EPUB}, 'epub'),
+        ({DataFormat.EPUB}, 'epub'),
+        ({DataFormat.HTML}, 'html'),
+        ({MetaFormat.BETA}, 'data'),
+        ({}, 'data'),
+    ))
+    def test_classify(self, mapper, story, flavors, result):
+        """
+        Tests classify with a story.
+        """
+        story = story.merge(flavors=flavors)
+
+        assert mapper.classify(story) == result
+
+    def test_map_with_long_template(self, story):
+        """
+        Tests `ValueError` is raised when result is too long.
+        """
+        mapper = StorySlugMapper('paca' * 256)
+
+        with pytest.raises(ValueError):
+            mapper(story)
 
 
 class TestMetaFormatMapper:
