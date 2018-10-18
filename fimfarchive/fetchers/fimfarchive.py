@@ -23,16 +23,14 @@ Fimfarchive fetcher.
 
 
 import json
-from typing import cast, Any, Dict, IO, Iterator, Optional, Tuple, Union
+from typing import Any, Dict, IO, Iterator, Optional, Tuple, Union
 from zipfile import ZipFile, BadZipFile
 
-from boltons.cacheutils import LRU
 from jmespath import compile as jmes
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
 from fimfarchive.stories import Story
-from fimfarchive.utils import Empty
 
 from .base import Fetcher
 
@@ -111,7 +109,7 @@ class FimfarchiveFetcher(Fetcher):
         except BadZipFile as e:
             raise StorySourceError("Archive is corrupt.") from e
 
-        self.paths = LRU()
+        self.paths = dict()
         self.is_open = True
 
     def load_index(self, source: IO[bytes]) -> Iterator[Tuple[int, str]]:
@@ -196,13 +194,18 @@ class FimfarchiveFetcher(Fetcher):
             StorySourceError: If the fetcher is closed.
         """
         key = self.validate(key)
-        path = self.paths.get(key, Empty)
+        path = self.paths.get(key)
 
-        if path is not Empty:
-            return cast(Optional[str], path)
+        if path is not None:
+            return path
 
         meta = self.fetch_meta(key)
-        return PATH.search(meta)
+        path = PATH.search(meta)
+
+        if path is not None:
+            return path
+
+        raise StorySourceError("Missing story path")
 
     def close(self) -> None:
         self.is_open = False
@@ -232,7 +235,11 @@ class FimfarchiveFetcher(Fetcher):
         if key != actual:
             raise StorySourceError(f"Invalid ID for {key}: {actual}")
 
-        self.paths[key] = PATH.search(meta)
+        try:
+            archive = meta.get('archive', meta)
+            self.paths[key] = archive['path']
+        except KeyError:
+            pass
 
         return meta
 
