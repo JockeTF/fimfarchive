@@ -23,6 +23,7 @@ Fimfarchive fetcher.
 
 
 import json
+from io import BufferedReader
 from typing import Any, Dict, IO, Iterator, Optional, Tuple, Union
 from zipfile import ZipFile, BadZipFile
 
@@ -47,6 +48,7 @@ __all__ = (
 )
 
 
+BUFFER_SIZE = 8_000_000
 PATH = jmes('archive.path || path')
 
 
@@ -103,7 +105,8 @@ class FimfarchiveFetcher(Fetcher):
 
         try:
             with self.archive.open('index.json') as fobj:
-                self.index = dict(self.load_index(fobj))
+                reader = BufferedReader(fobj, BUFFER_SIZE)  # type: ignore
+                self.index = dict(self.load_index(reader))
         except KeyError as e:
             raise StorySourceError("Archive is missing the index.") from e
         except BadZipFile as e:
@@ -112,7 +115,7 @@ class FimfarchiveFetcher(Fetcher):
         self.paths = dict()
         self.is_open = True
 
-    def load_index(self, source: IO[bytes]) -> Iterator[Tuple[int, str]]:
+    def load_index(self, source: Iterator[bytes]) -> Iterator[Tuple[int, str]]:
         """
         Yields unparsed index items from a byte stream.
 
