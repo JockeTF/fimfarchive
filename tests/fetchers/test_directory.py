@@ -26,6 +26,7 @@ import json
 import pytest
 from pathlib import Path
 from typing import Any, Dict
+from unittest.mock import patch
 
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import DirectoryFetcher
@@ -154,6 +155,15 @@ class TestDirectoryFetcher:
         Tests len returns the total number of available stories.
         """
         assert 3 == len(fetcher)
+
+    def test_len_caching(test, fetcher):
+        """
+        Tests len is only calculated once.
+        """
+        with patch.object(fetcher, 'list_keys', wraps=fetcher.list_keys) as m:
+            assert 3 == len(fetcher)
+            assert 3 == len(fetcher)
+            assert 1 == len(m.mock_calls)
 
     def test_iter(self, fetcher):
         """

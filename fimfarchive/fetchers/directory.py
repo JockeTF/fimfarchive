@@ -62,6 +62,7 @@ class DirectoryFetcher(Fetcher):
         """
         self.meta_path = meta_path
         self.data_path = data_path
+        self.length: Optional[int] = None
         self.flavors = frozenset(flavors)
 
     def iter_path_keys(self, path: Optional[Path]) -> Iterator[int]:
@@ -111,7 +112,10 @@ class DirectoryFetcher(Fetcher):
         """
         Returns the total number of stories in the directories.
         """
-        return len(self.list_keys())
+        if self.length is None:
+            self.length = len(self.list_keys())
+
+        return self.length
 
     def __iter__(self) -> Iterator[Story]:
         """
