@@ -36,3 +36,5 @@ venv/
 coverage.xml
 htmlcov/
 *.py,cover
+/.vs/fimfarchive/v15
+/.vs
