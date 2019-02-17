@@ -36,3 +36,6 @@ venv/
 coverage.xml
 htmlcov/
 *.py,cover
+
+# Visual studio
+/.vs
