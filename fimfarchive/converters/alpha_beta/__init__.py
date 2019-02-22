@@ -255,6 +255,10 @@ class RootHandler(Handler):
     @property
     def completion_status(self) -> Optional[str]:
         status = self.meta.get('status')
+
+        if status == 'On Hiatus':
+            return 'hiatus'
+
         return status and status.strip().lower()
 
     @property
