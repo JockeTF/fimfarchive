@@ -2,7 +2,7 @@ arrow
 bbcode
 blinker
 flake8
-git+https://github.com/qvantel/jsonapi-client.git
+jsonapi-client
 importlib_resources
 jmespath
 mypy
