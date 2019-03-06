@@ -5,7 +5,7 @@ Mapper tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2018  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -440,14 +440,14 @@ class TestMetaFormatMapper:
         Tests alpha meta format is detected.
         """
         story = self.merge(story, alpha, 'misc')
-        assert mapper(story) == MetaFormat.ALPHA
+        assert mapper(story) is MetaFormat.ALPHA
 
     def test_beta_format(self, mapper, story, beta):
         """
         Tests beta meta format is detected.
         """
         story = self.merge(story, beta, 'misc')
-        assert mapper(story) == MetaFormat.BETA
+        assert mapper(story) is MetaFormat.BETA
 
     def test_conflict(self, mapper, story, alpha, beta):
         """

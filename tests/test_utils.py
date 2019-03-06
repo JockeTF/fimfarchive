@@ -5,7 +5,7 @@ Utility tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -283,7 +283,7 @@ class TestFindFlavor:
         Tests flavor is returned when present.
         """
         found = find_flavor(story, MetaFormat)
-        assert found == MetaFormat.BETA
+        assert found is MetaFormat.BETA
 
     def test_missing_flavor(self, story):
         """
