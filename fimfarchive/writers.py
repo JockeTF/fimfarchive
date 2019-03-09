@@ -5,7 +5,7 @@ Writers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@ Writers for Fimfarchive.
 
 import json
 import os
+from typing import Callable, Optional, Union
 
 from fimfarchive.mappers import StaticMapper, StoryPathMapper
+from fimfarchive.stories import Story
 
 
 __all__ = (
@@ -34,19 +36,23 @@ __all__ = (
 )
 
 
+PathFunc = Callable[[Story], Optional[str]]
+PathSpec = Union[None, PathFunc, str]
+
+
 class Writer():
     """
     Abstract base class for story writers.
     """
 
-    def write(self, story):
+    def write(self, story: Story) -> None:
         """
         Saves the story to somewhere.
 
         Args:
             story: Intance of the `Story` class.
 
-        throws:
+        Raises:
             IOError: If writing the story failed.
         """
         raise NotImplementedError()
@@ -58,8 +64,12 @@ class DirectoryWriter(Writer):
     """
 
     def __init__(
-            self, meta_path=None, data_path=None,
-            overwrite=False, make_dirs=True):
+            self,
+            meta_path: PathSpec = None,
+            data_path: PathSpec = None,
+            overwrite: bool = False,
+            make_dirs: bool = True,
+            ) -> None:
         """
         Constructor.
 
@@ -78,7 +88,7 @@ class DirectoryWriter(Writer):
         self.overwrite = overwrite
         self.make_dirs = make_dirs
 
-    def get_mapper(self, obj):
+    def get_mapper(self, obj: PathSpec) -> PathFunc:
         """
         Returns a callable for mapping story to file path.
         """
@@ -91,7 +101,7 @@ class DirectoryWriter(Writer):
         else:
             raise TypeError("Path must be callable or string.")
 
-    def check_overwrite(self, path):
+    def check_overwrite(self, path: str) -> None:
         """
         Checks that a file is not overwritten unless requested.
 
@@ -104,7 +114,7 @@ class DirectoryWriter(Writer):
         if not self.overwrite and os.path.exists(path):
             raise FileExistsError("Would overwrite: '{}'." .format(path))
 
-    def check_directory(self, path):
+    def check_directory(self, path: str) -> None:
         """
         Checks that the path's parent directory exists.
 
@@ -127,7 +137,7 @@ class DirectoryWriter(Writer):
         else:
             raise FileNotFoundError(parent)
 
-    def perform_write(self, contents, path):
+    def perform_write(self, contents: bytes, path: str) -> None:
         """
         Performs the actual file write.
 
@@ -141,7 +151,7 @@ class DirectoryWriter(Writer):
         with open(path, 'wb') as fobj:
             fobj.write(contents)
 
-    def write_meta(self, story, path):
+    def write_meta(self, story: Story, path: str) -> None:
         """
         Prepares the story meta for writing.
 
@@ -159,7 +169,7 @@ class DirectoryWriter(Writer):
         contents = text.encode('utf-8')
         self.perform_write(contents, path)
 
-    def write_data(self, story, path):
+    def write_data(self, story: Story, path: str) -> None:
         """
         Prepares the story data for writing.
 
@@ -170,7 +180,7 @@ class DirectoryWriter(Writer):
         contents = story.data
         self.perform_write(contents, path)
 
-    def write(self, story):
+    def write(self, story: Story) -> None:
         meta_path = self.meta_path(story)
         data_path = self.data_path(story)
 
