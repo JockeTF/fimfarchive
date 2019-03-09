@@ -23,7 +23,8 @@ Mapper tests.
 
 
 import os
-from typing import no_type_check, Dict, Any
+from pathlib import Path
+from typing import Any, Dict
 from unittest.mock import patch, MagicMock, PropertyMock
 
 import pytest
@@ -262,23 +263,18 @@ class TestStoryPathMapper:
 
         mapper = StoryPathMapper(directory)
 
-        assert mapper(story) == path
+        assert mapper(story) == Path(path)
 
-    @no_type_check
     def test_casts_values(self, tmpdir, story):
         """
         Tests casts all values to string when joining.
         """
-        directory = MagicMock()
-        directory.__str__.return_value = 'dir'
+        mapper = StoryPathMapper('dir')
 
         story.key = MagicMock()
         story.key.__str__.return_value = 'key'
 
-        mapper = StoryPathMapper(directory)
-
-        assert mapper(story) == os.path.join('dir', 'key')
-        assert directory.__str__.called_once_with()
+        assert mapper(story) == Path('dir', 'key')
         assert story.key.__str__.called_once_with()
 
 

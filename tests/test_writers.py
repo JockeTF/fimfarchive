@@ -5,7 +5,7 @@ Writer tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ Writer tests.
 
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -77,7 +78,7 @@ class TestDirectoryWriter:
         Tests `TypeError` is raised for invalid path types.
         """
         with pytest.raises(TypeError):
-            DirectoryWriter(meta_path=1)
+            DirectoryWriter(meta_path=1)  # type: ignore
 
     def test_parent_directory_creation(self, story, tmpdir):
         """
@@ -146,8 +147,15 @@ class TestDirectoryWriter:
 
         writer.write(story)
 
-        with open(meta_path(story), 'rt') as fobj:
-            assert story.meta == json.load(fobj)
+        with open(meta_path(story), 'rt') as meta_stream:
+            assert story.meta == json.load(meta_stream)
 
-        with open(data_path(story), 'rb') as fobj:
-            assert story.data == fobj.read()
+        with open(data_path(story), 'rb') as data_stream:
+            assert story.data == data_stream.read()
+
+    def test_current_directory_check(self, story):
+        """
+        Tests directory check for current directory.
+        """
+        writer = DirectoryWriter()
+        writer.check_directory(Path('key'))

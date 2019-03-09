@@ -23,8 +23,8 @@ Writers for Fimfarchive.
 
 
 import json
-import os
-from typing import Callable, Optional, Union
+from pathlib import Path
+from typing import Callable, Union
 
 from fimfarchive.mappers import StaticMapper, StoryPathMapper
 from fimfarchive.stories import Story
@@ -36,8 +36,8 @@ __all__ = (
 )
 
 
-PathFunc = Callable[[Story], Optional[str]]
-PathSpec = Union[None, PathFunc, str]
+PathFunc = Callable[[Story], Union[None, Path, str]]
+PathSpec = Union[None, Path, PathFunc, str]
 
 
 class Writer():
@@ -94,14 +94,14 @@ class DirectoryWriter(Writer):
         """
         if callable(obj):
             return obj
-        elif isinstance(obj, str):
+        elif isinstance(obj, (Path, str)):
             return StoryPathMapper(obj)
         elif obj is None:
             return StaticMapper(obj)
         else:
             raise TypeError("Path must be callable or string.")
 
-    def check_overwrite(self, path: str) -> None:
+    def check_overwrite(self, path: Path) -> None:
         """
         Checks that a file is not overwritten unless requested.
 
@@ -111,10 +111,10 @@ class DirectoryWriter(Writer):
         Raises:
             FileExistsError: If overwrite is disabled and path exists.
         """
-        if not self.overwrite and os.path.exists(path):
+        if not self.overwrite and path.exists():
             raise FileExistsError("Would overwrite: '{}'." .format(path))
 
-    def check_directory(self, path: str) -> None:
+    def check_directory(self, path: Path) -> None:
         """
         Checks that the path's parent directory exists.
 
@@ -128,16 +128,16 @@ class DirectoryWriter(Writer):
             FileNotFoundError: If the parent directory does not exist,
                 and if directory creation has been disabled.
         """
-        parent = os.path.dirname(path)
+        parent = path.parent
 
-        if os.path.isdir(parent):
+        if parent.is_dir():
             return
         elif self.make_dirs:
-            os.makedirs(parent)
+            parent.mkdir(parents=True)
         else:
             raise FileNotFoundError(parent)
 
-    def perform_write(self, contents: bytes, path: str) -> None:
+    def perform_write(self, contents: bytes, path: Path) -> None:
         """
         Performs the actual file write.
 
@@ -148,10 +148,9 @@ class DirectoryWriter(Writer):
         self.check_overwrite(path)
         self.check_directory(path)
 
-        with open(path, 'wb') as fobj:
-            fobj.write(contents)
+        path.write_bytes(contents)
 
-    def write_meta(self, story: Story, path: str) -> None:
+    def write_meta(self, story: Story, path: Path) -> None:
         """
         Prepares the story meta for writing.
 
@@ -169,7 +168,7 @@ class DirectoryWriter(Writer):
         contents = text.encode('utf-8')
         self.perform_write(contents, path)
 
-    def write_data(self, story: Story, path: str) -> None:
+    def write_data(self, story: Story, path: Path) -> None:
         """
         Prepares the story data for writing.
 
@@ -181,11 +180,13 @@ class DirectoryWriter(Writer):
         self.perform_write(contents, path)
 
     def write(self, story: Story) -> None:
-        meta_path = self.meta_path(story)
-        data_path = self.data_path(story)
+        meta_target = self.meta_path(story)
+        data_target = self.data_path(story)
 
-        if meta_path:
+        if meta_target is not None:
+            meta_path = Path(meta_target).resolve()
             self.write_meta(story, meta_path)
 
-        if data_path:
+        if data_target is not None:
+            data_path = Path(data_target).resolve()
             self.write_data(story, data_path)

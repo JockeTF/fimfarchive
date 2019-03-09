@@ -5,7 +5,7 @@ Mappers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2018  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,10 +22,10 @@ Mappers for Fimfarchive.
 #
 
 
-import os
 import string
 from abc import abstractmethod
 from html import unescape
+from pathlib import Path
 from typing import Dict, Generic, Optional, Set, TypeVar, Union
 
 from arrow import api as arrow, Arrow
@@ -107,19 +107,22 @@ class StoryDateMapper(Mapper[Optional[Arrow]]):
             return None
 
 
-class StoryPathMapper(Mapper[str]):
+class StoryPathMapper(Mapper[Path]):
     """
     Returns a key-based file path for a story.
     """
 
-    def __init__(self, directory: str) -> None:
-        self.directory = directory
+    def __init__(self, directory: Union[Path, str]) -> None:
+        """
+        Constructor.
 
-    def __call__(self, story: Story) -> str:
-        directory = str(self.directory)
-        key = str(story.key)
+        Args:
+            directory: The directory for the path.
+        """
+        self.directory = Path(directory)
 
-        return os.path.join(directory, key)
+    def __call__(self, story: Story) -> Path:
+        return self.directory / str(story.key)
 
 
 class StorySlugMapper(Mapper[str]):
