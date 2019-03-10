@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="BookId" version="2.0">
+  <metadata
+      xmlns:dc="http://purl.org/dc/elements/1.1/"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xmlns:opf="http://www.idpf.org/2007/opf"
+      xmlns:dcterms="http://purl.org/dc/terms/">
+    <dc:title>{{ title }}</dc:title>
+    <dc:language>en</dc:language>
+    <dc:identifier id="BookId" opf:scheme="URI">{{ url }}</dc:identifier>
+    <dc:description>{{ short_description }}</dc:description>
+    <dc:publisher>Fimfiction</dc:publisher>
+    <dc:relation>http://www.fimfiction.net</dc:relation>
+    <dc:creator opf:file-as="{{ author.name }}" opf:role="aut">{{ author.name }}</dc:creator>
+    <dc:date>{{ date_updated }}</dc:date>
+    <dc:source>{{ url }}</dc:source>
+  </metadata>
+  <manifest>
+    <item id="ncx" href="book.ncx" media-type="application/x-dtbncx+xml"/>
+    {%- for chapter in chapters %}
+    {%- set cnum = chapter.chapter_number %}
+    <item id="c{{ cnum }}" href="Chapter{{ cnum }}.html" media-type="application/xhtml+xml"/>
+    {%- endfor %}
+  </manifest>
+  <spine toc="ncx">
+    {%- for chapter in chapters %}
+    <itemref idref="c{{ chapter.chapter_number }}"/>
+    {%- endfor %}
+  </spine>
+</package>

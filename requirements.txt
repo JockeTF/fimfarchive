@@ -4,6 +4,7 @@ blinker
 flake8
 jsonapi-client
 importlib_resources
+jinja2
 jmespath
 mypy
 pytest

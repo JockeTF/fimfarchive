@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ncx PUBLIC "-//NISO//DTD ncx 2005-1//EN" "http://www.daisy.org/z3986/2005/ncx-2005-1.dtd">
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="en">
+  <head>
+    <meta name="dtb:uid" content="{{ url }}"/>
+    <meta name="dtb:depth" content="2"/>
+    <meta name="dtb:totalPageCount" content="0"/>
+    <meta name="dtb:maxPageNumber" content="0"/>
+    <meta name="dtb:generator" content="Fimfarchive"/>
+  </head>
+  <docTitle>
+    <text>{{ title }}</text>
+  </docTitle>
+  <docAuthor>
+    <text>{{ author.name }}</text>
+  </docAuthor>
+  <navMap>
+    {%- for chapter in chapters %}
+    {%- set cnum = chapter.chapter_number %}
+    <navPoint id="c{{ cnum }}" playOrder="{{ cnum }}">
+      <navLabel>
+        <text>{{ chapter.title }}</text>
+      </navLabel>
+      <content src="Chapter{{ cnum }}.html"/>
+    </navPoint>
+    {%- endfor %}
+  </navMap>
+</ncx>

@@ -1,0 +1,151 @@
+{
+    "pairs": [
+        {
+            "fpub": [
+                {
+                    "name": "mimetype",
+                    "text": "application/epub+zip"
+                },
+                {
+                    "name": "META-INF/container.xml",
+                    "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<container version=\"1.0\" xmlns=\"urn:oasis:names:tc:opendocument:xmlns:container\">\n  <rootfiles>\n    <rootfile full-path=\"book.opf\" media-type=\"application/oebps-package+xml\"/>\n  </rootfiles>\n</container>\n"
+                },
+                {
+                    "name": "Chapter1.html",
+                    "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.1//EN\" \"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\">\n  <head>\n    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/>\n    <title>Chapter 1</title>\n  </head>\n  <body>\n    <h1>Chapter 1</h1>\n    <div id='content'><p>REDACTED<p></div>\n    <hr/>\n    <h1>Author&#39;s Note</h1>\n    <div id='authors-note'><p>REDACTED<p></div>\n  </body>\n</html>\n"
+                },
+                {
+                    "name": "book.opf",
+                    "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<package xmlns=\"http://www.idpf.org/2007/opf\" unique-identifier=\"BookId\" version=\"2.0\">\n  <metadata\n      xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\n      xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n      xmlns:opf=\"http://www.idpf.org/2007/opf\"\n      xmlns:dcterms=\"http://purl.org/dc/terms/\">\n    <dc:title>The Greatest Equine Who has Ever Lived!</dc:title>\n    <dc:language>en</dc:language>\n    <dc:identifier id=\"BookId\" opf:scheme=\"URI\">https://www.fimfiction.net/story/9/the-greatest-equine-who-has-ever-lived</dc:identifier>\n    <dc:description>REDACTED</dc:description>\n    <dc:publisher>Fimfiction</dc:publisher>\n    <dc:relation>http://www.fimfiction.net</dc:relation>\n    <dc:creator opf:file-as=\"Sethisto\" opf:role=\"aut\">Sethisto</dc:creator>\n    <dc:date>2011-06-25T21:05:53+00:00</dc:date>\n    <dc:source>https://www.fimfiction.net/story/9/the-greatest-equine-who-has-ever-lived</dc:source>\n  </metadata>\n  <manifest>\n    <item id=\"ncx\" href=\"book.ncx\" media-type=\"application/x-dtbncx+xml\"/>\n    <item id=\"c1\" href=\"Chapter1.html\" media-type=\"application/xhtml+xml\"/>\n  </manifest>\n  <spine toc=\"ncx\">\n    <itemref idref=\"c1\"/>\n  </spine>\n</package>\n"
+                },
+                {
+                    "name": "book.ncx",
+                    "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE ncx PUBLIC \"-//NISO//DTD ncx 2005-1//EN\" \"http://www.daisy.org/z3986/2005/ncx-2005-1.dtd\">\n<ncx xmlns=\"http://www.daisy.org/z3986/2005/ncx/\" version=\"2005-1\" xml:lang=\"en\">\n  <head>\n    <meta name=\"dtb:uid\" content=\"https://www.fimfiction.net/story/9/the-greatest-equine-who-has-ever-lived\"/>\n    <meta name=\"dtb:depth\" content=\"2\"/>\n    <meta name=\"dtb:totalPageCount\" content=\"0\"/>\n    <meta name=\"dtb:maxPageNumber\" content=\"0\"/>\n    <meta name=\"dtb:generator\" content=\"Fimfarchive\"/>\n  </head>\n  <docTitle>\n    <text>The Greatest Equine Who has Ever Lived!</text>\n  </docTitle>\n  <docAuthor>\n    <text>Sethisto</text>\n  </docAuthor>\n  <navMap>\n    <navPoint id=\"c1\" playOrder=\"1\">\n      <navLabel>\n        <text>Chapter 1</text>\n      </navLabel>\n      <content src=\"Chapter1.html\"/>\n    </navPoint>\n  </navMap>\n</ncx>\n"
+                }
+            ],
+            "json": [
+                {
+                    "authors_note_html": "<p>REDACTED<p>",
+                    "authors_note_position": "bottom",
+                    "chapter_number": 1,
+                    "content_html": "<p>REDACTED<p>",
+                    "id": 10,
+                    "title": "Chapter 1",
+                    "url": "https://www.fimfiction.net/story/9/1/the-greatest-equine-who-has-ever-lived/chapter-1"
+                }
+            ],
+            "key": 9,
+            "meta": {
+                "author": {
+                    "avatar": {
+                        "128": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-128",
+                        "160": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-160",
+                        "192": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-192",
+                        "256": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-256",
+                        "32": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-32",
+                        "320": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-320",
+                        "384": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-384",
+                        "48": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-48",
+                        "512": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-512",
+                        "64": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-64",
+                        "96": "https://cdn-img.fimfiction.net/user/t74v-1431818459-18-96"
+                    },
+                    "bio_html": "<p>REDACTED<p>",
+                    "date_joined": "2011-06-25T16:53:48-04:00",
+                    "id": 18,
+                    "name": "Sethisto",
+                    "num_blog_posts": 0,
+                    "num_followers": 146,
+                    "num_stories": 1,
+                    "url": "https://www.fimfiction.net/user/18/Sethisto"
+                },
+                "chapters": [
+                    {
+                        "chapter_number": 1,
+                        "date_modified": "2014-01-28T06:25:52-05:00",
+                        "date_published": "2011-07-08T14:04:11-04:00",
+                        "id": 10,
+                        "num_views": 10549,
+                        "num_words": 321,
+                        "published": true,
+                        "title": "Chapter 1",
+                        "url": "https://www.fimfiction.net/story/9/1/the-greatest-equine-who-has-ever-lived/chapter-1"
+                    }
+                ],
+                "color": {
+                    "hex": "3e3e7e",
+                    "rgb": [
+                        62,
+                        62,
+                        126
+                    ]
+                },
+                "completion_status": "incomplete",
+                "content_rating": "everyone",
+                "cover_image": {
+                    "full": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-full",
+                    "large": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-large",
+                    "medium": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-medium",
+                    "thumbnail": "https://cdn-img.fimfiction.net/story/vr3n-1432418803-9-tiny"
+                },
+                "date_modified": "1970-01-01T00:00:00+00:00",
+                "date_published": "2011-07-08T18:04:11+00:00",
+                "date_updated": "2011-06-25T21:05:53+00:00",
+                "description_html": "<p>REDACTED<p>",
+                "id": 9,
+                "num_chapters": 1,
+                "num_comments": 228,
+                "num_dislikes": 52,
+                "num_likes": 399,
+                "num_views": 10549,
+                "num_words": 321,
+                "prequel": null,
+                "published": true,
+                "rating": 88,
+                "short_description": "REDACTED",
+                "status": "visible",
+                "submitted": true,
+                "tags": [
+                    {
+                        "id": 20,
+                        "name": "Trixie",
+                        "old_id": "c:21",
+                        "type": "character",
+                        "url": "https://www.fimfiction.net/tag/trixie"
+                    },
+                    {
+                        "id": 6,
+                        "name": "Twilight Sparkle",
+                        "old_id": "c:7",
+                        "type": "character",
+                        "url": "https://www.fimfiction.net/tag/twilight-sparkle"
+                    },
+                    {
+                        "id": 234,
+                        "name": "Random",
+                        "old_id": "g:random",
+                        "type": "genre",
+                        "url": "https://www.fimfiction.net/tag/random"
+                    },
+                    {
+                        "id": 120,
+                        "name": "Romance",
+                        "old_id": "g:romance",
+                        "type": "genre",
+                        "url": "https://www.fimfiction.net/tag/romance"
+                    },
+                    {
+                        "id": 4,
+                        "name": "My Little Pony: Friendship is Magic",
+                        "old_id": "",
+                        "type": "series",
+                        "url": "https://www.fimfiction.net/tag/mlp-fim"
+                    }
+                ],
+                "title": "The Greatest Equine Who has Ever Lived!",
+                "total_num_views": 10549,
+                "url": "https://www.fimfiction.net/story/9/the-greatest-equine-who-has-ever-lived"
+            }
+        }
+    ]
+}

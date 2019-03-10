@@ -5,7 +5,7 @@ Converter module.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,9 +24,11 @@ Converter module.
 
 from .base import Converter
 from .alpha_beta import AlphaBetaConverter
+from .json_fpub import JsonFpubConverter
 
 
 __all__ = (
     'Converter',
     'AlphaBetaConverter',
+    'JsonFpubConverter',
 )
