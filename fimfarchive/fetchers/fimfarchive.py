@@ -32,15 +32,9 @@ from jmespath import compile as jmes
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import StorySource, DataFormat, MetaPurity
 from fimfarchive.stories import Story
+from fimfarchive.utils import find_compressor
 
 from .base import Fetcher
-
-
-try:
-    from lz4.block import compress, decompress
-except ModuleNotFoundError:
-    compress = lambda data: data  # noqa
-    decompress = lambda data: data  # noqa
 
 
 __all__ = (
@@ -50,6 +44,9 @@ __all__ = (
 
 BUFFER_SIZE = 8_000_000
 PATH = jmes('archive.path || path')
+
+
+compress, decompress = find_compressor()
 
 
 class FimfarchiveFetcher(Fetcher):
@@ -76,7 +73,7 @@ class FimfarchiveFetcher(Fetcher):
             StorySourceError: If no valid Fimfarchive release can be loaded.
         """
         self.archive: ZipFile
-        self.index: Dict[int, str]
+        self.index: Dict[int, bytes]
         self.paths: Dict[int, str]
         self.is_open: bool = False
 
@@ -115,7 +112,10 @@ class FimfarchiveFetcher(Fetcher):
         self.paths = dict()
         self.is_open = True
 
-    def load_index(self, source: Iterator[bytes]) -> Iterator[Tuple[int, str]]:
+    def load_index(
+            self,
+            source: Iterator[bytes],
+            ) -> Iterator[Tuple[int, bytes]]:
         """
         Yields unparsed index items from a byte stream.
 

@@ -26,8 +26,12 @@ import json
 import os
 import shutil
 from functools import partial
+from importlib import import_module
 from importlib_resources import read_binary, read_text
-from typing import Any, Dict, Iterator, Optional, Type, TypeVar, Union
+from typing import (
+    cast, Any, Callable, Dict, Iterator,
+    Optional, Tuple, Type, TypeVar, Union,
+)
 
 from tqdm import tqdm
 
@@ -38,12 +42,14 @@ from fimfarchive.stories import Story
 __all__ = (
     'Empty',
     'PersistedDict',
+    'find_compressor',
     'find_flavor',
     'tqdm',
 )
 
 
 F = TypeVar('F', bound=Flavor)
+ByteFunc = Callable[[bytes], bytes]
 
 
 tqdm = partial(
@@ -158,6 +164,25 @@ class JayWalker:
             value: The value of the entry.
         """
         self.walk(value)
+
+
+def find_compressor() -> Tuple[ByteFunc, ByteFunc]:
+    """
+    Searches for a fast compression module.
+
+    Returns:
+        A pair of compression functions.
+    """
+    for compressor in ('lz4.block', 'snappy', 'lzo'):
+        try:
+            module: Any = import_module(compressor)
+            return module.compress, module.decompress
+        except ImportError:
+            pass
+
+    dummy = cast(ByteFunc, lambda data: data)
+
+    return dummy, dummy
 
 
 def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
