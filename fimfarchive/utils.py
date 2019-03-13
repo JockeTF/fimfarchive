@@ -28,6 +28,7 @@ import shutil
 from functools import partial
 from importlib import import_module
 from importlib_resources import read_binary, read_text
+from pathlib import Path
 from typing import (
     cast, Any, Callable, Dict, Iterator,
     Optional, Tuple, Type, TypeVar, Union,
@@ -42,8 +43,10 @@ from fimfarchive.stories import Story
 __all__ = (
     'Empty',
     'PersistedDict',
+    'ResourceLoader',
     'find_compressor',
     'find_flavor',
+    'get_path',
     'tqdm',
 )
 
@@ -201,6 +204,22 @@ def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
             return current
 
     return None
+
+
+def get_path(source: Union[None, Path, str]) -> Optional[Path]:
+    """
+    Creates a path from an object, if one is supplied.
+
+    Args:
+        source: Object to create a path from.
+
+    Returns:
+        A resolved path instance, or None.
+    """
+    if source is None:
+        return None
+
+    return Path(source).resolve()
 
 
 class ResourceLoader:

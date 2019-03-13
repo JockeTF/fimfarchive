@@ -25,11 +25,12 @@ Directory fetcher.
 import json
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, Set
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, Union
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
+from fimfarchive.utils import get_path
 
 from .base import Fetcher
 
@@ -48,8 +49,8 @@ class DirectoryFetcher(Fetcher):
 
     def __init__(
             self,
-            meta_path: Path = None,
-            data_path: Path = None,
+            meta_path: Union[Path, str] = None,
+            data_path: Union[Path, str] = None,
             flavors: Iterable[Flavor] = tuple(),
             ) -> None:
         """
@@ -60,8 +61,8 @@ class DirectoryFetcher(Fetcher):
             data: The directory for story data.
             flavors: The flavors to add to stories.
         """
-        self.meta_path = meta_path
-        self.data_path = data_path
+        self.meta_path = get_path(meta_path)
+        self.data_path = get_path(data_path)
         self.length: Optional[int] = None
         self.flavors = frozenset(flavors)
 

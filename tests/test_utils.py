@@ -24,12 +24,16 @@ Utility tests.
 
 import json
 import os
+from pathlib import Path
 from unittest.mock import call, patch
 
 import pytest
 
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
-from fimfarchive.utils import find_flavor, Empty, JayWalker, PersistedDict
+from fimfarchive.utils import (
+    find_flavor, get_path,
+    Empty, JayWalker, PersistedDict
+)
 
 
 class TestEmpty:
@@ -291,3 +295,21 @@ class TestFindFlavor:
         """
         found = find_flavor(story, DataFormat)
         assert found is None
+
+
+class TestGetPath:
+    """
+    get_path tests.
+    """
+
+    @pytest.mark.parametrize('source,target', (
+        (None, None),
+        ('', Path().resolve()),
+        ('alpaca', Path('alpaca').resolve()),
+        (Path('alpaca'), Path('alpaca').resolve()),
+    ))
+    def test_return_values(self, source, target):
+        """
+        Tests function returns the correct value.
+        """
+        assert target == get_path(source)
