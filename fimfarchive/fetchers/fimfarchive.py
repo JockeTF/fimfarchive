@@ -141,7 +141,7 @@ class MemoryIndex(Index):
         return len(self.data)
 
     def close(self):
-        self.data.close()
+        self.data.clear()
 
 
 class FimfarchiveFetcher(Fetcher):
