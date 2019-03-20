@@ -25,10 +25,12 @@ Converter module.
 from .base import Converter
 from .alpha_beta import AlphaBetaConverter
 from .json_fpub import JsonFpubConverter
+from .local_utc import LocalUtcConverter
 
 
 __all__ = (
     'Converter',
     'AlphaBetaConverter',
     'JsonFpubConverter',
+    'LocalUtcConverter',
 )

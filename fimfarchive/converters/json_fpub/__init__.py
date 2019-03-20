@@ -23,21 +23,19 @@ JSON to FPUB converter for story data.
 
 
 import json
-from copy import deepcopy
 from io import BytesIO
-from typing import Any, Dict, Iterator, Optional, Tuple
+from typing import Any, Dict, Iterator, Tuple
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 
-import arrow
 from jinja2 import Environment, PackageLoader
 
 from fimfarchive.flavors import DataFormat, MetaFormat
 from fimfarchive.stories import Story
-from fimfarchive.utils import JayWalker
 
 from fimfarchive.fetchers.fimfiction2 import BetaFormatVerifier
 
 from ..base import Converter
+from ..local_utc import LocalUtcConverter
 
 
 __all__ = (
@@ -47,29 +45,6 @@ __all__ = (
 
 MIMETYPE = 'application/epub+zip'
 PACKAGE = __package__.rsplit('.', 1)
-
-
-class DateNormalizer(JayWalker):
-    """
-    Normalizes timezones of date values to UTC.
-    """
-
-    def handle(self, data, key, value) -> None:
-        if str(key).startswith('date_'):
-            data[key] = self.normalize(value)
-        else:
-            self.walk(value)
-
-    def normalize(self, value: Optional[str]) -> Optional[str]:
-        """
-        Normalizes a single date value.
-        """
-        parsed = arrow.get(value or 0)
-
-        if parsed.timestamp == 0:
-            return None
-
-        return parsed.to('utc').isoformat()
 
 
 class StoryRenderer:
@@ -89,7 +64,6 @@ class StoryRenderer:
         self.book_opf = env.get_template('book.opf')
         self.book_ncx = env.get_template('book.ncx')
 
-        self.date_normalizer = DateNormalizer()
         self.verify_meta = BetaFormatVerifier.from_meta_params()
         self.verify_data = BetaFormatVerifier.from_data_params()
 
@@ -146,7 +120,7 @@ class StoryRenderer:
             self.verify_index(index, meta['chapter_number'])
             self.verify_index(index, data['chapter_number'])
 
-            yield {**meta, **data}
+            yield {**data, **meta}
 
     def iter_content(self, story: Story) -> Iterator[Tuple[str, str]]:
         """
@@ -164,11 +138,8 @@ class StoryRenderer:
 
             yield path, self.chapter_html.render(chapter)
 
-        meta = deepcopy(story.meta)
-        self.date_normalizer.walk(meta)
-
-        yield 'book.opf', self.book_opf.render(meta)
-        yield 'book.ncx', self.book_ncx.render(meta)
+        yield 'book.opf', self.book_opf.render(story.meta)
+        yield 'book.ncx', self.book_ncx.render(story.meta)
 
     def __call__(self, story: Story) -> bytes:
         """
@@ -192,6 +163,7 @@ class JsonFpubConverter(Converter):
 
     def __init__(self) -> None:
         self.render = StoryRenderer()
+        self.normalize = LocalUtcConverter()
 
     def __call__(self, story: Story) -> Story:
         if DataFormat.JSON not in story.flavors:
@@ -200,6 +172,7 @@ class JsonFpubConverter(Converter):
         if MetaFormat.BETA not in story.flavors:
             raise ValueError(f"Missing flavor: {MetaFormat.BETA}")
 
+        story = self.normalize(story)
         data = self.render(story)
 
         flavors = set(story.flavors)
