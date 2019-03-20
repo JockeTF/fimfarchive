@@ -51,7 +51,7 @@ ARGUMENTS = ('--no-default-epub-cover',)
 proc = partial(run, stderr=STDOUT, timeout=TIMEOUT, check=True)
 
 
-def ebook_convert(data: bytes, pipe: int) -> bytes:
+def ebook_convert(data: bytes, pipe: int = DEVNULL) -> bytes:
     """
     Calls the external ebook-convert program.
     """
@@ -91,7 +91,7 @@ class FpubEpubConverter(Converter):
             with open(self.logdir / str(story.key), 'a') as fobj:
                 data = ebook_convert(story.data, fobj.fileno())
         else:
-            data = ebook_convert(story.data, DEVNULL)
+            data = ebook_convert(story.data)
 
         flavors = set(story.flavors)
         flavors.remove(DataFormat.FPUB)
