@@ -24,6 +24,7 @@ Converter module.
 
 from .base import Converter
 from .alpha_beta import AlphaBetaConverter
+from .fpub_epub import FpubEpubConverter
 from .json_fpub import JsonFpubConverter
 from .local_utc import LocalUtcConverter
 
@@ -31,6 +32,7 @@ from .local_utc import LocalUtcConverter
 __all__ = (
     'Converter',
     'AlphaBetaConverter',
+    'FpubEpubConverter',
     'JsonFpubConverter',
     'LocalUtcConverter',
 )
