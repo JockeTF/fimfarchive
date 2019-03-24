@@ -25,13 +25,14 @@ Fimfarchive fetcher tests.
 import json
 from io import BytesIO
 from typing import Any, Dict, List
+from unittest.mock import patch, MagicMock
 from zipfile import ZipFile
 
 import arrow
 import pytest
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
-from fimfarchive.fetchers import Fetcher, FimfarchiveFetcher
+from fimfarchive.fetchers import fimfarchive, Fetcher, FimfarchiveFetcher
 from fimfarchive.stories import Story
 from fimfarchive.utils import JayWalker
 
@@ -171,6 +172,16 @@ def serialize(obj: Dict) -> str:
     return output
 
 
+class PoolMock(MagicMock):
+    """
+    Mocks the multiprocessing pool.
+    """
+
+    @staticmethod
+    def imap(func, iterable, chunksize):
+        yield from map(func, iterable)
+
+
 class TestFimfarchiveFetcher:
     """
     FimfarchiveFetcher tests.
@@ -196,8 +207,16 @@ class TestFimfarchiveFetcher:
 
         return stream
 
+    @pytest.fixture
+    def pool(self):
+        """
+        Yields a multiprocessing pool mock.
+        """
+        with patch.object(fimfarchive, 'Pool', PoolMock) as mock:
+            yield mock
+
     @pytest.fixture()
-    def fetcher(self, archive):
+    def fetcher(self, archive, pool):
         """
         Returns the fetcher instance to test.
         """
