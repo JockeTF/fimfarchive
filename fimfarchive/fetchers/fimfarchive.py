@@ -27,8 +27,8 @@ import marshal
 from io import BufferedReader
 from multiprocessing import Pool
 from typing import (
-    cast, Any, Callable, Dict, IO, Iterator,
-    Mapping, Optional, Tuple, Union,
+    cast, Any, Callable, Dict, IO, Iterable, Iterator,
+    Mapping, Optional, Sized, Tuple, Union,
 )
 from zipfile import ZipFile, BadZipFile
 
@@ -144,7 +144,7 @@ class MemoryIndex(Index):
         self.data.clear()
 
 
-class FimfarchiveFetcher(Fetcher):
+class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
     """
     Fetcher for Fimfarchive.
     """

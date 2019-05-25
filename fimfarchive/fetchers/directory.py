@@ -25,7 +25,7 @@ Directory fetcher.
 import json
 from itertools import chain
 from pathlib import Path
-from typing import Any, Dict, Iterable, Iterator, Optional, Set, Union
+from typing import Any, Dict, Iterable, Iterator, Optional, Set, Sized, Union
 
 from fimfarchive.exceptions import InvalidStoryError, StorySourceError
 from fimfarchive.flavors import Flavor
@@ -40,7 +40,7 @@ __all__ = (
 )
 
 
-class DirectoryFetcher(Fetcher):
+class DirectoryFetcher(Iterable[Story], Sized, Fetcher):
     """
     Fetches stories from file system.
     """
