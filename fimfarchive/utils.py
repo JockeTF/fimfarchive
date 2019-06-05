@@ -31,7 +31,7 @@ from importlib_resources import read_binary, read_text
 from pathlib import Path
 from typing import (
     cast, Any, Callable, Dict, Iterator,
-    Optional, Tuple, Type, TypeVar, Union,
+    Optional, Set, Tuple, Type, TypeVar, Union,
 )
 
 from tqdm import tqdm
@@ -62,6 +62,20 @@ tqdm = partial(
     smoothing=0,
     ncols=72,
 )
+
+
+#
+# Authors who have opted out of being archived.
+#
+# Please respect their wishes.
+#
+
+AUTHOR_BLACKLIST: Set[int] = {
+    135140,
+}
+
+STORY_BLACKLIST: Set[int] = set()
+STORY_WHITELIST: Set[int] = set()
 
 
 class EmptyMeta(type):
@@ -220,6 +234,29 @@ def get_path(source: Union[None, Path, str]) -> Optional[Path]:
         return None
 
     return Path(source).resolve()
+
+
+def is_blacklisted(story: Story) -> bool:
+    """
+    Checks if a story has been blacklisted.
+
+    Args:
+        story: Instance to check.
+
+    Returns:
+        True if a story has been blacklisted.
+    """
+    story_id = story.key
+    author_id = story.meta['author']['id']
+
+    if story_id in STORY_WHITELIST:
+        return False
+    elif story_id in STORY_BLACKLIST:
+        return True
+    elif author_id in AUTHOR_BLACKLIST:
+        return True
+    else:
+        return False
 
 
 class ResourceLoader:

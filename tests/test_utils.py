@@ -29,11 +29,19 @@ from unittest.mock import call, patch
 
 import pytest
 
+from fimfarchive import utils
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
 from fimfarchive.utils import (
-    find_flavor, get_path,
-    Empty, JayWalker, PersistedDict
+    find_flavor, get_path, is_blacklisted,
+    Empty, JayWalker, PersistedDict,
 )
+
+
+BLACKLISTED_AUTHOR = 1
+BLACKLISTED_STORY = 2
+WHITELISTED_STORY = 3
+UNLISTED_AUTHOR = 4
+UNLISTED_STORY = 5
 
 
 class TestEmpty:
@@ -313,3 +321,38 @@ class TestGetPath:
         Tests function returns the correct value.
         """
         assert target == get_path(source)
+
+
+class TestIsBlacklisted:
+    """
+    is_blacklisted tests.
+    """
+
+    @pytest.fixture
+    def utils(self):
+        """
+        Patches the blacklists and whitelists.
+        """
+        ab = patch.object(utils, 'AUTHOR_BLACKLIST', {BLACKLISTED_AUTHOR})
+        sb = patch.object(utils, 'STORY_BLACKLIST', {BLACKLISTED_STORY})
+        sw = patch.object(utils, 'STORY_WHITELIST', {WHITELISTED_STORY})
+
+        with ab, sb, sw:
+            yield utils
+
+    @pytest.mark.parametrize('key,author,result', [
+        (BLACKLISTED_STORY, BLACKLISTED_AUTHOR, True),
+        (BLACKLISTED_STORY, UNLISTED_AUTHOR, True),
+        (UNLISTED_STORY, BLACKLISTED_AUTHOR, True),
+        (UNLISTED_STORY, UNLISTED_AUTHOR, False),
+        (WHITELISTED_STORY, BLACKLISTED_AUTHOR, False),
+        (WHITELISTED_STORY, UNLISTED_AUTHOR, False),
+    ])
+    def test_blacklisted(self, utils, story, key, author, result):
+        """
+        Tests the various blacklist combinations.
+        """
+        meta = {'id': key, 'author': {'id': author}}
+        story = story.merge(key=key, meta=meta)
+
+        assert result is is_blacklisted(story)
