@@ -25,8 +25,10 @@ Mappers for Fimfarchive.
 import string
 from abc import abstractmethod
 from html import unescape
+from io import BytesIO
 from pathlib import Path
 from typing import Dict, Generic, Optional, Set, TypeVar, Union
+from zipfile import ZipFile
 
 from arrow import api as arrow, Arrow
 
@@ -39,6 +41,8 @@ from fimfarchive.utils import find_flavor
 __all__ = (
     'Mapper',
     'StaticMapper',
+    'DataFormatMapper',
+    'MetaFormatMapper',
     'StoryDateMapper',
     'StoryPathMapper',
     'StorySlugMapper',
@@ -282,14 +286,55 @@ class MetaFormatMapper(Mapper[Optional[MetaFormat]]):
     def __call__(self, story: Story) -> Optional[MetaFormat]:
         flavor = find_flavor(story, MetaFormat)
 
-        if flavor:
+        if flavor is not None:
             return flavor
 
         items = self.spec.items()
         meta = set(story.meta.keys())
-        matches = {fmt for fmt, spec in items if spec & meta}
+        matches = [fmt for fmt, spec in items if spec & meta]
 
         if len(matches) == 1:
-            return next(iter(matches))
+            return matches[0]
+        else:
+            return None
+
+
+class DataFormatMapper(Mapper[Optional[DataFormat]]):
+    """
+    Guesses the data format of stories.
+    """
+    spec: Dict[DataFormat, Set[str]] = {
+        DataFormat.EPUB: {'content.opf', 'mimetype', 'toc.ncx'},
+        DataFormat.FPUB: {'book.ncx', 'book.opf', 'mimetype'},
+    }
+
+    zip_magic: Set[bytes] = {
+        b'PK\x03\x04',
+        b'PK\x05\x06',
+        b'PK\x07\x08',
+    }
+
+    def __call__(self, story: Story) -> Optional[DataFormat]:
+        flavor = find_flavor(story, DataFormat)
+
+        if flavor is not None:
+            return flavor
+
+        data = story.data.rstrip()
+
+        if data and data[0] == 123 and data[-1] == 125:
+            return DataFormat.JSON
+
+        if data[:4] not in self.zip_magic:
+            return None
+
+        with ZipFile(BytesIO(data)) as zobj:
+            names = set(zobj.namelist())
+
+        items = self.spec.items()
+        matches = [fmt for fmt, spec in items if spec <= names]
+
+        if len(matches) == 1:
+            return matches[0]
         else:
             return None

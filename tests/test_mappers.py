@@ -23,17 +23,19 @@ Mapper tests.
 
 
 import os
+from io import BytesIO
 from pathlib import Path
 from typing import Any, Dict
 from unittest.mock import patch, MagicMock, PropertyMock
+from zipfile import ZipFile
 
 import pytest
 
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.flavors import DataFormat, MetaFormat
 from fimfarchive.mappers import (
-    MetaFormatMapper, StaticMapper, StoryDateMapper,
-    StoryPathMapper, StorySlugMapper
+    DataFormatMapper, MetaFormatMapper, StaticMapper,
+    StoryDateMapper, StoryPathMapper, StorySlugMapper,
 )
 from fimfarchive.stories import Story
 
@@ -460,3 +462,107 @@ class TestMetaFormatMapper:
         story = self.merge(story, beta, 'misc')
 
         assert mapper(story) is MetaFormat.ALPHA
+
+
+class TestDataFormatMapper:
+    """
+    DataFormatMapper tests.
+    """
+
+    @pytest.fixture
+    def mapper(self):
+        """
+        Returns a data format mapper instance.
+        """
+        return DataFormatMapper()
+
+    def zip(self, names) -> bytes:
+        """
+        Returns a populated ZIP-file as bytes.
+        """
+        data = BytesIO()
+
+        with ZipFile(data, 'w') as zobj:
+            for name in names:
+                zobj.writestr(name, name)
+
+        return data.getvalue()
+
+    @pytest.mark.parametrize('data', [
+        b'{}',
+        b'{"id": 42}',
+        b'{"id": 42}\n',
+    ])
+    def test_json_mapping(self, mapper, story, data):
+        """
+        Tests detection of JSON data format.
+        """
+        story = story.merge(data=data, flavors=[])
+
+        assert DataFormat.JSON is mapper(story)
+
+    @pytest.mark.parametrize('files', [
+        ['mimetype', 'book.ncx', 'book.opf'],
+        ['mimetype', 'book.opf', 'book.ncx', 'Chapter1.html'],
+    ])
+    def test_fpub_mapping(self, mapper, story, files):
+        """
+        Tests detection of FPUB data format.
+        """
+        story = story.merge(data=self.zip(files), flavors=[])
+
+        assert DataFormat.FPUB is mapper(story)
+
+    @pytest.mark.parametrize('files', [
+        ['mimetype', 'content.opf', 'toc.ncx'],
+        ['mimetype', 'toc.ncx', 'content.opf', 'Chapter1.html'],
+    ])
+    def test_epub_mapping(self, mapper, story, files):
+        """
+        Tests detection of EPUB data format.
+        """
+        story = story.merge(data=self.zip(files), flavors=[])
+
+        assert DataFormat.EPUB is mapper(story)
+
+    @pytest.mark.parametrize('fmt', [
+        DataFormat.EPUB,
+        DataFormat.JSON,
+    ])
+    def test_included_mapping(self, mapper, story, fmt):
+        """
+        Tests detection of included flavor.
+        """
+        story = story.merge(flavors=[fmt])
+
+        assert fmt is mapper(story)
+
+    @pytest.mark.parametrize('data', [
+        b'',
+        b'P',
+        b'PK',
+        b'PK\x03',
+        b'PK\x03\x03',
+    ])
+    def test_unknown_raw_mapping(self, mapper, story, data):
+        """
+        Tests unknown raw data returns no flavor.
+        """
+        story = story.merge(data=data, flavors=[])
+
+        assert None is mapper(story)
+
+    @pytest.mark.parametrize('files', [
+        [],
+        ['alpaca.jpg'],
+        ['book.opf', 'book.ncx'],
+        ['mimetype', 'book.ncx'],
+        ['content.opf', 'tox.ncx', 'Chapter1.html'],
+    ])
+    def test_unknown_zip_mapping(self, mapper, story, files):
+        """
+        Tests unknown ZIP data returns no flavor.
+        """
+        story = story.merge(data=self.zip(files), flavors=[])
+
+        assert None is mapper(story)
