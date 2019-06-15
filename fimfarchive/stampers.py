@@ -5,7 +5,7 @@ Stampers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ Stampers for Fimfarchive.
 #
 
 
-from typing import Any, Dict, Set
+from typing import Any, Callable, Dict, Optional, Set
 
 import arrow
 
@@ -106,3 +106,31 @@ class UpdateStamper(Stamper):
                 archive[key] = timestamp
             elif key not in archive:
                 archive[key] = None
+
+
+class PathStamper(Stamper):
+    """
+    Adds archive paths to stories.
+    """
+
+    def __init__(self, mapper: Callable[[Story], Optional[str]]) -> None:
+        """
+        Constructor.
+
+        Args:
+            mapper: Callable returning the path to stamp.
+        """
+        self.map = mapper
+
+    def __call__(self, story: Story) -> None:
+        archive = self.get_archive(story)
+        path = self.map(story)
+
+        if 'path' in archive:
+            del archive['path']
+
+        if 'path' in story.meta:
+            del story.meta['path']
+
+        if path:
+            archive['path'] = path

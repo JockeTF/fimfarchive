@@ -5,7 +5,7 @@ Stamper tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -29,7 +29,8 @@ import arrow
 import pytest
 
 from fimfarchive.flavors import UpdateStatus
-from fimfarchive.stampers import Stamper, UpdateStamper
+from fimfarchive.mappers import StaticMapper
+from fimfarchive.stampers import Stamper, PathStamper, UpdateStamper
 
 
 class TestStamper:
@@ -187,3 +188,66 @@ class TestUpdateStamper:
         assert archive['date_created'] == prev
         assert archive['date_fetched'] == prev
         assert archive['date_updated'] == prev
+
+
+class TestPathStamper:
+    """
+    PathStamper tests.
+    """
+
+    @pytest.mark.parametrize('value', (None, 'Some'))
+    def test_cleared_alpha_path(self, story, value):
+        """
+        Tests removal of old alpha format values.
+        """
+        story = story.merge(meta={
+            **story.meta,
+            'path': 'path',
+        })
+
+        meta = story.meta
+        assert 'path' in meta
+
+        stamp = PathStamper(StaticMapper(value))
+        stamp(story)
+
+        assert 'path' not in meta
+
+    def test_cleared_beta_path(self, story):
+        """
+        Tests removal of old beta format values.
+        """
+        story = story.merge(meta={
+            **story.meta,
+            'archive': {
+                'path': 'path',
+            },
+        })
+
+        archive = story.meta['archive']
+        assert 'path' in archive
+
+        stamp = PathStamper(StaticMapper(None))
+        stamp(story)
+
+        assert 'path' not in archive
+
+    @pytest.mark.parametrize('value', (None, ''))
+    def test_ignored_blank_value(self, story, value):
+        """
+        Tests blank values are ignored.
+        """
+        stamp = PathStamper(StaticMapper(value))
+        stamp(story)
+
+        assert 'path' not in story.meta['archive']
+
+    @pytest.mark.parametrize('value', ('one', 'two'))
+    def test_stamped_value(self, story, value):
+        """
+        Tests values are stamped to story meta.
+        """
+        stamp = PathStamper(StaticMapper(value))
+        stamp(story)
+
+        assert value == story.meta['archive']['path']
