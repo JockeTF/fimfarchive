@@ -28,9 +28,11 @@ from typing import Dict
 import arrow
 import pytest
 
-from fimfarchive.flavors import UpdateStatus
+from fimfarchive.flavors import DataFormat, MetaFormat, UpdateStatus
 from fimfarchive.mappers import StaticMapper
-from fimfarchive.stampers import Stamper, PathStamper, UpdateStamper
+from fimfarchive.stampers import (
+    Stamper, FlavorStamper, PathStamper, UpdateStamper,
+)
 
 
 class TestStamper:
@@ -188,6 +190,35 @@ class TestUpdateStamper:
         assert archive['date_created'] == prev
         assert archive['date_fetched'] == prev
         assert archive['date_updated'] == prev
+
+
+class TestFlavorStamper:
+    """
+    FlavorStamper tests.
+    """
+
+    @pytest.mark.parametrize('value', (None, ''))
+    def test_ignored_blank_value(self, story, value):
+        """
+        Tests blank values are ignored.
+        """
+        stamp = FlavorStamper(StaticMapper(value))
+        stamp(story)
+
+        assert value not in story.flavors
+
+    @pytest.mark.parametrize('value', (
+        DataFormat.EPUB,
+        MetaFormat.ALPHA,
+    ))
+    def test_stamped_value(self, story, value):
+        """
+        Tests values are stamped to stories.
+        """
+        stamp = FlavorStamper(StaticMapper(value))
+        stamp(story)
+
+        assert value in story.flavors
 
 
 class TestPathStamper:

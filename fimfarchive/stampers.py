@@ -26,7 +26,7 @@ from typing import Any, Callable, Dict, Optional, Set
 
 import arrow
 
-from fimfarchive.flavors import UpdateStatus
+from fimfarchive.flavors import Flavor, UpdateStatus
 from fimfarchive.stories import Story
 from fimfarchive.utils import find_flavor
 
@@ -108,6 +108,27 @@ class UpdateStamper(Stamper):
                 archive[key] = None
 
 
+class FlavorStamper(Stamper):
+    """
+    Adds flavors to stories.
+    """
+
+    def __init__(self, mapper: Callable[[Story], Optional[Flavor]]) -> None:
+        """
+        Constructor.
+
+        Args:
+            mapper: Callable returning the flavor to stamp with.
+        """
+        self.map = mapper
+
+    def __call__(self, story: Story) -> None:
+        flavor = self.map(story)
+
+        if flavor:
+            story.flavors.add(flavor)
+
+
 class PathStamper(Stamper):
     """
     Adds archive paths to stories.
@@ -118,7 +139,7 @@ class PathStamper(Stamper):
         Constructor.
 
         Args:
-            mapper: Callable returning the path to stamp.
+            mapper: Callable returning the path to stamp with.
         """
         self.map = mapper
 
