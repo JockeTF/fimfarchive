@@ -23,10 +23,15 @@ Writers for Fimfarchive.
 
 
 import json
+from copy import deepcopy
 from pathlib import Path
-from typing import Callable, Union
+from typing import Callable, Iterable, Tuple, Union
+from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 
-from fimfarchive.mappers import StaticMapper, StoryPathMapper
+from fimfarchive.mappers import (
+    DataFormatMapper, StaticMapper, StoryPathMapper, StorySlugMapper,
+)
+from fimfarchive.stampers import FlavorStamper, PathStamper
 from fimfarchive.stories import Story
 
 
@@ -56,6 +61,17 @@ class Writer():
             IOError: If writing the story failed.
         """
         raise NotImplementedError()
+
+    def close(self) -> None:
+        """
+        Finalizes writes and closes files.
+        """
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.close()
 
 
 class DirectoryWriter(Writer):
@@ -190,3 +206,89 @@ class DirectoryWriter(Writer):
         if data_target is not None:
             data_path = Path(data_target).resolve()
             self.write_data(story, data_path)
+
+
+class FimfarchiveWriter(Writer):
+    """
+    Writes stories to a ZIP-file.
+    """
+
+    def __init__(
+            self,
+            path: Union[Path, str],
+            extras: Iterable[Tuple[str, bytes]] = (),
+            ) -> None:
+        """
+        Constructor.
+
+        Args:
+            path: Output path for the archive.
+            extras: Extra names and data to add.
+        """
+        archive_path = Path(path).resolve(False)
+        index_path = archive_path.with_suffix('.json')
+
+        if archive_path.suffix != '.zip':
+            raise ValueError(f"Path '{archive_path}' needs zip suffix.")
+
+        if archive_path.exists():
+            raise ValueError(f"Path '{archive_path}' already exists.")
+
+        if index_path.exists():
+            raise ValueError(f"Path '{index_path}' already exists.")
+
+        self.index_path = index_path
+        self.archive_path = archive_path
+        self.extras = extras
+
+        self.stamp_format = FlavorStamper(DataFormatMapper())
+        self.stamp_path = PathStamper(StorySlugMapper())
+
+        index_path.parent.mkdir(parents=True, exist_ok=True)
+        archive_path.parent.mkdir(parents=True, exist_ok=True)
+
+        self.index = index_path.open('wt', encoding='utf8')
+        self.archive = ZipFile(archive_path, 'w', ZIP_STORED)
+
+        self.index.write('{\n')
+        self.open = True
+
+    def write(self, story: Story) -> None:
+        if not self.open:
+            raise ValueError("Writer is closed.")
+
+        if story.key != story.meta['id']:
+            raise ValueError("Invalid story key.")
+
+        story = story.merge(meta=deepcopy(story.meta))
+
+        self.stamp_format(story)
+        self.stamp_path(story)
+
+        path = story.meta['archive']['path']
+        meta = json.dumps(story.meta, ensure_ascii=False, sort_keys=True)
+        line = f'"{story.key}": {meta},\n'
+
+        self.index.write(line)
+        self.archive.writestr(path, story.data, ZIP_STORED)
+
+    def close(self) -> None:
+        if not self.open:
+            return
+
+        self.open = False
+
+        if 2 < self.index.tell():
+            self.index.seek(self.index.tell() - 2)
+
+        self.index.write('\n}\n')
+        self.index.close()
+
+        for name, data in self.extras:
+            self.archive.writestr(name, data, ZIP_DEFLATED)
+
+        self.archive.write(self.index_path, 'index.json', ZIP_DEFLATED)
+        self.archive.close()
+
+        del self.index
+        del self.archive

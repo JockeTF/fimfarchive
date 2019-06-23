@@ -24,12 +24,18 @@ Writer tests.
 
 import json
 import os
+from functools import partial
+from io import BytesIO
 from pathlib import Path
+from zipfile import ZipFile
 
 import pytest
 
-from fimfarchive.mappers import StoryPathMapper
-from fimfarchive.writers import DirectoryWriter
+from fimfarchive.flavors import DataFormat
+from fimfarchive.mappers import StoryPathMapper, StorySlugMapper
+from fimfarchive.stampers import PathStamper
+from fimfarchive.stories import Story
+from fimfarchive.writers import DirectoryWriter, FimfarchiveWriter
 
 
 class TestDirectoryWriter:
@@ -159,3 +165,104 @@ class TestDirectoryWriter:
         """
         writer = DirectoryWriter()
         writer.check_directory(Path('key'))
+
+
+class TestFimfarchiveWriter:
+    """
+    FimfarchiveWriter tests.
+    """
+
+    def story(self, key, title, author, name) -> Story:
+        """
+        Returns a dummy story for writing.
+        """
+        stream = BytesIO()
+
+        with ZipFile(stream, 'w') as zobj:
+            zobj.writestr('text', "Story {key}")
+
+        meta = {
+            'id': key,
+            'title': title,
+            'author': {
+                'id': author,
+                'name': name,
+            },
+        }
+
+        return Story(
+            key=key,
+            fetcher=None,
+            meta=meta,
+            data=stream.getvalue(),
+            flavors=[DataFormat.EPUB],
+        )
+
+    @pytest.fixture
+    def stories(self):
+        """
+        Returns a collection of stories to write.
+        """
+        return (
+            self.story(32, "Floof", 48, "Floofer"),
+            self.story(64, "Poof", 80, "Poofer"),
+        )
+
+    @pytest.fixture
+    def extras(self):
+        """
+        Returns extra data to write.
+        """
+        return (
+            ('about.json', b'about'),
+            ('readme.pdf', b'readme'),
+        )
+
+    @pytest.fixture
+    def archive(self, tmpdir, stories, extras):
+        """
+        Returns an archive as a ZipFile instance.
+        """
+        archive = Path(tmpdir) / 'archive.zip'
+
+        with FimfarchiveWriter(archive, extras) as writer:
+            for story in stories:
+                writer.write(story)
+
+        return ZipFile(BytesIO(archive.read_bytes()))
+
+    def test_meta(self, stories, archive):
+        """
+        Tests index looks as expected.
+        """
+        stamp = PathStamper(StorySlugMapper())
+
+        for story in stories:
+            stamp(story)
+
+        dumps = partial(json.dumps, ensure_ascii=False, sort_keys=True)
+        first, second = tuple(dumps(story.meta) for story in stories)
+        raw = f'{{\n"32": {first},\n"64": {second}\n}}\n'
+
+        assert json.loads(archive.read('index.json').decode())
+        assert raw.encode() == archive.read('index.json')
+
+    def test_data(self, stories, archive):
+        """
+        Tests archive includes story data.
+        """
+        index = json.loads(archive.read('index.json').decode())
+
+        for story in stories:
+            data = story.data
+            meta = index[str(story.key)]
+            path = meta['archive']['path']
+
+            assert data == archive.read(path)
+
+    def test_extras(self, extras, archive):
+        """
+        Tests archive includes extras.
+        """
+        for name, data in extras:
+            assert data == archive.read(name)
