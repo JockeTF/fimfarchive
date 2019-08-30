@@ -130,8 +130,12 @@ class AuthorHandler(Handler):
     )
 
     @property
+    def id(self):
+        return int(self.meta['id'])
+
+    @property
     def url(self):
-        uid = int(self.id)
+        uid = self.id
         name = urlquote(str(self.name))
         return f'{HOST}/user/{uid}/{name}'
 
