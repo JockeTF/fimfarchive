@@ -2,10 +2,10 @@ arrow
 bbcode
 blinker
 flake8
-jsonapi-client
 importlib_resources
 jinja2
 jmespath
+jsonapi-client
 mypy
 pytest
 requests
