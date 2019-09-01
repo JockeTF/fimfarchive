@@ -5,7 +5,7 @@ Update command.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2018  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -194,7 +194,7 @@ class UpdatePrinter(SignalReceiver):
 
 class UpdateCommand(Command):
     """
-    Fetches updates from Fimfiction.
+    Updates stories for Fimfarchive.
     """
 
     @property
