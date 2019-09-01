@@ -24,8 +24,10 @@ Fimfarchive fetcher.
 
 import json
 import marshal
+import sqlite3
 from io import BufferedReader
 from multiprocessing import Pool
+from pathlib import Path
 from typing import (
     cast, Any, Callable, Dict, IO, Iterable, Iterator,
     Mapping, Optional, Sized, Tuple, Union,
@@ -65,6 +67,12 @@ class Index(Mapping[int, Dict[str, Any]]):
         """
         Closes the index, if necessary.
         """
+
+    def iteritems(self) -> Iterator[Tuple[int, Dict[str, Any]]]:
+        """
+        Special items iterator, for performance.
+        """
+        yield from self.items()
 
     def load(self, source: IO[bytes]) -> Iterator[Tuple[int, bytes]]:
         """
@@ -140,8 +148,56 @@ class MemoryIndex(Index):
     def __len__(self) -> int:
         return len(self.data)
 
+    def iteritems(self) -> Iterator[Tuple[int, Dict[str, Any]]]:
+        for key, value in self.data.items():
+            yield key, deserialize(decompress(value))
+
     def close(self):
         self.data.clear()
+
+
+class SqliteIndex(Index):
+    """
+    Cached mapping from key to story meta.
+    """
+
+    CREATE = 'CREATE TABLE "cache" (key INT PRIMARY KEY, value BLOB)'
+    INSERT = 'INSERT INTO cache VALUES (?, ?)'
+    SELECT = 'SELECT value FROM cache WHERE key = ?'
+    LIST_KEYS = 'SELECT key FROM cache ORDER BY key'
+    LIST_ITEMS = 'SELECT key, value FROM cache ORDER BY key'
+
+    def __init__(self, name: str, stream: IO[bytes]) -> None:
+        if Path(name).exists():
+            self.db = sqlite3.connect(name)
+        else:
+            self.db = sqlite3.connect(name)
+            self.db.execute(self.CREATE)
+            self.db.executemany(self.INSERT, self.load(stream))
+            self.db.commit()
+
+        keys = self.db.execute(self.LIST_KEYS)
+        self._keys = set(row[0] for row in keys)
+
+    def __getitem__(self, key: int) -> Dict[str, Any]:
+        value = self.db.execute(self.SELECT, (key,))
+        return marshal.loads(value.fetchone()[0])
+
+    def __contains__(self, item) -> bool:
+        return item in self._keys
+
+    def __iter__(self) -> Iterator[int]:
+        return iter(sorted(self._keys))
+
+    def __len__(self) -> int:
+        return len(self._keys)
+
+    def iteritems(self) -> Iterator[Tuple[int, Dict[str, Any]]]:
+        items = self.db.execute(self.LIST_ITEMS)
+        return ((k, deserialize(v)) for k, v in items)
+
+    def close(self) -> None:
+        self.db.close()
 
 
 class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
@@ -216,10 +272,12 @@ class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
         """
         Yields all stories in the archive, ordered by ID.
         """
-        for key in sorted(self.index.keys()):
-            yield self.fetch(key)
+        for key, meta in self.index.iteritems():
+            key = self.validate_key(key)
+            meta = self.validate_meta(key, meta)
+            yield Story(key, self, meta, None, self.flavors)
 
-    def validate(self, key: int) -> int:
+    def validate_key(self, key: int) -> int:
         """
         Ensures that the key matches a valid story
 
@@ -243,6 +301,20 @@ class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
 
         return key
 
+    def validate_meta(self, key: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+        actual = meta.get('id')
+
+        if key != actual:
+            raise StorySourceError(f"Invalid ID for {key}: {actual}")
+
+        try:
+            archive = meta.get('archive', meta)
+            self.paths[key] = archive['path']
+        except KeyError:
+            pass
+
+        return meta
+
     def fetch_path(self, key: int) -> Optional[str]:
         """
         Fetches the archive path of a story.
@@ -257,7 +329,7 @@ class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
             InvalidStoryError: If a valid story is not found.
             StorySourceError: If the fetcher is closed.
         """
-        key = self.validate(key)
+        key = self.validate_key(key)
         path = self.paths.get(key)
 
         if path is not None:
@@ -284,23 +356,13 @@ class FimfarchiveFetcher(Iterable[Story], Sized, Fetcher):
             self.paths.clear()
 
     def fetch_meta(self, key: int) -> Dict[str, Any]:
-        key = self.validate(key)
-        meta = self.index[key]
-        actual = meta.get('id')
-
-        if key != actual:
-            raise StorySourceError(f"Invalid ID for {key}: {actual}")
-
-        try:
-            archive = meta.get('archive', meta)
-            self.paths[key] = archive['path']
-        except KeyError:
-            pass
+        key = self.validate_key(key)
+        meta = self.validate_meta(key, self.index[key])
 
         return meta
 
     def fetch_data(self, key: int) -> bytes:
-        key = self.validate(key)
+        key = self.validate_key(key)
         path = self.fetch_path(key)
 
         if not path:
