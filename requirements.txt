@@ -1,6 +1,7 @@
 arrow
 bbcode
 blinker
+colorama
 flake8
 importlib_resources
 jinja2

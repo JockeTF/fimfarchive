@@ -24,13 +24,15 @@ Command module.
 
 from .base import Command
 from .build import BuildCommand
+from .fetch import FetchCommand
 from .root import RootCommand
 from .update import UpdateCommand
 
 
 __all__ = (
     'Command',
-    'RootCommand',
     'BuildCommand',
+    'FetchCommand',
+    'RootCommand',
     'UpdateCommand',
 )
