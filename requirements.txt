@@ -2,6 +2,7 @@ arrow
 bbcode
 beautifulsoup4
 blinker
+colorama
 flake8
 importlib_resources
 jinja2

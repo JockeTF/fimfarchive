@@ -89,6 +89,7 @@ setup(
         'bbcode',
         'beautifulsoup4',
         'blinker',
+        'colorama',
         'importlib_resources',
         'jinja2',
         'jmespath',
