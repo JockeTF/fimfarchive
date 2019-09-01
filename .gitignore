@@ -31,8 +31,17 @@ venv/
 # Rope project.
 .ropeproject/
 
+# Mypy cache.
+.mypy_cache/
+
 # Coverage output.
 .coverage
 coverage.xml
 htmlcov/
 *.py,cover
+
+# Fimfarchive data.
+fimfarchive.zip
+
+# Operations configuration.
+operations/inventory.yml
