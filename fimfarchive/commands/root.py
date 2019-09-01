@@ -26,6 +26,7 @@ from typing import Dict, Type
 
 from .base import Command
 from .build import BuildCommand
+from .render import RenderCommand
 from .update import UpdateCommand
 
 
@@ -40,6 +41,7 @@ class RootCommand(Command):
     """
     commands: Dict[str, Type[Command]] = {
         'build': BuildCommand,
+        'render': RenderCommand,
         'update': UpdateCommand,
     }
 
