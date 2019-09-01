@@ -25,6 +25,7 @@ Root command.
 from typing import Dict, Type
 
 from .base import Command
+from .normal import NormalCommand
 from .update import UpdateCommand
 
 
@@ -38,6 +39,7 @@ class RootCommand(Command):
     The main application command.
     """
     commands: Dict[str, Type[Command]] = {
+        'normal': NormalCommand,
         'update': UpdateCommand,
     }
 

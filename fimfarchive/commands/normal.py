@@ -1,11 +1,11 @@
 """
-Command module.
+Normalize command.
 """
 
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,15 +22,34 @@ Command module.
 #
 
 
+from pathlib import Path
+
+from fimfarchive.converters import LocalUtcConverter
+from fimfarchive.fetchers import DirectoryFetcher
+from fimfarchive.utils import tqdm
+from fimfarchive.writers import DirectoryWriter
+
+
 from .base import Command
-from .root import RootCommand
-from .normal import NormalCommand
-from .update import UpdateCommand
 
 
 __all__ = (
-    'Command',
-    'RootCommand',
     'NormalCommand',
-    'UpdateCommand',
 )
+
+
+class NormalCommand(Command):
+    """
+    Normalizes updated story meta.
+    """
+
+    def __call__(self, *args: str) -> int:
+        convert = LocalUtcConverter()
+        fetcher = DirectoryFetcher(meta_path=Path('worktree/update/meta'))
+        writer = DirectoryWriter(meta_path='worktree/normal/meta')
+
+        for story in tqdm(fetcher):
+            story = convert(story)
+            writer.write(story)
+
+        return 0
