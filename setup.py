@@ -88,6 +88,7 @@ setup(
         'arrow',
         'bbcode',
         'blinker',
+        'colorama',
         'importlib_resources',
         'jinja2',
         'jmespath',
