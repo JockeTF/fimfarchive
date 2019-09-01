@@ -23,11 +23,16 @@ Main module script.
 
 
 import sys
+import warnings
+
+from arrow.factory import ArrowParseWarning
 
 from fimfarchive.commands import RootCommand
 
 
 if __name__ == '__main__':
+    warnings.simplefilter('ignore', ArrowParseWarning)
+
     cmd = RootCommand()
     code = cmd(*sys.argv[1:])
     exit(code=code)
