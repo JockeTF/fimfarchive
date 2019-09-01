@@ -120,6 +120,18 @@ class Index(Mapping[int, Dict[str, Any]]):
             return -1, f"Malformed meta for {key}: {e}".encode()
 
 
+class DirectIndex(Dict[int, Dict[str, Any]], Index):
+    """
+    In-memory mapping from story key to meta.
+    """
+
+    def __init__(self, stream: IO[bytes]) -> None:
+        loader = self.load(stream)
+        items = ((k, deserialize(v)) for k, v in loader)
+
+        super().__init__(items)
+
+
 class MemoryIndex(Index):
     """
     In-memory mapping from story key to meta.
