@@ -25,6 +25,7 @@ Command module.
 from .base import Command
 from .build import BuildCommand
 from .root import RootCommand
+from .render import RenderCommand
 from .update import UpdateCommand
 
 
@@ -32,5 +33,6 @@ __all__ = (
     'Command',
     'RootCommand',
     'BuildCommand',
+    'RenderCommand',
     'UpdateCommand',
 )

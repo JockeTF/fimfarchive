@@ -23,10 +23,12 @@ Tasks module.
 
 
 from .build import BuildTask
+from .render import RenderTask
 from .update import UpdateTask
 
 
 __all__ = (
     'BuildTask',
+    'RenderTask',
     'UpdateTask',
 )
