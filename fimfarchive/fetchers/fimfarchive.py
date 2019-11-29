@@ -110,14 +110,14 @@ class Index(Mapping[int, Dict[str, Any]]):
             return -1, f"Unknown parser error: {e}".encode()
 
         if meta[0] != 123 or meta[-1] != 125:
-            return -1, f"Malformed JSON object for {key}.".encode()
+            return -1, f"Malformed JSON object for {key!r}.".encode()
 
         try:
             return int(key), serialize(json.loads(meta.decode()))
         except UnicodeDecodeError as e:
             return -1, f"Incorrectly encoded index: {e}".encode()
         except ValueError as e:
-            return -1, f"Malformed meta for {key}: {e}".encode()
+            return -1, f"Malformed meta for {key!r}: {e}".encode()
 
 
 class MemoryIndex(Index):
