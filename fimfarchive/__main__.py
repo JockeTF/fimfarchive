@@ -5,7 +5,7 @@ Main module script.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2019  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,16 +23,11 @@ Main module script.
 
 
 import sys
-import warnings
-
-from arrow.factory import ArrowParseWarning
 
 from fimfarchive.commands import RootCommand
 
 
 if __name__ == '__main__':
-    warnings.simplefilter('ignore', ArrowParseWarning)
-
     cmd = RootCommand()
     code = cmd(*sys.argv[1:])
     exit(code=code)
