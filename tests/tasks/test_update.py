@@ -5,7 +5,7 @@ Update task tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2020  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,61 +22,17 @@ Update task tests.
 #
 
 
-from typing import Dict
+from copy import deepcopy
 from unittest.mock import MagicMock, call, patch
 
 import pytest
 
-from fimfarchive.exceptions import InvalidStoryError, StorySourceError
-from fimfarchive.fetchers import Fetcher
+from fimfarchive.exceptions import StorySourceError
 from fimfarchive.flavors import DataFormat, StorySource, UpdateStatus
 from fimfarchive.selectors import RefetchSelector, UpdateSelector
-from fimfarchive.stories import Story
 from fimfarchive.tasks.update import (
     UpdateTask, SUCCESS_DELAY, SKIPPED_DELAY, FAILURE_DELAY,
 )
-
-
-class DummyFetcher(Fetcher):
-    """
-    Fetcher with local instance storage.
-    """
-
-    def __init__(self):
-        """
-        Constructor.
-        """
-        self.stories: Dict[int, Story] = dict()
-
-    def add(self, key, date, flavors=()):
-        """
-        Adds a story to the fetcher.
-        """
-        story = Story(
-            key=key,
-            flavors=flavors,
-            data=f'Story {key}',
-            meta={
-                'id': key,
-                'date_modified': date,
-                'chapters': [
-                    {'id': key},
-                ],
-            },
-        )
-
-        self.stories[key] = story
-
-        return story
-
-    def fetch(self, key):
-        """
-        Returns a previously stored story.
-        """
-        try:
-            return self.stories[key]
-        except KeyError:
-            raise InvalidStoryError()
 
 
 class TestUpdateTask:
@@ -85,18 +41,18 @@ class TestUpdateTask:
     """
 
     @pytest.fixture
-    def fimfiction(self):
+    def fimfiction(self, dummy):
         """
         Returns a `Fetcher` simulating Fimfiction.
         """
-        return DummyFetcher()
+        return deepcopy(dummy)
 
     @pytest.fixture
-    def fimfarchive(self):
+    def fimfarchive(self, dummy):
         """
         Returns a `Fetcher` simulating Fimfarchive.
         """
-        return DummyFetcher()
+        return deepcopy(dummy)
 
     @pytest.fixture
     def selector(self):
