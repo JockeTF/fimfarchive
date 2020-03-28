@@ -246,8 +246,8 @@ def is_blacklisted(story: Story) -> bool:
     Returns:
         True if a story has been blacklisted.
     """
-    story_id = story.key
-    author_id = story.meta['author']['id']
+    story_id = int(story.meta['id'])
+    author_id = int(story.meta['author']['id'])
 
     if story_id in STORY_WHITELIST:
         return False
