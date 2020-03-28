@@ -19,6 +19,9 @@ __pycache__/
 # Virtual environment.
 venv/
 
+# Vim settings.
+.vim/
+
 # PyCharm project.
 /.idea/
 *.iml
