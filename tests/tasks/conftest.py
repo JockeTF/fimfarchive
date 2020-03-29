@@ -22,11 +22,26 @@ Common task fixtures.
 #
 
 
+from copy import deepcopy
 from typing import Dict
 
 from fimfarchive.exceptions import InvalidStoryError
+from fimfarchive.converters import Converter
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.stories import Story
+from fimfarchive.utils import Empty
+
+
+class DummyConverer(Converter):
+    """
+    Converter that increments a counter.
+    """
+
+    def __call__(self, story: Story) -> Story:
+        meta = deepcopy(story.meta)
+        meta['conversions'] += 1
+
+        return story.merge(meta=meta)
 
 
 class DummyFetcher(Fetcher):
@@ -40,28 +55,41 @@ class DummyFetcher(Fetcher):
         """
         self.stories: Dict[int, Story] = dict()
 
-    def add(self, key, date, flavors=()):
+    def add(self, key, date, flavors=(), data=Empty):
         """
         Adds a story to the fetcher.
         """
+        meta = {
+            'id': key,
+            'title': f't{key}',
+            'date_modified': date,
+            'conversions': 0,
+            'author': {
+                'id': key,
+                'name': f'n{key}'
+            },
+            'chapters': [
+                {'id': key},
+            ],
+        }
+
+        if data is Empty:
+            text = f'd{key}'
+            data = text.encode()
+
         story = Story(
             key=key,
+            fetcher=self,
+            meta=meta,
+            data=data,
             flavors=flavors,
-            data=f'Story {key}'.encode(),
-            meta={
-                'id': key,
-                'date_modified': date,
-                'chapters': [
-                    {'id': key},
-                ],
-            },
         )
 
         self.stories[key] = story
 
         return story
 
-    def fetch(self, key):
+    def fetch(self, key, prefetch_meta=None, prefetch_data=None):
         """
         Returns a previously stored story.
         """
@@ -69,3 +97,22 @@ class DummyFetcher(Fetcher):
             return self.stories[key]
         except KeyError:
             raise InvalidStoryError()
+
+    def fetch_data(self, key):
+        """
+        Raises exception for missing data.
+        """
+        raise InvalidStoryError()
+
+    def fetch_meta(self, key):
+        """
+        Raises exception for missing meta.
+        """
+        raise InvalidStoryError()
+
+    def __iter__(self):
+        """
+        Yields all previously stored stories.
+        """
+        for key in sorted(self.stories.keys()):
+            yield self.stories[key]

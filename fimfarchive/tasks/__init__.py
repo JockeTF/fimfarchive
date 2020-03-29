@@ -5,7 +5,7 @@ Tasks module.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2020  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,9 +22,11 @@ Tasks module.
 #
 
 
+from .build import BuildTask
 from .update import UpdateTask
 
 
 __all__ = (
+    'BuildTask',
     'UpdateTask',
 )
