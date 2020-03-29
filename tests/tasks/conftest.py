@@ -24,8 +24,6 @@ Common task fixtures.
 
 from typing import Dict
 
-import pytest
-
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.stories import Story
@@ -71,11 +69,3 @@ class DummyFetcher(Fetcher):
             return self.stories[key]
         except KeyError:
             raise InvalidStoryError()
-
-
-@pytest.fixture
-def dummy() -> DummyFetcher:
-    """
-    Returns a `Fetcher` dummy.
-    """
-    return DummyFetcher()

@@ -22,7 +22,6 @@ Update task tests.
 #
 
 
-from copy import deepcopy
 from unittest.mock import MagicMock, call, patch
 
 import pytest
@@ -34,6 +33,8 @@ from fimfarchive.tasks.update import (
     UpdateTask, SUCCESS_DELAY, SKIPPED_DELAY, FAILURE_DELAY,
 )
 
+from .conftest import DummyFetcher
+
 
 class TestUpdateTask:
     """
@@ -41,18 +42,18 @@ class TestUpdateTask:
     """
 
     @pytest.fixture
-    def fimfiction(self, dummy):
+    def fimfiction(self):
         """
         Returns a `Fetcher` simulating Fimfiction.
         """
-        return deepcopy(dummy)
+        return DummyFetcher()
 
     @pytest.fixture
-    def fimfarchive(self, dummy):
+    def fimfarchive(self):
         """
         Returns a `Fetcher` simulating Fimfarchive.
         """
-        return deepcopy(dummy)
+        return DummyFetcher()
 
     @pytest.fixture
     def selector(self):
