@@ -5,7 +5,7 @@ Command module.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2020  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,6 +23,7 @@ Command module.
 
 
 from .base import Command
+from .build import BuildCommand
 from .root import RootCommand
 from .update import UpdateCommand
 
@@ -30,5 +31,6 @@ from .update import UpdateCommand
 __all__ = (
     'Command',
     'RootCommand',
+    'BuildCommand',
     'UpdateCommand',
 )

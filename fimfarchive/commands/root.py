@@ -5,7 +5,7 @@ Root command.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2020  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ Root command.
 from typing import Dict, Type
 
 from .base import Command
+from .build import BuildCommand
 from .update import UpdateCommand
 
 
@@ -38,6 +39,7 @@ class RootCommand(Command):
     The main application command.
     """
     commands: Dict[str, Type[Command]] = {
+        'build': BuildCommand,
         'update': UpdateCommand,
     }
 
