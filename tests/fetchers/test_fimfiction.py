@@ -74,6 +74,7 @@ class TestFimfictionFetcher:
 
         yield FimfictionFetcher()
 
+    @pytest.mark.xfail(reason="Recorder issue")
     def test_with_statment(self):
         """
         Tests fetcher can be used in with statements.
