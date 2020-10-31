@@ -32,7 +32,7 @@ import importlib_resources as resources
 import pytest
 from _pytest.fixtures import FixtureRequest
 from requests import Session, Response
-from requests.sessions import Request
+from requests.sessions import PreparedRequest
 from requests_mock import Mocker
 
 from fimfarchive.utils import JayWalker
@@ -89,7 +89,7 @@ class Recorder(ContextManager['Recorder']):
     def __call__(
             self,
             session: Session,
-            request: Request,
+            request: PreparedRequest,
             **kwargs
             ) -> Response:
         """
