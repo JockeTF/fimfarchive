@@ -74,7 +74,11 @@ AUTHOR_BLACKLIST: Set[int] = {
     135140,
 }
 
-STORY_BLACKLIST: Set[int] = set()
+STORY_BLACKLIST: Set[int] = {
+    316169,
+    318201,
+}
+
 STORY_WHITELIST: Set[int] = set()
 
 
