@@ -26,8 +26,7 @@ from typing import Set
 
 from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.fetchers import DirectoryFetcher, FimfarchiveFetcher
-from fimfarchive.stories import Story
-from fimfarchive.utils import tqdm
+from fimfarchive.utils import is_blacklisted, tqdm
 
 from .base import Command
 
@@ -37,17 +36,8 @@ __all__ = (
 )
 
 
-AUTHOR_BLACKLIST: Set[int] = {
-    135140,
-}
-
-
 class CountCommand(Command):
     "Mwap!"
-
-    def include(self, story: Story) -> bool:
-        author = int(story.meta['author']['id'])
-        return author not in AUTHOR_BLACKLIST
 
     def __call__(self, *args):
         fimfarchive = FimfarchiveFetcher(
@@ -75,7 +65,7 @@ class CountCommand(Command):
             if key != new.meta['id']:
                 raise ValueError("Derpy ID.")
 
-            if not self.include(new):
+            if is_blacklisted(new):
                 blocked.add(key)
                 continue
 
