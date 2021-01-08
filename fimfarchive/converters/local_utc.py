@@ -50,7 +50,7 @@ class DateNormalizer(JayWalker):
         """
         parsed = arrow.get(value or 0)
 
-        if parsed.timestamp == 0:
+        if parsed.int_timestamp == 0:
             return None
 
         return parsed.to('utc').isoformat()
