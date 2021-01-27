@@ -25,3 +25,41 @@ easy access to stories and metadata within the archive.
 
 [Fimfiction]: https://www.fimfiction.net
 [user profile]: https://www.fimfiction.net/user/116950/Fimfarchive
+
+
+# Installation
+
+This repository contains only things that are useful to developers. While it
+does include a command line tool as well, it cannot do anything productive on
+its own without access to the [Fimfiction API].
+
+There are primarily two ways to install this tool. The first is installation
+for use as a library, and the other is installation for developing Fimfachive.
+Using a [virtual environment] is recommended for both approaches to avoid
+contaminating the rest of the Python installation.
+
+[Fimfiction API]: https://www.fimfiction.net/developers/api/v2/docs
+[virtual environment]: https://docs.python.org/3/tutorial/venv.html
+
+
+## Library Installation
+
+First, make sure the [virtual environment] has been created an activated. Then,
+simply install the library directly from the `master` branch on GitHub.
+
+```bash
+python3 -m pip install git+https://github.com/JockeTF/fimfarchive.git
+```
+
+Optionally install `lz4` to lower the memory footprint of open archives.
+
+```bash
+python3 -m pip install lz4
+```
+
+TODO: Demonstrate usage.
+
+
+## Development Installation
+
+TODO: Populate section.
