@@ -33,7 +33,7 @@ however needed to stories directly from Fimfiction.
 
 There are primarily two ways to install this tool. The first is installation as
 a library for use within other projects, and the second is installation for
-development of Fimfachive. Using a [virtual environment] is recommended for
+development of Fimfarchive. Using a [virtual environment] is recommended for
 both cases in order to avoid contaminating the rest of the Python installation.
 
 ## Installation as a Library
@@ -86,3 +86,43 @@ pytest
 ```
 
 [virtual environment]: https://docs.python.org/3/tutorial/venv.html
+
+
+# Running
+
+Fimfarchive has a command line interface which is invoked as a Python module.
+It can't do much except prepare new Fimfarchie releases. For archive browsing
+you will need to use third-party tools, or make your own.
+
+```
+$ python3 -m fimfarchive
+Usage: COMMAND [PARAMETERS]
+
+Fimfarchive, ensuring that history is preseved.
+
+Commands:
+  build   Builds a new Fimfarchive release.
+  update  Updates stories for Fimfarchive.
+```
+
+The command line interface features multiple subcommands, each with its own
+brief help text. The subcommand is specified as the second program argument.
+
+```
+$ python3 -m fimfarchive update --help
+usage: [-h] [--alpha] --archive PATH [--refetch]
+
+Updates stories for Fimfarchive.
+
+optional arguments:
+  -h, --help      show this help message and exit
+  --alpha         fetch from Fimfiction APIv1
+  --archive PATH  previous version of the archive
+  --refetch       refetch all available stories
+```
+
+Some commands (such as `update`) require a Fimfiction API key. The program
+reads this key from the environment variable `FIMFICTION_ACCESS_TOKEN`. Any
+data downloaded from Fimfiction is stored in the current working directory,
+typically in the `worktree` subdirectory. The same thing goes for rendered
+stories, built archives, or anything else related to the release process.
