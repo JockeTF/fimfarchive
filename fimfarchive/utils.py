@@ -72,6 +72,8 @@ tqdm = partial(
 
 AUTHOR_BLACKLIST: Set[int] = {
     135140,
+    242007,
+    270453,
 }
 
 STORY_BLACKLIST: Set[int] = {
