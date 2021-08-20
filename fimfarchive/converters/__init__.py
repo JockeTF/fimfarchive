@@ -27,6 +27,7 @@ from .alpha_beta import AlphaBetaConverter
 from .fpub_epub import FpubEpubConverter
 from .json_fpub import JsonFpubConverter
 from .local_utc import LocalUtcConverter
+from .web_local import WebLocalConverter
 
 
 __all__ = (
@@ -35,4 +36,5 @@ __all__ = (
     'FpubEpubConverter',
     'JsonFpubConverter',
     'LocalUtcConverter',
+    'WebLocalConverter',
 )
