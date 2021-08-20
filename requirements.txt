@@ -1,5 +1,6 @@
 arrow
 bbcode
+beautifulsoup4
 blinker
 flake8
 importlib_resources
