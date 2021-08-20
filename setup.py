@@ -87,6 +87,7 @@ setup(
     install_requires=(
         'arrow',
         'bbcode',
+        'beautifulsoup4',
         'blinker',
         'importlib_resources',
         'jinja2',
