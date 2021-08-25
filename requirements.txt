@@ -11,3 +11,4 @@ pytest
 requests
 requests-mock
 tqdm
+types-requests
