@@ -30,7 +30,7 @@ from typing import Any, ContextManager, Dict, Iterator, Optional, Union, Type
 
 import importlib_resources as resources
 import pytest
-from _pytest.fixtures import FixtureRequest
+from pytest import FixtureRequest
 from requests import Session, Response
 from requests.sessions import PreparedRequest
 from requests_mock import Mocker
@@ -177,7 +177,7 @@ def responses(request: FixtureRequest) -> Iterator[Union[Recorder, Responder]]:
     Mocks or saves HTTP responses.
     """
     real = environ.get('REAL_HTTP', '').lower()
-    name = request.fspath.basename[:-3] + '.json'
+    name = request.path.with_suffix('.json').name
     package = request.module.__package__
 
     context: Type[Union[Recorder, Responder]]
