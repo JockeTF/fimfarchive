@@ -24,7 +24,9 @@ Fetch task.
 
 from typing import Iterable
 
-from fimfarchive.converters import FpubEpubConverter, JsonFpubConverter
+from fimfarchive.converters import (
+    FpubEpubConverter, JsonFpubConverter, WebLocalConverter
+)
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.writers import Writer
 from fimfarchive.signals import Signal, SignalSender
@@ -62,6 +64,7 @@ class FetchTask(SignalSender):
         self.writer = writer
         self.to_fpub = JsonFpubConverter()
         self.to_epub = FpubEpubConverter()
+        self.to_imgl = WebLocalConverter()
         self.keys = sorted(set(keys))
 
     def run(self) -> None:
@@ -74,7 +77,8 @@ class FetchTask(SignalSender):
             try:
                 json = self.fetcher.fetch(key)
                 fpub = self.to_fpub(json)
-                epub = self.to_epub(fpub)
+                ipub = self.to_imgl(fpub)
+                epub = self.to_epub(ipub)
                 self.writer.write(epub)
                 self.on_success(key, epub)
             except Exception as e:
