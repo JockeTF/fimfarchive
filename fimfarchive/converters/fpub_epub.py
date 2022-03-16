@@ -46,7 +46,7 @@ TARGET = 'target.epub'
 TIMEOUT = 300
 
 PROGRAM = 'ebook-convert'
-ARGUMENTS = ('--no-default-epub-cover',)
+ARGUMENTS = ('--cover', 'cover.jpg')
 
 proc = partial(run, stderr=STDOUT, timeout=TIMEOUT, check=True)
 

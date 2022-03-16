@@ -8,15 +8,12 @@
   <body>
     {%- autoescape false %}
     {%- if authors_note_position == 'top' %}
-    <h1>{{ "Author's Note" | e }}</h1>
+    <h2>{{ "Author's Note" | e }}</h2>
     <div id='authors-note'>{{ authors_note_html }}</div>
-    <hr/>
     {%- endif %}
-    <h1>{{ title | e }}</h1>
     <div id='content'>{{ content_html }}</div>
     {%- if authors_note_position == 'bottom' %}
-    <hr/>
-    <h1>{{ "Author's Note" | e }}</h1>
+    <h2>{{ "Author's Note" | e }}</h2>
     <div id='authors-note'>{{ authors_note_html }}</div>
     {%- endif %}
     {%- endautoescape %}

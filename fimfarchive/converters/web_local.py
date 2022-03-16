@@ -30,7 +30,7 @@ from urllib.parse import unquote
 from zipfile import ZipFile
 
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, Tag
 
 from fimfarchive.exceptions import StorySourceError
 from fimfarchive.stories import Story
@@ -79,6 +79,8 @@ class ImageLoader:
                 tag.attrs['src'] = self.cache[url]
             else:
                 tag.attrs['src'] = self.fetch(url)
+
+            tag.wrap(Tag(name='center'))
 
         return dom.decode_contents().encode()
 
