@@ -55,7 +55,7 @@ DEFAULT_SKIPS = 500
 # http://www.fimfarchive.net/
 #
 
-SUCCESS_DELAY = 8
+SUCCESS_DELAY = 5
 SKIPPED_DELAY = 2
 FAILURE_DELAY = 300
 
