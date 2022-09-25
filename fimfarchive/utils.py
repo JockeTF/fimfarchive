@@ -27,7 +27,7 @@ import os
 import shutil
 from functools import partial
 from importlib import import_module
-from importlib_resources import read_binary, read_text
+from importlib_resources import files
 from pathlib import Path
 from typing import (
     cast, Any, Callable, Dict, Iterator,
@@ -295,7 +295,10 @@ class ResourceLoader:
         if binary is None:
             binary = self.binary
 
+        package = files(self.package)
+        resource = package.joinpath(name)
+
         if binary:
-            return read_binary(self.package, name)
+            return resource.read_bytes()
         else:
-            return read_text(self.package, name)
+            return resource.read_text()
