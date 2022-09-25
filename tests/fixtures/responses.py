@@ -28,8 +28,8 @@ from os import environ
 from pathlib import Path
 from typing import Any, ContextManager, Dict, Iterator, Optional, Union, Type
 
-import importlib_resources as resources
 import pytest
+from importlib_resources import as_file, files
 from pytest import FixtureRequest
 from requests import Session, Response
 from requests.sessions import PreparedRequest
@@ -178,7 +178,8 @@ def responses(request: FixtureRequest) -> Iterator[Union[Recorder, Responder]]:
     """
     real = environ.get('REAL_HTTP', '').lower()
     name = request.path.with_suffix('.json').name
-    package = request.module.__package__
+    package = files(request.module.__package__)
+    resource = package.joinpath(name)
 
     context: Type[Union[Recorder, Responder]]
 
@@ -187,6 +188,6 @@ def responses(request: FixtureRequest) -> Iterator[Union[Recorder, Responder]]:
     else:
         context = Responder
 
-    with resources.path(package, name) as path:
+    with as_file(resource) as path:
         with context(path) as handler:
             yield handler
