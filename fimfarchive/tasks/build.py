@@ -52,8 +52,8 @@ class BuildTask:
             self,
             output: PathArg,
             upcoming: Iterable[Story],
-            previous: Fetcher = None,
-            extras: PathArg = None,
+            previous: Optional[Fetcher] = None,
+            extras: Optional[PathArg] = None,
             ) -> None:
         """
         Constructor.

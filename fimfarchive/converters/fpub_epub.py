@@ -77,7 +77,7 @@ class FpubEpubConverter(Converter):
     Converts story data from FPUB to EPUB.
     """
 
-    def __init__(self, logdir: Union[Path, str] = None) -> None:
+    def __init__(self, logdir: Union[None, Path, str] = None) -> None:
         self.logdir = get_path(logdir)
 
         if self.logdir and not self.logdir.is_dir():

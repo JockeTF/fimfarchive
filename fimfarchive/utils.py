@@ -281,7 +281,11 @@ class ResourceLoader:
         self.package = package
         self.binary = binary
 
-    def __call__(self, name: str, binary: bool = None) -> Union[str, bytes]:
+    def __call__(
+            self,
+            name: str,
+            binary: Optional[bool] = None,
+            ) -> Union[str, bytes]:
         """
         Loads a package resource.
 

@@ -22,7 +22,7 @@ Stories for Fimfarchive.
 #
 
 
-from typing import TYPE_CHECKING, Any, Dict, Iterable, TypeVar
+from typing import TYPE_CHECKING, Any, Dict, Iterable, Optional, TypeVar
 
 from fimfarchive.exceptions import StorySourceError
 
@@ -48,9 +48,9 @@ class Story:
     def __init__(
             self,
             key: int,
-            fetcher: Fetcher = None,
-            meta: Dict[str, Any] = None,
-            data: bytes = None,
+            fetcher: Optional[Fetcher] = None,
+            meta: Optional[Dict[str, Any]] = None,
+            data: Optional[bytes] = None,
             flavors: Iterable[Flavor] = (),
             ) -> None:
         """

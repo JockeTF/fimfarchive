@@ -49,8 +49,8 @@ class DirectoryFetcher(Iterable[Story], Sized, Fetcher):
 
     def __init__(
             self,
-            meta_path: Union[Path, str] = None,
-            data_path: Union[Path, str] = None,
+            meta_path: Union[None, Path, str] = None,
+            data_path: Union[None, Path, str] = None,
             flavors: Iterable[Flavor] = tuple(),
             ) -> None:
         """

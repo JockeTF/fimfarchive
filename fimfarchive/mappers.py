@@ -134,7 +134,7 @@ class StorySlugMapper(Mapper[str]):
     Returns a slug-based file path for a story.
     """
 
-    def __init__(self, template: str = None) -> None:
+    def __init__(self, template: Optional[str] = None) -> None:
         """
         Constructor.
 

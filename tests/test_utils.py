@@ -53,7 +53,7 @@ class TestEmpty:
         """
         Tests `Empty` class evaluates to `False`.
         """
-        assert not Empty
+        assert bool(Empty) is False
 
     def test_empty_class_is_empty(self):
         """
