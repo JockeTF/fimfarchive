@@ -79,6 +79,8 @@ AUTHOR_BLACKLIST: Set[int] = {
 STORY_BLACKLIST: Set[int] = {
     316169,
     318201,
+    413197,
+    499134,
 }
 
 STORY_WHITELIST: Set[int] = set()
