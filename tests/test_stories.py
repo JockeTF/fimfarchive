@@ -210,7 +210,7 @@ class TestStory:
 
         assert story.flavors is not flavors
         assert story.flavors == {flavor.A}
-        assert type(story.flavors) == set
+        assert type(story.flavors) is set
 
     def test_merge_without_parameters(self, story):
         """

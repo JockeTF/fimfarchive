@@ -40,8 +40,8 @@ class TestFlavor:
         a = flavor.A
         b = flavor.B
 
-        assert type(a) == flavor
-        assert type(b) == flavor
+        assert type(a) is flavor
+        assert type(b) is flavor
         assert a.value == 1
         assert b.value == 2
         assert a is flavor.A
