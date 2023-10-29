@@ -11,4 +11,6 @@ pytest
 requests
 requests-mock
 tqdm
+types-jmespath
 types-requests
+types-tqdm

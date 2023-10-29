@@ -5,7 +5,7 @@ Various utilities.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2023  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,16 +25,15 @@ Various utilities.
 import json
 import os
 import shutil
-from functools import partial
 from importlib import import_module
 from importlib_resources import files
 from pathlib import Path
 from typing import (
-    cast, Any, Callable, Dict, Iterator,
+    cast, Any, Callable, Dict, Iterable, Iterator,
     Optional, Set, Tuple, Type, TypeVar, Union,
 )
 
-from tqdm import tqdm
+from tqdm import tqdm as _tqdm
 
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
@@ -51,17 +50,9 @@ __all__ = (
 )
 
 
-F = TypeVar('F', bound=Flavor)
 ByteFunc = Callable[[bytes], bytes]
-
-
-tqdm = partial(
-    tqdm,
-    ascii=True,
-    leave=False,
-    smoothing=0,
-    ncols=72,
-)
+F = TypeVar('F', bound=Flavor)
+T = TypeVar('T')
 
 
 #
@@ -309,3 +300,17 @@ class ResourceLoader:
             return resource.read_bytes()
         else:
             return resource.read_text()
+
+
+def tqdm(iterable: Iterable[T], **kwargs) -> Iterable[T]:
+    """
+    Adds an ASCII progress bar to the iterable.
+    """
+    return _tqdm(
+        iterable,
+        ascii=True,
+        leave=False,
+        smoothing=0,
+        ncols=72,
+        **kwargs,
+    )
