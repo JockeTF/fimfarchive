@@ -29,7 +29,7 @@ from pathlib import Path
 from typing import Any, ContextManager, Dict, Iterator, Optional, Union, Type
 
 import pytest
-from importlib_resources import as_file, files
+from importlib.resources import as_file, files
 from pytest import FixtureRequest
 from requests import Session, Response
 from requests.sessions import PreparedRequest
