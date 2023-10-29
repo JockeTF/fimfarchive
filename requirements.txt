@@ -2,7 +2,6 @@ arrow
 bbcode
 blinker
 flake8
-importlib_resources
 jinja2
 jmespath
 jsonapi-client
