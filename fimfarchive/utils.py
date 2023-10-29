@@ -26,7 +26,7 @@ import json
 import os
 import shutil
 from importlib import import_module
-from importlib_resources import files
+from importlib.resources import files
 from pathlib import Path
 from typing import (
     cast, Any, Callable, Dict, Iterator,
