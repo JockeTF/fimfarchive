@@ -29,7 +29,7 @@ from importlib import import_module
 from importlib_resources import files
 from pathlib import Path
 from typing import (
-    cast, Any, Callable, Dict, Iterable, Iterator,
+    cast, Any, Callable, Dict, Iterator,
     Optional, Set, Tuple, Type, TypeVar, Union,
 )
 
@@ -302,15 +302,18 @@ class ResourceLoader:
             return resource.read_text()
 
 
-def tqdm(iterable: Iterable[T], **kwargs) -> Iterable[T]:
+class tqdm(_tqdm):
     """
     Adds an ASCII progress bar to the iterable.
     """
-    return _tqdm(
-        iterable,
-        ascii=True,
-        leave=False,
-        smoothing=0,
-        ncols=72,
-        **kwargs,
-    )
+
+    defaults = {
+        'ascii': True,
+        'leave': False,
+        'smoothing': 0.0,
+        'ncols': 72,
+    }
+
+    def __init__(self, *args, **kwargs):
+        kwargs = {**self.defaults, **kwargs}
+        return super().__init__(*args, **kwargs)

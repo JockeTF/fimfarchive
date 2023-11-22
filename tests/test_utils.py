@@ -33,7 +33,7 @@ from fimfarchive import utils
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
 from fimfarchive.utils import (
     find_flavor, get_path, is_blacklisted,
-    Empty, JayWalker, PersistedDict,
+    Empty, JayWalker, PersistedDict, tqdm,
 )
 
 
@@ -366,3 +366,21 @@ class TestIsBlacklisted:
         story = story.merge(key=key, meta=meta)
 
         assert result is is_blacklisted(story)
+
+
+class TestTqdm:
+    """
+    tqdm tests.
+    """
+
+    def test_overridden_default(self):
+        """
+        Tests defaults can be overridden.
+        """
+        tqdm((), disable=True, smoothing=1.0)
+
+    def test_without_iterator(self):
+        """
+        Tests iterator is not required.
+        """
+        tqdm(disable=True, total=42)
