@@ -95,7 +95,7 @@ class BuildTask:
             directory: Path to read extras from
         """
         if directory is None:
-            return ()
+            return
 
         for path in Path(directory).iterdir():
             yield path.name, path.read_bytes()
