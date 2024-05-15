@@ -102,7 +102,7 @@ class TestStoryDateMapper:
             m.side_effect = InvalidStoryError
 
             assert mapper(story) is None
-            assert m.called_once_with(story)
+            m.assert_called_once_with()
 
     def test_empty_meta(self, mapper, story):
         """
@@ -277,7 +277,7 @@ class TestStoryPathMapper:
         story.key.__str__.return_value = 'key'
 
         assert mapper(story) == Path('dir', 'key')
-        assert story.key.__str__.called_once_with()
+        story.key.__str__.assert_called_once_with()
 
 
 class TestStorySlugMapper:
