@@ -64,6 +64,7 @@ T = TypeVar('T')
 AUTHOR_BLACKLIST: Set[int] = {
     33094,
     135140,
+    220118,
     242007,
     296868,
 }
