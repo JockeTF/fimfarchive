@@ -65,24 +65,22 @@ Start by creating a clone of the Fimfarchive repository.
 git clone https://github.com/JockeTF/fimfarchive.git
 ```
 
-Enter the cloned repository and create a virtual environment called `venv`
-within it. Make sure to activate the virtual environment before proceeding to
-install the development dependencies.
+Enter the cloned repository and install the development dependencies.
 
 ```bash
-python3 -m pip install -r requirements.txt
+uv sync
 ```
 
 Optionally also install `lz4` to lower the memory footprint of open archives.
 
 ```bash
-python3 -m pip install lz4
+uv sync --extra lz4
 ```
 
 All done! Run the test suite to make sure everything works as expected.
 
 ```bash
-pytest
+uv run pytest
 ```
 
 [virtual environment]: https://docs.python.org/3/tutorial/venv.html
@@ -91,11 +89,11 @@ pytest
 # Running
 
 Fimfarchive has a command line interface which is invoked as a Python module.
-It can't do much except prepare new Fimfarchie releases. For archive browsing
+It can't do much except prepare new Fimfarchive releases. For archive browsing
 you will need to use third-party tools, or make your own.
 
 ```
-$ python3 -m fimfarchive
+$ uv run python -m fimfarchive
 Usage: COMMAND [PARAMETERS]
 
 Fimfarchive, ensuring that history is preseved.
@@ -109,7 +107,7 @@ The command line interface features multiple subcommands, each with its own
 brief help text. The subcommand is specified as the second program argument.
 
 ```
-$ python3 -m fimfarchive update --help
+$ uv run python -m fimfarchive update --help
 usage: [-h] [--alpha] --archive PATH [--refetch]
 
 Updates stories for Fimfarchive.

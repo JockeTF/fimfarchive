@@ -5,7 +5,7 @@ Writers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2019  Joakim Soderlund
+# Copyright (C) 2024  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ from fimfarchive.stories import Story
 __all__ = (
     'Writer',
     'DirectoryWriter',
-    'FimfarchiveWriter'
+    'FimfarchiveWriter',
 )
 
 

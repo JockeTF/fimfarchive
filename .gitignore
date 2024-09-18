@@ -16,8 +16,11 @@ Thumbs.db
 # Python cache.
 __pycache__/
 
+# Lock files.
+uv.lock
+
 # Virtual environment.
-venv/
+.venv/
 
 # Vim settings.
 .vim/
