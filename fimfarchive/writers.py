@@ -38,6 +38,7 @@ from fimfarchive.stories import Story
 __all__ = (
     'Writer',
     'DirectoryWriter',
+    'FimfarchiveWriter'
 )
 
 
