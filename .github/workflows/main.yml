@@ -34,7 +34,7 @@ jobs:
       run: uv sync --all-extras --dev
 
     - name: Check styling
-      run: uv run flake8 --ignore=E123,E231,W291,W293 fimfarchive tests
+      run: uv run ruff check
 
     - name: Check types
       run: uv run mypy

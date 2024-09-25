@@ -156,7 +156,7 @@ class TestDirectoryFetcher:
         """
         assert 3 == len(fetcher)
 
-    def test_len_caching(test, fetcher):
+    def test_len_caching(self, fetcher):
         """
         Tests len is only calculated once.
         """

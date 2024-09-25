@@ -34,7 +34,7 @@ from jsonapi_client.document import Document
 from jsonapi_client.exceptions import DocumentError
 from jsonapi_client.resourceobject import ResourceObject
 
-from fimfarchive import __version__ as VERSION
+from fimfarchive import __version__ as version
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity, StorySource
 
 from fimfarchive.exceptions import (
@@ -164,7 +164,7 @@ class ApiClient:
         headers = {
             'Accept-Encoding': 'gzip, deflate',
             'Authorization': f'Bearer {token}',
-            'User-Agent': f'fimfarchive/{VERSION}',
+            'User-Agent': f'fimfarchive/{version}',
         }
 
         return Session(

@@ -22,10 +22,10 @@ lz4 = ["lz4~=4.3"]
 [tool.uv]
 compile-bytecode = true
 dev-dependencies = [
-    "flake8~=5.0",
     "mypy~=1.11",
     "pytest~=8.3",
     "requests-mock~=1.12",
+    "ruff~=0.6",
     "types-jmespath~=1.0",
     "types-requests~=2.32",
     "types-tqdm~=4.66",
@@ -44,6 +44,13 @@ venv = ".venv"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.ruff]
+extend-exclude = ["fimfarchive/__init__.py"]
+
+[tool.ruff.lint]
+select = ["A", "E", "F", "N", "RUF", "T10", "W"]
+ignore = ["N801", "RUF012"]
 
 [build-system]
 requires = ["hatchling"]
