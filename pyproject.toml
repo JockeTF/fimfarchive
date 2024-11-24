@@ -49,7 +49,7 @@ extend-exclude = ["fimfarchive/__init__.py"]
 
 [tool.ruff.lint]
 select = ["A", "E", "F", "N", "RUF", "T10", "W"]
-ignore = ["N801", "RUF012"]
+ignore = ["N801", "RUF012", "RUF022"]
 
 [build-system]
 requires = ["hatchling"]
