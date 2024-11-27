@@ -3,15 +3,20 @@
 from copy import deepcopy
 from datetime import datetime
 from io import BytesIO
+from math import ceil
 from pathlib import Path
-from typing import Iterator, override
+from typing import Iterator
 from xml.dom import minidom
+from xml.dom.minidom import Document
 from zipfile import ZipFile
+
+from PIL import Image, ImageDraw, ImageFont
+from requests import get
 
 from fimfarchive.converters import Converter
 from fimfarchive.fetchers import FimfarchiveFetcher
-from fimfarchive.stories import Story
 from fimfarchive.mappers import StorySlugMapper
+from fimfarchive.stories import Story
 from fimfarchive.writers import DirectoryWriter
 
 from .base import Command
@@ -19,26 +24,9 @@ from .base import Command
 dt = datetime.fromisoformat
 
 
-DATE_START = dt("2023-12-01 00:00:00Z")
-DATE_STOP = dt("2024-01-01 00:00:00Z")
+DATE_START = dt("2023-12-01T00:00:00+00:00")
+DATE_STOP = dt("2024-01-01T00:00:00+00:00")
 TARGET_AUTHOR = 46322
-
-COVER_PAGE = """
-    <?xml version='1.0' encoding='utf-8'?>
-    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-        <head>
-            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-            <meta name="calibre:cover" content="true"/>
-            <title>Cover</title>
-        </head>
-        <body>
-            <center>
-                <h1>Title</h1>
-                <img src="cover.png"/>
-            </center>
-        </body>
-    </html>
-""".lstrip()
 
 COVER_IMAGES = [
     "https://derpicdn.net/img/view/2015/12/1/1034522.png",
@@ -71,77 +59,23 @@ COVER_IMAGES = [
 ]
 
 
-class CoverPage:
-
-    def __init__(self, story: Story) -> None:
-        published = dt(story.meta["date_published"])
-        self.day = published.day
-
-    def get_cover(self) -> bytes:
-        if not (url := COVER_IMAGES[self.day - 1]):
-            raise ValueError("Missing cover")
-
-        _, name = url.rsplit("/", 1)
-        path = Path(f"covers/{name}")
-
-        return path.read_bytes()
-
-    def get_title(self) -> bytes:
-        dom = minidom.parseString(COVER_PAGE)
-        (title,) = dom.getElementsByTagName("h1")
-        (text,) = title.childNodes
-
-        text.replaceWholeText(f"Advent {self.day:02}")
-
-        return dom.toprettyxml().encode()
+def day(story: Story) -> int:
+    """
+    Returns the day of publishing.
+    """
+    return dt(story.meta["date_published"]).day
 
 
 class AdventConverter(Converter):
     """
-    Replaces titles with advent dates.
+    Base class for modifying story meta and data.
     """
 
-    def get_title(self, story: Story) -> str:
-        published = dt(story.meta["date_published"])
+    def handle_opf(self, story: Story, dom: Document):
+        pass
 
-        return f"Advent {published.day:02}"
-
-    def get_opf(self, story: Story, data: bytes) -> bytes:
-        dom = minidom.parseString(data)
-        (package,) = dom.getElementsByTagName("package")
-        (manifest,) = dom.getElementsByTagName("manifest")
-        (spine,) = dom.getElementsByTagName("spine")
-        (title,) = dom.getElementsByTagName("dc:title")
-
-        (text,) = title.childNodes
-        text.replaceWholeText(self.get_title(story))
-
-        index = manifest.firstChild
-        item = dom.createElement("item")
-        item.setAttribute("id", "cover")
-        item.setAttribute("href", "cover.png")
-        item.setAttribute("media-type", "image/png")
-        manifest.insertBefore(item, index)
-        item = dom.createElement("item")
-        item.setAttribute("id", "title")
-        item.setAttribute("href", "title.xhtml")
-        item.setAttribute("media-type", "application/xhtml+xml")
-        manifest.insertBefore(item, index)
-
-        index = spine.firstChild
-        item = dom.createElement("itemref")
-        item.setAttribute("idref", "title")
-        spine.insertBefore(item, index)
-
-        guide = dom.createElement("guide")
-        reference = dom.createElement("reference")
-        reference.setAttribute("type", "cover")
-        reference.setAttribute("href", "title.xhtml")
-        reference.setAttribute("title", "title")
-        guide.appendChild(reference)
-        package.appendChild(guide)
-
-        return dom.toprettyxml().encode()
+    def handle_zip(self, story: Story, arc: ZipFile):
+        pass
 
     def get_data(self, story: Story) -> bytes:
         buffer = BytesIO()
@@ -153,23 +87,19 @@ class AdventConverter(Converter):
                 data = source.read(info)
 
                 if info.filename == "content.opf":
-                    data = self.get_opf(story, data)
+                    dom = minidom.parseString(data)
+                    self.handle_opf(story, dom)
+                    data = dom.toprettyxml().encode()
 
                 target.writestr(info, data)
 
-            cover = CoverPage(story)
-            target.writestr("cover.png", cover.get_cover())
-            target.writestr("title.xhtml", cover.get_title())
+            self.handle_zip(story, target)
 
         return buffer.getvalue()
 
     def get_meta(self, story: Story) -> dict:
-        meta = deepcopy(story.meta)
-        meta["title"] = self.get_title(story)
+        return deepcopy(story.meta)
 
-        return meta
-
-    @override
     def __call__(self, story: Story) -> Story:
         return story.merge(
             data=self.get_data(story),
@@ -177,9 +107,93 @@ class AdventConverter(Converter):
         )
 
 
+class CoverConverter(AdventConverter):
+    """
+    Adds advent cover by dm29.
+    """
+
+    file_name = "cover.png"
+
+    def fetch(self, story: Story) -> bytes:
+        if not (url := COVER_IMAGES[day(story) - 1]):
+            raise ValueError("Missing cover")
+
+        _, name = url.rsplit("/", 1)
+        path = Path(f"covers/{name}")
+
+        if not path.is_file():
+            return get(url).content
+
+        return path.read_bytes()
+
+    def draw(self, story: Story) -> bytes:
+        # Load cover art
+        data = self.fetch(story)
+        art = Image.open(BytesIO(data))
+
+        # Create cover image
+        height = ceil(art.width * 1.6)
+        cover = Image.new("RGB", (art.width, height), "lightgray")
+        cover.paste(art, (0, height - art.height))
+
+        # Initialize draw tool
+        draw = ImageDraw.Draw(cover)
+        font = ImageFont.load_default(height // 12)
+
+        # Draw story number
+        ident = f"{story.key}"
+        _, _, tw, th = draw.textbbox((0, 0), ident, font)
+        ts = ((art.width - tw) / 2, (height - art.height - th) / 2 - th / 8)
+        draw.text(ts, ident, "black", font)
+
+        # Draw calendar date
+        title = f"Advent {day(story):02}"
+        _, _, tw, th = draw.textbbox((0, 0), title, font)
+        ts = ((art.width - tw) / 2, (ts[1] + th + th / 4))
+        draw.text(ts, title, "black", font)
+
+        # Render image
+        buffer = BytesIO()
+        cover.save(buffer, "png")
+
+        return buffer.getvalue()
+
+    def handle_opf(self, story: Story, dom: Document):
+        (manifest,) = dom.getElementsByTagName("manifest")
+
+        cover = dom.createElement("item")
+        cover.setAttribute("id", "cover")
+        cover.setAttribute("href", self.file_name)
+        cover.setAttribute("media-type", "image/png")
+
+        manifest.insertBefore(cover, manifest.firstChild)
+
+    def handle_zip(self, story: Story, arc: ZipFile):
+        arc.writestr(self.file_name, self.draw(story))
+
+
+class TitleConverter(AdventConverter):
+    """
+    Replaces title with advent date.
+    """
+
+    def handle_opf(self, story: Story, dom: Document):
+        title = f"Advent {day(story):02} - {story.key}"
+        (node,) = dom.getElementsByTagName("dc:title")
+        (text,) = node.childNodes
+
+        text.replaceWholeText(title)
+
+    def get_meta(self, story: Story) -> dict:
+        meta = super().get_meta(story)
+        meta["title"] = f"Advent {day(story):02}"
+
+        return meta
+
+
 class AdventCommand(Command):
     """
-    Creates an advent calendar.
+    Creates advent calendar.
     """
 
     def filter(self, fetcher: FimfarchiveFetcher) -> Iterator[Story]:
@@ -197,11 +211,15 @@ class AdventCommand(Command):
         (archive,) = args
 
         slug = StorySlugMapper()
-        convert = AdventConverter()
         fetcher = FimfarchiveFetcher(archive)
         writer = DirectoryWriter(data_path=slug)
 
+        convert_cover = CoverConverter()
+        convert_title = TitleConverter()
+
         for story in self.filter(fetcher):
-            writer.write(convert(story))
+            story = convert_cover(story)
+            story = convert_title(story)
+            writer.write(story)
 
         return 0
