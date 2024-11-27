@@ -24,6 +24,7 @@ Root command.
 
 from typing import Dict, Type
 
+from .advent import AdventCommand
 from .base import Command
 from .build import BuildCommand
 from .update import UpdateCommand
@@ -39,6 +40,7 @@ class RootCommand(Command):
     The main application command.
     """
     commands: Dict[str, Type[Command]] = {
+        'advent': AdventCommand,
         'build': BuildCommand,
         'update': UpdateCommand,
     }
