@@ -26,6 +26,7 @@ import json
 from abc import ABC, abstractmethod
 from collections import OrderedDict, defaultdict
 from copy import deepcopy
+from time import sleep
 from typing import Any, Dict, Iterator, Optional, Set
 from urllib.parse import urlencode
 
@@ -36,6 +37,7 @@ from jsonapi_client.resourceobject import ResourceObject
 
 from fimfarchive import __version__ as version
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity, StorySource
+from fimfarchive.utils import tqdm
 
 from fimfarchive.exceptions import (
     FimfarchiveError,
@@ -302,9 +304,16 @@ class SingleRequester(Requester):
         return response.resource
 
     def get_data(self, key: int) -> Iterator[ResourceObject]:
-        path = f'stories/{key}/chapters'
-        response = self.get(key, path, DATA_PARAMS)
-        return response.resources
+        list_path = f'stories/{key}/chapters'
+        list_params = deepcopy(DATA_PARAMS)
+        list_params['fields[chapter]'].remove('content_html')
+        list_response = self.get(key, list_path, list_params)
+
+        for resource in tqdm(list_response.resources):
+            path = f"chapters/{resource.id}"
+            response = self.get(key, path, DATA_PARAMS)
+            yield response.resource
+            sleep(5)
 
 
 class BulkRequester(Requester):
@@ -685,7 +694,7 @@ class Fimfiction2Fetcher(Fetcher):
     Fetcher for Fimfiction APIv2.
     """
     prefetch_meta = True
-    prefetch_data = False
+    prefetch_data = True
 
     flavors = frozenset((
         StorySource.FIMFICTION,
@@ -703,12 +712,14 @@ class Fimfiction2Fetcher(Fetcher):
             bulk_meta: Toggles bulk fetching of story meta.
             bulk_data: Toggles bulk fetching of story data.
         """
+        assert not bulk_meta
+        assert not bulk_data
         client = ApiClient(token)
         self.extract_meta = MetaDocumentifier()
         self.extract_chapter = Documentifier()
         self.verify_meta = BetaFormatVerifier.from_meta_params()
         self.verify_chapter = BetaFormatVerifier.from_data_params()
-        self.requester = RoutedRequester(client, bulk_meta, bulk_data)
+        self.requester = SingleRequester(client)
 
     def fetch_meta(self, key: int) -> Dict[str, Any]:
         resource = self.requester.get_meta(int(key))
