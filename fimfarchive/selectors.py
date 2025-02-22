@@ -5,7 +5,7 @@ Selectors for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2025  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ from fimfarchive.exceptions import InvalidStoryError
 from fimfarchive.flavors import UpdateStatus
 from fimfarchive.mappers import StoryDateMapper
 
+
+# ruff: noqa: A005, stdlib-module-shadowing.
 
 __all__ = (
     'Selector',
