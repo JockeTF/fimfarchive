@@ -7,6 +7,7 @@
 \usepackage{graphicx}
 \usepackage{hyperref}
 \usepackage{listings}
+\usepackage{longtable}
 \usepackage{lstautogobble}
 
 \begin{document}
@@ -35,19 +36,20 @@ The metadata of each story can be found in \path{index.json}. The file contains 
 \begin{lstlisting}[breaklines, basicstyle=\ttfamily\small, columns=flexible]
 {
   "archive": {
-    "date_checked": "2017-11-03T12:03:47.175215+00:00",
+    "date_checked": "2025-01-30T09:03:38.241144+00:00",
     "date_created": null,
-    "date_fetched": "2017-11-03T12:03:47.175215+00:00",
+    "date_fetched": "2025-01-30T09:03:38.241144+00:00",
     "date_updated": "2017-11-03T12:03:47.175215+00:00",
-    "path":"epub/p/phantomfox-26190/sunny_skies_all_day_long-20685.epub"
+    "path": "epub/p/phantomfox-26190/sunny_skies_all_day_long-20685.epub"
   },
   "author": {
     "avatar": {
       "128": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-128",
-      "16": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-16",
+      "160": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-160",
       "192": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-192",
       "256": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-256",
       "32": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-32",
+      "320": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-320",
       "384": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-384",
       "48": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-48",
       "512": "https://cdn-img.fimfiction.net/user/p8d8-1431820610-26190-512",
@@ -59,7 +61,7 @@ The metadata of each story can be found in \path{index.json}. The file contains 
     "id": 26190,
     "name": "PhantomFox",
     "num_blog_posts": 1,
-    "num_followers": 699,
+    "num_followers": 730,
     "num_stories": 3,
     "url": "https://www.fimfiction.net/user/26190/PhantomFox"
   },
@@ -69,7 +71,7 @@ The metadata of each story can be found in \path{index.json}. The file contains 
       "date_modified": "2012-09-26T17:27:44+00:00",
       "date_published": "2012-09-26T17:27:44+00:00",
       "id": 63408,
-      "num_views": 86994,
+      "num_views": 110641,
       "num_words": 8536,
       "published": true,
       "title": "Chapter 1",
@@ -98,14 +100,14 @@ The metadata of each story can be found in \path{index.json}. The file contains 
   "description_html": "<p>Princess Celestia tires of constantly being surrounded by decorum, deference, and formality, and decides to take a day off from being Princess.  But visiting Ponyville incognito is harder than she expects.  Will she be able to fit in and make friends without blowing her cover?</p>",
   "id": 20685,
   "num_chapters": 1,
-  "num_comments": 773,
-  "num_dislikes": 140,
-  "num_likes": 8796,
-  "num_views": 86994,
+  "num_comments": 811,
+  "num_dislikes": 145,
+  "num_likes": 9549,
+  "num_views": 110640,
   "num_words": 8536,
   "prequel": null,
   "published": true,
-  "rating": 98,
+  "rating": 99,
   "short_description": "Celestia's Day Off",
   "status": "visible",
   "submitted": true,
@@ -130,10 +132,17 @@ The metadata of each story can be found in \path{index.json}. The file contains 
       "old_id": "g:slice_of_life",
       "type": "genre",
       "url": "https://www.fimfiction.net/tag/slice-of-life"
+    },
+    {
+      "id": 4,
+      "name": "My Little Pony: Friendship is Magic",
+      "old_id": "",
+      "type": "series",
+      "url": "https://www.fimfiction.net/tag/mlp-fim"
     }
   ],
   "title": "Sunny Skies All Day Long",
-  "total_num_views": 86994,
+  "total_num_views": 110640,
   "url": "https://www.fimfiction.net/story/20685/sunny-skies-all-day-long"
 }
 \end{lstlisting}
@@ -141,8 +150,7 @@ The metadata of each story can be found in \path{index.json}. The file contains 
 
 \section{Changelog} \label{sec:changelog}
 
-\begin{center}
-\begin{tabular}{|r|r|r|r|r|r|} \hline
+\begin{longtable}{|r|r|r|r|r|r|} \hline
 \textbf{Version} & \textbf{Stories} & \textbf{Added} & \textbf{Updated} & \textbf{Removed} \\ \hline
 20250301         & $221824$         & $1454$         & $2920$           & $0$              \\ \hline
 20241201         & $220370$         & $1578$         & $3084$           & $3$              \\ \hline
@@ -191,13 +199,16 @@ The metadata of each story can be found in \path{index.json}. The file contains 
 20140120         & $70420$          & $9821$         & $7317$           & $14$             \\ \hline
 20131015         & $60613$          & $13446$        & $7694$           & $0$              \\ \hline
 20130616         & $47167$          & $47167$        & $0$              & $0$              \\ \hline
-\end{tabular}
-\end{center}
+\end{longtable}
 
 \subsection{20250301}  \label{sec:changelog_20250301}
 
 \begin{itemize}
 \item Updated archive contents.
+\item Fixed a stale story that couldn't be updated.
+  \\ (Approach suggested by Silk Rose)
+\item Fixed missing index fields in the release candidate.
+  \\ (Found and reported by hawthornbunny)
 \end{itemize}
 
 \subsection{20241201}  \label{sec:changelog_20241201}
