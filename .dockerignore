@@ -1,0 +1,5 @@
+*.zip
+.*_cache/
+.venv/
+uv.lock
+worktree/
