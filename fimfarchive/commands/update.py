@@ -25,6 +25,7 @@ Update command.
 import os
 import traceback
 from argparse import ArgumentParser, Namespace, FileType
+from functools import partial
 from os.path import basename
 from typing import Any, Iterable, Iterator, Optional
 
@@ -49,6 +50,8 @@ __all__ = (
 
 
 ACCESS_TOKEN_KEY = 'FIMFICTION_ACCESS_TOKEN'
+
+print = partial(print, flush=True)  # noqa: A001
 
 
 class StoryFormatter(Iterable[str]):
