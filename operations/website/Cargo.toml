@@ -1,0 +1,17 @@
+[package]
+name = "fimfawebsite"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0"
+authors = ["Joakim Soderlund <joakim.soderlund@gmail.com>"]
+
+[profile.release]
+codegen-units = 1
+lto = true
+panic = "abort"
+strip = true
+
+[dependencies]
+axum = { version = "0.8.4", features = ["macros"] }
+tokio = { version = "1.45.0", features = ["rt-multi-thread"] }
+tower-http = { version = "0.6.4", features = ["fs"] }
