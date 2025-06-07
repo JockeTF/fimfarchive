@@ -15,3 +15,6 @@ strip = true
 axum = { version = "0.8.4", features = ["macros"] }
 tokio = { version = "1.45.0", features = ["rt-multi-thread"] }
 tower-http = { version = "0.6.4", features = ["fs"] }
+
+[lints.clippy]
+pedantic = "warn"
