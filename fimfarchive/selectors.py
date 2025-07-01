@@ -27,8 +27,6 @@ from fimfarchive.flavors import UpdateStatus
 from fimfarchive.mappers import StoryDateMapper
 
 
-# ruff: noqa: A005, stdlib-module-shadowing.
-
 __all__ = (
     'Selector',
     'RefetchSelector',
