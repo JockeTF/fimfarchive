@@ -269,7 +269,7 @@ class StorySlugMapper(Mapper[str]):
         path = self.template.format(**parts)
 
         if self.slug_limit < len(path):
-            raise ValueError("Path too long: {}".format(path))
+            raise ValueError(f"Path too long: {path}")
 
         return path
 

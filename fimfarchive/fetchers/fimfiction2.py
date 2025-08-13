@@ -294,7 +294,7 @@ class SingleRequester(Requester):
         except DocumentError as e:
             raise self.error(key, e.response.status_code) from e
         except Exception as e:
-            raise StorySourceError("Unknown error for {key}.") from e
+            raise StorySourceError(f"Unknown error for {key}.") from e
 
     def get_meta(self, key: int) -> ResourceObject:
         path = f'stories/{key}'

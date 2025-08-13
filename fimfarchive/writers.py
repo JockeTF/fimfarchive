@@ -129,7 +129,7 @@ class DirectoryWriter(Writer):
             FileExistsError: If overwrite is disabled and path exists.
         """
         if not self.overwrite and path.exists():
-            raise FileExistsError("Would overwrite: '{}'." .format(path))
+            raise FileExistsError(f"Would overwrite: {path}.")
 
     def check_directory(self, path: Path) -> None:
         """

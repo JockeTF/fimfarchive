@@ -179,7 +179,7 @@ class TestFimfarchiveWriter:
         stream = BytesIO()
 
         with ZipFile(stream, 'w') as zobj:
-            zobj.writestr('text', "Story {key}")
+            zobj.writestr('text', f"Story {key}")
 
         meta = {
             'id': key,
