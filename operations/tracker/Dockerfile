@@ -1,4 +1,4 @@
-FROM docker.io/library/debian:bookworm-slim
+FROM docker.io/library/debian:trixie-slim
 
 RUN apt-get -y update \
  && apt-get -y full-upgrade \
