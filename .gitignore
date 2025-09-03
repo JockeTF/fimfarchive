@@ -37,8 +37,10 @@ uv.lock
 # Rope project.
 .ropeproject/
 
-# Mypy cache.
+# Cache directories.
 .mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # Coverage output.
 .coverage
@@ -47,7 +49,5 @@ htmlcov/
 *.py,cover
 
 # Fimfarchive data.
-fimfarchive.zip
-
-# Operations configuration.
-operations/inventory.yml
+*.zip
+worktree/
