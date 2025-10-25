@@ -26,6 +26,7 @@ from hashlib import sha1
 from io import BytesIO
 from puremagic import from_stream as what
 from typing import Dict, Iterator, Tuple
+from urllib.parse import unquote
 from zipfile import ZipFile
 
 import requests
@@ -72,7 +73,7 @@ class ImageLoader:
 
         for tag in dom.find_all('img'):
             src = tag.attrs['src']
-            url = str(src)  # unquote(src.split('?url=')[1])
+            url = unquote(src.split('?url=')[1])
 
             if url in self.cache:
                 tag.attrs['src'] = self.cache[url]
