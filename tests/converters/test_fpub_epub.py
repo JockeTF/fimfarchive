@@ -97,7 +97,7 @@ class TestFpubEpubConverter:
         """
         Verifies process call arguments.
         """
-        name, args, kwargs = call
+        _, args, kwargs = call
         program, source, target, cover = args[0]
         stdout = kwargs['stdout']
 
