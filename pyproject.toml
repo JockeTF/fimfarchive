@@ -18,9 +18,8 @@ dependencies = [
 [project.optional-dependencies]
 lz4 = ["lz4~=4.3"]
 
-[tool.uv]
-compile-bytecode = true
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "mypy~=1.11",
     "pytest~=8.3",
     "requests-mock~=1.12",
@@ -29,6 +28,9 @@ dev-dependencies = [
     "types-requests~=2.32",
     "types-tqdm~=4.66",
 ]
+
+[tool.uv]
+compile-bytecode = true
 
 [tool.uv.sources.jsonapi-client]
 git = "https://github.com/JockeTF/jsonapi-client.git"
