@@ -24,8 +24,8 @@ Fimfarchive fetcher.
 
 import json
 import marshal
+import multiprocessing
 from io import BufferedReader
-from multiprocessing import Pool
 from typing import (
     cast, Any, Callable, Dict, IO, Iterable, Iterator,
     Mapping, Optional, Sized, Tuple, Union,
@@ -54,6 +54,7 @@ PATH = jmes('archive.path || path')
 compress, decompress = find_compressor()
 serialize = cast(Callable[[Dict[str, Any]], bytes], marshal.dumps)
 deserialize = cast(Callable[[bytes], Dict[str, Any]], marshal.loads)
+Pool = multiprocessing.get_context('spawn').Pool
 
 
 class Index(Mapping[int, Dict[str, Any]]):
