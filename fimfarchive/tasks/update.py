@@ -229,7 +229,7 @@ class UpdateTask(SignalSender):
 
         return selected
 
-    def run(self) -> int:
+    def run(self) -> str | None:
         """
         Runs the updater task.
         """
@@ -262,4 +262,5 @@ class UpdateTask(SignalSender):
                     time.sleep(SKIPPED_DELAY)
 
         # TODO: Test return codes
-        return int(retried == self.retries)
+        if retried == self.retries:
+            return "Max retries reached"
