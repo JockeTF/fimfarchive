@@ -229,7 +229,7 @@ class UpdateTask(SignalSender):
 
         return selected
 
-    def run(self) -> None:
+    def run(self) -> int:
         """
         Runs the updater task.
         """
@@ -260,3 +260,6 @@ class UpdateTask(SignalSender):
                     skipped += 1
                     self.on_skipped(key, story)
                     time.sleep(SKIPPED_DELAY)
+
+        # TODO: Test return codes
+        return int(retried == self.retries)

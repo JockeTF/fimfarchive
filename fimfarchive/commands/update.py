@@ -275,8 +275,8 @@ class UpdateCommand(Command):
         task = self.configure(opts)
 
         with UpdatePrinter(task):
-            task.run()
+            code = task.run()
 
         print(f"\nDone: {arrow.now()}")
 
-        return 0
+        return code
