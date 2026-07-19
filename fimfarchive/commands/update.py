@@ -270,7 +270,7 @@ class UpdateCommand(Command):
             selector=selector,
         )
 
-    def __call__(self, *args):
+    def __call__(self, *args) -> str | None:
         opts = self.parser.parse_args(args)
         task = self.configure(opts)
 
