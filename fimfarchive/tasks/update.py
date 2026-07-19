@@ -40,7 +40,7 @@ from fimfarchive.writers import DirectoryWriter
 
 
 DEFAULT_WORKDIR = 'worktree/update'
-DEFAULT_RETRIES = 10
+DEFAULT_RETRIES = 15
 DEFAULT_SKIPS = 500
 
 
@@ -244,13 +244,13 @@ class UpdateTask(SignalSender):
             try:
                 story = self.update(key)
             except Exception as e:
-                retried += 1
                 self.on_failure(key, e)
-                time.sleep(FAILURE_DELAY)
+                time.sleep(FAILURE_DELAY * 2**retried)
+                retried += 1
             else:
-                retried = 0
                 self.state['key'] += 1
                 self.state.save()
+                retried = 0
 
                 if story:
                     skipped = 0

@@ -149,7 +149,7 @@ class TestUpdateTask:
 
         delays = (
             FAILURE_DELAY,
-            FAILURE_DELAY,
+            FAILURE_DELAY * 2,
         )
 
         self.verify_run(task, delays)
