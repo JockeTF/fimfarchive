@@ -5,7 +5,7 @@ Global pytest fixtures.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ Global pytest fixtures.
 #
 
 
-from .common import fetcher, flavor, story
+from .common import fetcher, flavor, story, sync
 from .responses import responses
 
 
@@ -31,4 +31,5 @@ __all__ = (
     'flavor',
     'responses',
     'story',
+    'sync',
 )

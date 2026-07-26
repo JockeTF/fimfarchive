@@ -5,7 +5,7 @@ Utility tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2019  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -33,8 +33,27 @@ from fimfarchive import utils
 from fimfarchive.flavors import DataFormat, MetaFormat, MetaPurity
 from fimfarchive.utils import (
     find_flavor, get_path, is_blacklisted,
-    Empty, JayWalker, PersistedDict, tqdm,
+    Empty, JayWalker, PersistedDict, sync, tqdm,
 )
+
+
+class TestSync:
+    """
+    Sync tests.
+    """
+
+    def test_sync_is_callable(self):
+        """
+        Tests `sync` can be called on the current system.
+        """
+        assert sync() is None
+
+    @pytest.mark.xfail(os.name != 'posix', reason="Specific to platform")
+    def test_sync_is_imported_on_posix(self):
+        """
+        Tests `sync` is imported successfully on POSIX.
+        """
+        assert sync is os.sync
 
 
 class TestEmpty:
@@ -127,6 +146,18 @@ class TestPersistedDict:
             saved = json.load(fobj)
 
         assert dict(data) == saved
+
+    def test_syncs_during_save(self, tmppath, sync):
+        """
+        Tests `sync` is called during save.
+        """
+        data = PersistedDict(tmppath)
+
+        assert sync.call_count == 0
+        data.save()
+        assert sync.call_count == 1
+        data.save()
+        assert sync.call_count == 3
 
     def test_loads_values(self, tmpfile, sample):
         """

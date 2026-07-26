@@ -5,7 +5,7 @@ Common pytest fixtures.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -22,10 +22,11 @@ Common pytest fixtures.
 #
 
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
 import pytest
 
+from fimfarchive import utils
 from fimfarchive.fetchers import Fetcher
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
@@ -70,3 +71,12 @@ def story(flavor):
     )
 
     return story
+
+
+@pytest.fixture
+def sync():
+    """
+    Returns a mock for file system sync calls.
+    """
+    with patch.object(utils, "sync", MagicMock([])) as mock:
+        yield mock

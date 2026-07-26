@@ -5,7 +5,7 @@ Writer tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2019  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -166,6 +166,14 @@ class TestDirectoryWriter:
         writer = DirectoryWriter()
         writer.check_directory(Path('key'))
 
+    def test_sync_is_called_after_write(self, story, sync):
+        """
+        Tests `sync` is called after write.
+        """
+        sync.assert_not_called()
+        DirectoryWriter().write(story)
+        sync.assert_called_once()
+
 
 class TestFimfarchiveWriter:
     """
@@ -219,7 +227,7 @@ class TestFimfarchiveWriter:
         )
 
     @pytest.fixture
-    def archive(self, tmpdir, stories, extras):
+    def archive(self, tmpdir, stories, extras, sync):
         """
         Returns an archive as a ZipFile instance.
         """
@@ -266,3 +274,16 @@ class TestFimfarchiveWriter:
         """
         for name, data in extras:
             assert data == archive.read(name)
+
+    def test_sync(self, tmpdir, stories, sync):
+        """
+        Tests `sync` is called after close.
+        """
+        archive = Path(tmpdir) / 'sync.zip'
+
+        with FimfarchiveWriter(archive) as writer:
+            for story in stories:
+                sync.assert_not_called()
+                writer.write(story)
+
+        sync.assert_called_once()

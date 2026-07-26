@@ -5,7 +5,7 @@ Various utilities.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2023  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,6 @@ Various utilities.
 
 
 import json
-import os
 import shutil
 from importlib import import_module
 from importlib.resources import files
@@ -38,6 +37,11 @@ from tqdm import tqdm as _tqdm
 from fimfarchive.flavors import Flavor
 from fimfarchive.stories import Story
 
+try:
+    from os import sync
+except ImportError:
+    def sync() -> None: ...
+
 
 __all__ = (
     'Empty',
@@ -46,6 +50,7 @@ __all__ = (
     'find_compressor',
     'find_flavor',
     'get_path',
+    'sync',
     'tqdm',
 )
 
@@ -104,7 +109,7 @@ class PersistedDict(Dict[str, Any]):
     Dictionary for simple persistance.
     """
 
-    def __init__(self, path, default=dict()):
+    def __init__(self, path: str | Path, default=dict()):
         """
         Constructor.
 
@@ -113,8 +118,8 @@ class PersistedDict(Dict[str, Any]):
             default: Initial values for entries.
         """
         super().__init__()
-        self.path = path
-        self.temp = path + '~'
+        self.path = Path(path).with_suffix('.json')
+        self.temp = Path(path).with_suffix('.temp')
         self.default = default
         self.load()
 
@@ -125,9 +130,9 @@ class PersistedDict(Dict[str, Any]):
         self.clear()
         self.update(self.default)
 
-        if os.path.exists(self.path):
-            with open(self.path, 'rt') as fobj:
-                self.update(json.load(fobj))
+        if self.path.exists():
+            text = self.path.read_text()
+            self.update(json.loads(text))
 
     def save(self):
         """
@@ -140,14 +145,14 @@ class PersistedDict(Dict[str, Any]):
             sort_keys=True,
         )
 
-        if os.path.exists(self.path):
+        if self.path.exists():
             shutil.copy(self.path, self.temp)
+            sync()
 
-        with open(self.path, 'wt') as fobj:
-            fobj.write(content)
+        self.path.write_text(content)
+        sync()
 
-        if os.path.exists(self.temp):
-            os.remove(self.temp)
+        self.temp.unlink(missing_ok=True)
 
 
 class JayWalker:

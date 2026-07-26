@@ -5,7 +5,7 @@ Writers for Fimfarchive.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2024  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Tuple, Union
 from zipfile import ZipFile, ZIP_DEFLATED, ZIP_STORED
 
+from fimfarchive import utils
 from fimfarchive.mappers import (
     DataFormatMapper, StaticMapper, StoryPathMapper, StorySlugMapper,
 )
@@ -208,6 +209,8 @@ class DirectoryWriter(Writer):
             data_path = Path(data_target).resolve()
             self.write_data(story, data_path)
 
+        utils.sync()
+
 
 class FimfarchiveWriter(Writer):
     """
@@ -293,3 +296,5 @@ class FimfarchiveWriter(Writer):
 
         del self.index
         del self.archive
+
+        utils.sync()
