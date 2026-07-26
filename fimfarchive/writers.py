@@ -42,7 +42,7 @@ __all__ = (
 )
 
 
-PathFunc = Callable[[Story], Union[None, Path, str]]
+PathFunc = Callable[[Story], Union[Path, str, None]]
 PathSpec = Union[None, Path, PathFunc, str]
 
 

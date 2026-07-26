@@ -223,7 +223,7 @@ def find_flavor(story: Story, flavor: Type[F]) -> Optional[F]:
     return None
 
 
-def get_path(source: Union[None, Path, str]) -> Optional[Path]:
+def get_path(source: Union[Path, str, None]) -> Optional[Path]:
     """
     Creates a path from an object, if one is supplied.
 
