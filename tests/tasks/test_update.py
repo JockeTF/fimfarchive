@@ -5,7 +5,7 @@ Update task tests.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2020  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ class TestRefetchingUpdateTask(TestUpdateTask):
         """
         return RefetchSelector()
 
-    def test_revived_story(self, task, fimfarchive, fimfiction):
+    def test_revived_story(self, task, fimfarchive, fimfiction, archive):
         """
         Tests updating for a revived story.
         """

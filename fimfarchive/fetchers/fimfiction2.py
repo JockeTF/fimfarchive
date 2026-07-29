@@ -5,7 +5,7 @@ Fimfiction APIv2 fetcher.
 
 #
 # Fimfarchive, preserves stories from Fimfiction.
-# Copyright (C) 2015  Joakim Soderlund
+# Copyright (C) 2026  Joakim Soderlund
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -202,8 +202,11 @@ class ApiClient:
         """
         query = self.create_filter(params)
         session = self.create_session(self.token)
+        document = session.get(path, query)
 
-        return session.get(path, query)
+        assert isinstance(document, Document)
+
+        return document
 
 
 class Requester(ABC):
@@ -292,7 +295,7 @@ class SingleRequester(Requester):
         try:
             return self.client.get(path, params)
         except DocumentError as e:
-            raise self.error(key, e.response.status_code) from e
+            raise self.error(key, int(e.errors['status_code'])) from e
         except Exception as e:
             raise StorySourceError(f"Unknown error for {key}.") from e
 
@@ -304,7 +307,7 @@ class SingleRequester(Requester):
     def get_data(self, key: int) -> Iterator[ResourceObject]:
         path = f'stories/{key}/chapters'
         response = self.get(key, path, DATA_PARAMS)
-        return response.resources
+        return iter(response.resources)
 
 
 class BulkRequester(Requester):

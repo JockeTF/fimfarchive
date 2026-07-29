@@ -38,7 +38,8 @@ git = "https://github.com/JockeTF/jsonapi-client.git"
 
 [tool.mypy]
 files = ["fimfarchive", "tests"]
-ignore_missing_imports = true
+check_untyped_defs = true
+follow_untyped_imports = true
 
 [tool.pyright]
 venvPath = "."

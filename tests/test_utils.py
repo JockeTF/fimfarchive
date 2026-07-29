@@ -46,7 +46,7 @@ class TestSync:
         """
         Tests `sync` can be called on the current system.
         """
-        assert sync() is None
+        assert sync() is None  # type: ignore[func-returns-value]
 
     @pytest.mark.xfail(os.name != 'posix', reason="Specific to platform")
     def test_sync_is_imported_on_posix(self):
