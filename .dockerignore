@@ -1,5 +1,6 @@
 *.zip
 .*_cache/
+.jj/
 .venv/
 uv.lock
 worktree/
