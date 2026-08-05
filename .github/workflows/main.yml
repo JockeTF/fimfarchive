@@ -29,15 +29,6 @@ jobs:
       uses: astral-sh/setup-uv@v9.0.0
       with:
         enable-cache: true
-
-    - name: Sync dependencies
-      run: uv sync --all-extras --dev
-
-    - name: Check styling
-      run: uv run ruff check
-
-    - name: Check types
-      run: uv run mypy
-
-    - name: Run tests
-      run: uv run pytest
+    
+    - name: Run checks
+      run: make
